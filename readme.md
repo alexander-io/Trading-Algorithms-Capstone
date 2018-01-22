@@ -1,4 +1,4 @@
-#Functionalities: 
+###Functionalities:   
 A python program written to interact with the GDAX exchange. 
 
 This will run server side in the background and will not have a ui. It will probably have a log of some kind. It will listen for incoming trade data and use it to predict the value 24hrs from now. I have already set up a live websocket feed that is recording this data for my Econ thesis. If I have time I would like to implement a way to use the predictions to make market operations using the GDAX api. Market operations will be made using an algorithmic trader hooked up to a wallet. If we have time, manual market operations will be possible in the online GUI through exchanges with provided information.
@@ -19,9 +19,9 @@ Test multiple time intervals (stretch)
 Greater than 90% accuracy (stretch stretch)  
 
 
-#Timeline: 
-WEEK  
-TASK  
+###Timeline:   
+##WEEK  
+##TASK  
 Week 0  
 Fix websocket feed(sometimes stops recording) and twitter feed (sometimes just stops)  
 Week 1  
