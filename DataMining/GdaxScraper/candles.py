@@ -68,7 +68,7 @@ class GdaxCandleGen():
         gran_str = str(granularity)
         start=timepoint
         data = []
-        while start>datetime.date(2017, 11, 1):
+        while start>datetime.date(2017, 1, 1):
             end = timepoint
             start = timepoint - granularity * 200
             timepoint = start
@@ -98,7 +98,7 @@ class GdaxCandleGen():
         gran_str = str(granularity)
         start=timepoint
         data = []
-        while start>datetime.date(2017, 11, 1):
+        while start>datetime.date(2017, 1, 1):
             end = timepoint
             start = timepoint - granularity * 200
             timepoint = start
