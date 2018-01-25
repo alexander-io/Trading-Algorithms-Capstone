@@ -19,7 +19,19 @@ let request = require('request') // include request npm package
  * pagetitle, title of the wiki page (case sensitive)
  */
 
-let x = function(pagetitle) {
+let x = function(pagetitle, date) {
+
+  let startingyear, startingmonth, startingday
+  let endingyear, endingmonth, endingday
+
+  if (date) {
+    date.startingyear ? startingyear = date.startingyear : console.log('no starting year provided')
+    console.log('starting year : ' + startingyear)
+
+    date.endingyear ? endingyear = date.endingyear : console.log('no ending year provided')
+
+  }
+
 
   let req_url = 'https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/' + pagetitle + '/daily/2015100100/2015103100'
   var options = {
@@ -31,9 +43,9 @@ let x = function(pagetitle) {
 
   function callback(error, response, body) {
     if (!error && response.statusCode == 200) {
-      console.log(body["items"])
+      // console.log(body)
     }
   }
   request(options, callback);
 }
-x('Bitcoin')
+x('Bitcoin', {'startingyear' : '2017'})
