@@ -4,19 +4,36 @@
 
 // resource :
 // https://www.npmjs.com/package/request#custom-http-headers
+// https://wikimedia.org/api
 
-let request = require('request')
-var options = {
-  url: 'http://tools.wmflabs.org/pageviews/?project=en.wikipedia.org&platform=all-access&agent=user&start=2018-01-18&end=2018-01-18&pages=Bitcoin|Ethereum',
-  headers: {
-    'User-Agent': 'request'
-  }
-};
+let request = require('request') // include request npm package
 
-function callback(error, response, body) {
-  if (!error && response.statusCode == 200) {
-    console.log(body)
+
+/* this is a comment */
+// this works for one line
+
+
+/*
+ * define a function x to fire off request to pageview count rest api
+ * provide as parameters :
+ * pagetitle, title of the wiki page (case sensitive)
+ */
+
+let x = function(pagetitle) {
+
+  let req_url = 'https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/' + pagetitle + '/daily/2015100100/2015103100'
+  var options = {
+    url : req_url,
+    headers: {
+      'User-Agent': 'request'
+    }
+  };
+
+  function callback(error, response, body) {
+    if (!error && response.statusCode == 200) {
+      console.log(body["items"])
+    }
   }
+  request(options, callback);
 }
-
-request(options, callback);
+x('Bitcoin')
