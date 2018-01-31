@@ -8,6 +8,14 @@ let app = express(),
 
 const dbName = 'crypto_trading'
 
+
+/**
+ * insert a document into the database
+ * @param entry, json object to enter to db
+ * @param collection_title, title of the collection/table to receive the insertion
+ * @param db, db object that's generated through the mongo.connect() function call
+ * @param callback, (optional) a callback function to exec when completed
+ */
 let insert = function(entry, collection_title, db, callback) {
   let collection = db.collection(collection_title)
   collection.insert(entry, function(err, result) {
@@ -18,15 +26,16 @@ let insert = function(entry, collection_title, db, callback) {
     }
   })
 }
+
+
+// before doing db operations, connect first
 mongo.connect(url, function(err, client) {
   console.log('successfully connected to server')
   const  db = client.db(dbName)
+
   insert({'entry' : 'entryone'}, 'first_collection', db)
   client.close()
 })
-
-
-// app.get('/')
 
 app.listen(port, function() {
   console.log('i can hear port', port)
