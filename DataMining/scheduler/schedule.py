@@ -1,9 +1,32 @@
-import os, subprocess
+import os, subprocess, time, inspect
 
 
 # we are here Trading-Algorithm/DataMining/scheduler/
 # scripts to call here :
-#   Trading-Algorithm/DataMining/Wiki/scrape.js
-#   TODO ... add more relative script paths to call
+wiki="=Wiki/scrape.js"
+reddit="Reddit/Sentiment.py"
+blockchain="blockchain/getData.py"
+twitter="Twitter/Sentiment.py"
+#
 
-os.system("~/node-v8.7.0-linux-x64/bin/node ../Wiki/scrape.js")
+#os.system("~/node-v8.7.0-linux-x64/bin/node ../Wiki/scrape.js")
+
+#get current file directory
+path=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+#chop off last 9 charecters (scheduler) from the end
+path=path[0:len(path)-9]
+
+#infinite loop for gathering data
+while False:
+	#get current time (seconds from 1970, posix/unix/epoch format) and divide by sixty to get minutes
+	currentTime = int(time.time())//60
+	#once a day stuff
+	if currentTime%86400==0:
+		os.system("node "+path+wiki)
+		os.system("python3 "+path+blockchain)
+	#every 15 min stuff
+	if currentTime%900==0:
+		os.system("python3 "+path+blockchain)
+		os.system("python3 "+path+twitter)
+
+	time.sleep(60)
