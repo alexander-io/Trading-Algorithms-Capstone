@@ -1,20 +1,20 @@
-import requests, csv, re, json
+import requests, csv, re, json,time
 
 class blockchainInfo():
 
 	
 	def __init__(self):
-		self.BTCcharts=["market-cap","trade-volume","hash-rate","cost-per-transaction","transaction-fees","n-unique-addresses","n-transactions","transactions-per-second","n-transactions-excluding-popular","estimated-transaction-volume"]
+		self.BTCcharts=["market-cap","trade-volume","hash-rate","cost-per-transaction","transaction-fees","n-unique-addresses","n-transactions","n-transactions-excluding-popular","estimated-transaction-volume"]
 		self.BTC_URLpart1,self.BTC_URLpart2,self.BTC_URLpart3="https://api.blockchain.info/charts/","?timespan=","&format=json&sampled=false"
 
 
-	def compileHistoricData(self):
-		timeSpan="10years"
+	def pollData(self,timeSpan):
 		data=[]
 		names=[]
 		for chart in self.BTCcharts:
 			resp=requests.get(self.BTC_URLpart1+chart+self.BTC_URLpart2+timeSpan+self.BTC_URLpart3).text
 			text=(json.loads(resp))
+			#print(text)
 			data.append(text["values"])
 			names.append(text["name"])
 		'''
@@ -25,10 +25,11 @@ class blockchainInfo():
 			print('')
 		'''
 		#print(data)
-		return (names,data)		
+		return (names,data)	
+
 
 	def saveHistoricData(self):
-		names,data=self.compileHistoricData()
+		names,data=self.pollData('10years')
 		with open('historicBlockchainDataBTC.csv', 'w', newline='') as csvfile:
 			#Use csv Writer
 			csvWriter = csv.writer(csvfile)
@@ -53,9 +54,27 @@ class blockchainInfo():
 				csvWriter.writerow(row)
 		csvfile.close()
 
+	def getCurrentData(self):
+		while True:
+			names,data=self.pollData('2days')
+			with open('historicBlockchainDataBTC.csv', 'a', newline='') as csvfile:
+				#Use csv Writer
+				csvWriter = csv.writer(csvfile)
+				row=[]
+				row.append(data[0][0]['x'])
+				for dataType in data:
+					row.append(dataType[0]['y'])
+				csvWriter.writerow(row)
+			csvfile.close()
+			time.sleep(86400)
+
+
+
 def main():
 	bc=blockchainInfo()
 	bc.saveHistoricData()
+	time.sleep(86400)
+	bc.getCurrentData()
 
 if __name__ == "__main__":
     # calling main function
