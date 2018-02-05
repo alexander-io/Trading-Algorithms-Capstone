@@ -6,9 +6,21 @@
 // https://www.npmjs.com/package/request#custom-http-headers
 // https://wikimedia.org/api
 
+// import __dirname + '/../../db/db_functions.js'
+// import 'scrape.js'
+require(__dirname + '/../../db/db_functions.js')
 let request = require('request') // include request npm package
 
+// let mongo = require('mongodb'),
+//   url = 'mongodb://localhost:27017'
+// let mongoclient =  mongo.MongoClient
+//
+// const dbName = 'crypto_trading'
 
+
+//
+
+// console.log(__dirname + '/../../db/db_functions.js')
 /* this is a comment */
 // this works for one line
 
@@ -39,6 +51,7 @@ let x = function(pagetitle, date) {
   let startingyear, startingmonth, startingday
   let endingyear, endingmonth, endingday
 
+  // if the date parameter  was  provided... assign all  of the afore-declared variables based on date object parameter
   if (date) {
     date.startingyear ? startingyear = date.startingyear : console.log('no starting year provided')
     date.startingmonth ? startingmonth = date.startingmonth : console.log('no starting month provided')
@@ -50,12 +63,14 @@ let x = function(pagetitle, date) {
   }
   let date_request_string = format_date_request(date)
 
+  // concatenate request_url string to contain the page  title and the date request string
   let req_url =
     'https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/'
     + pagetitle
     + '/daily/'
     + date_request_string
 
+  // http request parameters go  here
   var options = {
     url : req_url,
     headers: {
@@ -68,8 +83,10 @@ let x = function(pagetitle, date) {
       let info = JSON.parse(body)
       for (let x = 0; x <  info.items.length; x++) {
         console.log(info.items[x].timestamp + ' : ' + info.items[x].views)
-
+        let insert_object
+        insert()
         // TODO format to unix timestamp, $ date +%s
+        // TODO connect to mongo database and write response data to database
 
       }
     } else {
