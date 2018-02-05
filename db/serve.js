@@ -8,7 +8,6 @@ let app = express(),
 
 const dbName = 'crypto_trading'
 
-
 /**
  * insert a document into the database
  * @param entry, json object to enter to db
