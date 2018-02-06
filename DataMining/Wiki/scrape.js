@@ -6,21 +6,11 @@
 // https://www.npmjs.com/package/request#custom-http-headers
 // https://wikimedia.org/api
 
-// import __dirname + '/../../db/db_functions.js'
-// import 'scrape.js'
-require(__dirname + '/../../db/db_functions.js')
+let db_insert = require(__dirname + '/../../db/db_functions.js')
 let request = require('request') // include request npm package
 
-// let mongo = require('mongodb'),
-//   url = 'mongodb://localhost:27017'
-// let mongoclient =  mongo.MongoClient
-//
-// const dbName = 'crypto_trading'
+let date = new Date()
 
-
-//
-
-// console.log(__dirname + '/../../db/db_functions.js')
 /* this is a comment */
 // this works for one line
 
@@ -83,8 +73,16 @@ let x = function(pagetitle, date) {
       let info = JSON.parse(body)
       for (let x = 0; x <  info.items.length; x++) {
         console.log(info.items[x].timestamp + ' : ' + info.items[x].views)
-        let insert_object
-        insert()
+
+        let insert_object =  {
+          'pagetitle' : pagetitle,
+          'timestamp' : info.items[x].timestamp.substring(0, info.items[x].timestamp.length -2),
+          'year' : info.items[x].timestamp.substring(0,4),
+          'month' : info.items[x].timestamp.substring(4,6),
+          'day' : info.items[x].timestamp.substring(6,8),
+          'views' : info.items[x].views
+        }
+        db_insert(insert_object, 'wiki_views' /* collection title */)
         // TODO format to unix timestamp, $ date +%s
         // TODO connect to mongo database and write response data to database
 
@@ -96,11 +94,12 @@ let x = function(pagetitle, date) {
   request(options, callback);
 }
 
+// test function call
 x('Bitcoin', {
-  'startingyear' : '2017',
-  'startingmonth' : '10',
-  'startingday' : '1',
-  'endingyear' : '2017',
-  'endingmonth' : '10',
-  'endingday' : '6'
+  'startingyear' : date.getFullYear(),
+  'startingmonth' : date.getMonth(),
+  'startingday' : date.getDate(),
+  'endingyear' : date.getFullYear(),
+  'endingmonth' : date.getMonth(),
+  'endingday' : date.getDate()
 })

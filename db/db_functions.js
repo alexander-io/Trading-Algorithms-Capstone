@@ -24,6 +24,6 @@
     })
   }
 
-  insert({'test' : 'entry'}, 'test_collection')
+  // insert({'test' : 'entry'}, 'test_collection')
 
 }())
