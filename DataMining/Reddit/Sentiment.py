@@ -20,7 +20,7 @@ Choose by most paricipation
 class redditSentiment():
 
 	def getSentimentBTC():
-		user_agent='MacOS:Reddit Sentiment Scraper:v1.1 (by /u/zsmerritt)'
+		user_agent='MacOS:Reddit Sentiment Scraper:v1.2 (by /u/zsmerritt)'
 		client_id='h04EaRGHc4uPKQ'
 		client_secret='0JX1YF8_AHBSvKHgDGVKaN0aTMU'
 		r = praw.Reddit(client_id=client_id,client_secret=client_secret,user_agent=user_agent)
@@ -45,7 +45,7 @@ class redditSentiment():
 		csvfile.close()
 
 	def getSentimentETH():
-		user_agent='MacOS:Reddit Sentiment Scraper:v1.1 (by /u/zsmerritt)'
+		user_agent='MacOS:Reddit Sentiment Scraper:v1.2 (by /u/zsmerritt)'
 		client_id='h04EaRGHc4uPKQ'
 		client_secret='0JX1YF8_AHBSvKHgDGVKaN0aTMU'
 		r = praw.Reddit(client_id=client_id,client_secret=client_secret,user_agent=user_agent)
@@ -69,8 +69,8 @@ class redditSentiment():
 		csvfile.close()
 
 
-	def getSentimentETH():
-		user_agent='MacOS:Reddit Sentiment Scraper:v1.1 (by /u/zsmerritt)'
+	def getSentimentLTC():
+		user_agent='MacOS:Reddit Sentiment Scraper:v1.2 (by /u/zsmerritt)'
 		client_id='h04EaRGHc4uPKQ'
 		client_secret='0JX1YF8_AHBSvKHgDGVKaN0aTMU'
 		r = praw.Reddit(client_id=client_id,client_secret=client_secret,user_agent=user_agent)
@@ -93,23 +93,19 @@ class redditSentiment():
 			csvWriter.writerow([datetime.datetime.now(),comment_blob.sentiment.polarity,comment_blob.sentiment.subjectivity])
 		csvfile.close()
 
-	
-	
-
-
-def redditBitcoinSentiment():
-	while True:
-		redditSentiment.getSentimentBTC()
-		time.sleep(21600)
-
-def redditEthereumSentiment():
-	while True:
-		redditSentiment.getSentimentETH()
-		time.sleep(21600)
 
 def main():
-	Thread(target=redditEthereumSentiment).start()
-	Thread(target=redditBitcoinSentiment).start()
+	print("starting reddit sentiment")
+	startTime=time.time()
+	redditSentiment.getSentimentLTC()
+	print('LTC Done')
+	redditSentiment.getSentimentETH()
+	print('ETH Done')
+	redditSentiment.getSentimentBTC()
+	print(' BTC Done')
+	endTime=time.time()
+	print("ending reddit sentiment")
+	print('Time taken: '+str(endTime-startTime))
 
 if __name__ == "__main__":
 	# calling main function

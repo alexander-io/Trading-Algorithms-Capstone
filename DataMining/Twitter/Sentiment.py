@@ -11,6 +11,24 @@ class TwitterClient(object):
         Class constructor or initialization method.
         '''
         # keys and tokens from the Twitter Dev Console
+    #Bitcoin
+        consumer_keyBTC = '9rVL33CxgKO1X5JPZGYL3qYHP'
+        consumer_secretBTC = 'WSuYRW6WuF3GFxYcPGYr8gLuOwPupCT9biBB7zuB9tlaf450EN'
+        access_tokenBTC = '922587032051785728-N1OaYlpJZPiGwQYmL0HhFr48o0JcOnx'
+        access_token_secretBTC = 'dNMOjZTWcbJEnURMR20Bx6S868fdjOwDApNCPKs3GfYqX'
+    
+    #Ethereum
+        consumer_keyETH = 'VxpSOPCrAtFmLEUAtTDy6OMXv'
+        consumer_secretETH = 'HBq7Xwk1mgd4ucJvOjNg8Uy8PlHvQxM4Rou1Jp14qjWp1x0zES'
+        access_tokenETH = '922587032051785728-5QNeEWEQYSKjmO6yhvfrzf2SHgDbMDe'
+        access_token_secretETH = 'AjumQM60tusYsUEz79FmK5lrqnhSWCTO4yUTOGX0J2Ou1'
+
+    #Litecoin
+        consumer_keyLTC = 'GC13PStya8Ntoism1pss8bwM3'
+        consumer_secretLTC = 'tM9gmmjD4AJOHtEiqbWak4E17vnXC565v5A5RBpfm1v73wClOT'
+        access_tokenLTC = '922587032051785728-CqvqxAVNycalkb7FktCbNLf9VZlCocO'
+        access_token_secretLTC = 'TG4svsI4HLQqUNR4mPmzTjJsmgPMgq8l42JgNvpKPgJhR'
+
 
         # attempt authentication
         try:
@@ -200,12 +218,18 @@ class TwitterClient(object):
  
 def main():
     # creating object of TwitterClient Class
+    print("starting twitter sentiment")
+    startTime=time.time()
     api = TwitterClient()
-    while True:
-        api.writeToCSV_BTC()
-        api.writeToCSV_ETH()
-        api.writeToCSV_LTC()
-        time.sleep(900)#fifteen minutes
+    api.writeToCSV_BTC()
+    print('BTC Done')
+    api.writeToCSV_ETH()
+    print('BTC DONE')
+    api.writeToCSV_LTC()
+    print('LTC Done')
+    endTime=time.time()
+    print("ending twitter sentiment")
+    print('Time taken: '+str(endTime-startTime))
     #check to see if throttled
     #data = api.rate_limit_status()
     #print(data)

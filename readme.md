@@ -23,7 +23,7 @@ Timeline:
 WEEK  
 TASK  
 Week 0  
-Fix websocket feed(sometimes stops recording) and twitter feed (sometimes just stops)  
+Fix websocket feed (sometimes stops recording) and twitter feed (sometimes just stops)  
 Week 1  
 Research and Tutorials on AI/ML  
 Week 2  
