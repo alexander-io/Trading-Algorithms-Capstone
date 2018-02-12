@@ -16,7 +16,6 @@ let x = function() {
     if (!error && response.statusCode == 200) {
       let info = JSON.parse(body)
       for (let x = 0; x < info.length;x++) {
-        console.log(info[x])
         if (
           info[x].id == 'bitcoin'
           || info[x].id == 'ethereum'

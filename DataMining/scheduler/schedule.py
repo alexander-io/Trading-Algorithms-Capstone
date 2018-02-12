@@ -7,6 +7,7 @@ wiki="=Wiki/scrape.js"
 reddit="Reddit/Sentiment.py"
 blockchain="blockchain/getData.py"
 twitter="Twitter/Sentiment.py"
+cmarketcap="blockchain/cmarketcap.js"
 #
 
 #os.system("~/node-v8.7.0-linux-x64/bin/node ../Wiki/scrape.js")
@@ -26,6 +27,7 @@ while False:
 		os.system("python3 "+path+blockchain)
 	#every 15 min stuff
 	if currentTime%900==0:
+		os.system("node "+path+cmarketcap)
 		os.system("python3 "+path+blockchain)
 		os.system("python3 "+path+twitter)
 
