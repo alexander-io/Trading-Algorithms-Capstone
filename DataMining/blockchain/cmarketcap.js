@@ -16,6 +16,7 @@ let x = function() {
     if (!error && response.statusCode == 200) {
       let info = JSON.parse(body)
       for (let x = 0; x < info.length;x++) {
+        console.log(info[x])
         if (
           info[x].id == 'bitcoin'
           || info[x].id == 'ethereum'
@@ -23,7 +24,7 @@ let x = function() {
           || info[x].id == 'litecoin'
           || info[x].id == 'bitcoin-cash'
         ) {
-          // TODO insert json into db
+          db_insert(info[x], 'coinmarketcap_ticker' /* collection title */)
         }
       }
     }
