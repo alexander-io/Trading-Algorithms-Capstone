@@ -1,10 +1,10 @@
 import requests, csv, re, json, time, pprint
 
 #importing mongo push module
-import importlib.util
+import importlib.util, os, inspect
 
 path=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-path=path[0:51]
+path=path[0:len(path)-21]
 path+='db/serve.py'
 
 spec = importlib.util.spec_from_file_location("serve.py", path)
@@ -83,7 +83,6 @@ class blockchainInfo():
 
 	def getCurrentData(self):
 		names,data=self.pollData('2days')
-		collection = db.BitcoinChain
 		#add names to top of datafile
 		self.BTCcharts.insert(0,'date')
 		#grab dates
