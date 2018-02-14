@@ -5,7 +5,7 @@ from threading import Thread
 import importlib.util,os,inspect
 
 path=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-path=path[0:51]
+path=path[0:len(path)-22]
 path+='db/serve.py'
 
 spec = importlib.util.spec_from_file_location("serve.py", path)

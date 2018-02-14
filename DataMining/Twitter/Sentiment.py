@@ -6,7 +6,7 @@ from textblob import TextBlob
 import importlib.util,os,inspect
 
 path=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-path=path[0:51]
+path=path[0:len(path)-18]
 path+='db/serve.py'
 
 spec = importlib.util.spec_from_file_location("serve.py", path)
@@ -16,10 +16,9 @@ spec.loader.exec_module(serve)
  
 class TwitterClient(object):
 
-    self.coins=['Bitcoin','Litecoin','Ethereum']
 
     def __init__(self):
-
+        self.coins=['Bitcoin','Litecoin','Ethereum']
         # keys and tokens from the Twitter Dev Console
     #Bitcoin
         consumer_keyBTC = '9rVL33CxgKO1X5JPZGYL3qYHP'
@@ -149,9 +148,9 @@ class TwitterClient(object):
                 nuetralPercent = 100*(len(tweets) - (len(ntweets) + len(ptweets)))/len(tweets)
                 
                 post= {
-                    'date' : str( datetime.datetime.now())
-                    'positive' : str(positivePercent)
-                    'negative' : str(negativePercent)
+                    'date' : str( datetime.datetime.now()),
+                    'positive' : str(positivePercent),
+                    'negative' : str(negativePercent),
                     'nuetral' : str(nuetralPercent)
                 }
                 serve.serve(post, coin+'Twitter')
@@ -255,12 +254,7 @@ def main():
     print("starting twitter sentiment")
     startTime=time.time()
     api = TwitterClient()
-    api.writeToCSV_BTC()
-    print('BTC Done')
-    api.writeToCSV_ETH()
-    print('BTC DONE')
-    api.writeToCSV_LTC()
-    print('LTC Done')
+    api.writeToDatabase()
     endTime=time.time()
     print("ending twitter sentiment")
     print('Time taken: '+str(endTime-startTime))
