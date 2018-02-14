@@ -8,7 +8,6 @@
 
 let db_insert = require(__dirname + '/../../db/db_functions.js')
 let request = require('request') // include request npm package
-
 let date = new Date()
 
 /* this is a comment */

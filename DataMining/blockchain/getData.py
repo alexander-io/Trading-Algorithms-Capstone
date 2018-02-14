@@ -1,5 +1,16 @@
 import requests, csv, re, json, time, pprint
-from pymongo import MongoClient
+
+#importing mongo push module
+import importlib.util
+
+path=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+path=path[0:51]
+path+='db/serve.py'
+
+spec = importlib.util.spec_from_file_location("serve.py", path)
+serve = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(serve)
+#end of module importation
 
 class blockchainInfo():
 
@@ -29,9 +40,6 @@ class blockchainInfo():
 
 	def saveHistoricData(self):
 		names,data=self.pollData('10years')
-		client=MongoClient('mongodb://localhost:27017/')
-		db = client.crypto_trading
-		collection = db.BitcoinChain
 		#add names to top of datafile
 		self.BTCcharts.insert(0,'date')
 		#grab dates
@@ -58,8 +66,7 @@ class blockchainInfo():
 				'n-transactions-excluding-popular' : str(row[7]),
 				'estimated-transaction-volume' : str(row[8])
 			}
-			posts = db.posts
-			post_id = posts.insert_one(post)
+			serve.serve(post, 'BitcoinChain')
 
 		'''
 		with open('historicBlockchainDataBTC.csv', 'w', newline='') as csvfile:
@@ -76,8 +83,6 @@ class blockchainInfo():
 
 	def getCurrentData(self):
 		names,data=self.pollData('2days')
-		client=MongoClient('mongodb://localhost:27017/')
-		db = client.crypto_trading
 		collection = db.BitcoinChain
 		#add names to top of datafile
 		self.BTCcharts.insert(0,'date')
@@ -100,9 +105,7 @@ class blockchainInfo():
 			'n-transactions-excluding-popular' : str(row[7]),
 			'estimated-transaction-volume' : str(row[8])
 		}
-		posts = db.posts
-		post_id = posts.insert_one(post)
-		pprint.pprint(posts.find_one())
+		serve.serve(post, 'BitcoinChain')
 
 		'''
 		names,data=self.pollData('2days')

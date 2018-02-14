@@ -1,15 +1,25 @@
 import re, tweepy, datetime, time, csv
 from tweepy import OAuthHandler
 from textblob import TextBlob
+
+#importing mongo push module
+import importlib.util,os,inspect
+
+path=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+path=path[0:51]
+path+='db/serve.py'
+
+spec = importlib.util.spec_from_file_location("serve.py", path)
+serve = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(serve)
+#end of module importatios
  
 class TwitterClient(object):
-    '''
-    Generic Twitter Class for sentiment analysis.
-    '''
+
+    self.coins=['Bitcoin','Litecoin','Ethereum']
+
     def __init__(self):
-        '''
-        Class constructor or initialization method.
-        '''
+
         # keys and tokens from the Twitter Dev Console
     #Bitcoin
         consumer_keyBTC = '9rVL33CxgKO1X5JPZGYL3qYHP'
@@ -125,12 +135,36 @@ class TwitterClient(object):
             # print error (if any)
             print("Error : " + str(e))
 
+    def writeToDatabase(self):
+        for coin in self.coins:
+            tweets = self.get_tweets(query = coin, count=1000, page = 1, start=datetime.date.today()-datetime.timedelta(days=1), end=datetime.date.today())
+
+            if not tweets==None:
+                ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 'positive']
+                positivePercent = 100*len(ptweets)/len(tweets)
+
+                ntweets = [tweet for tweet in tweets if tweet['sentiment'] == 'negative']
+                negativePercent = 100*len(ntweets)/len(tweets)
+
+                nuetralPercent = 100*(len(tweets) - (len(ntweets) + len(ptweets)))/len(tweets)
+                
+                post= {
+                    'date' : str( datetime.datetime.now())
+                    'positive' : str(positivePercent)
+                    'negative' : str(negativePercent)
+                    'nuetral' : str(nuetralPercent)
+                }
+                serve.serve(post, coin+'Twitter')
+
+            else:
+                print('No Tweets or limit exceeded')
+
     def writeToCSV_BTC(self):
         with open('TwitterSentimentBTC.csv', 'a', newline='') as csvfile:    
             #Use csv Writer
             csvWriter = csv.writer(csvfile)
             # calling function to get tweets
-            tweets = self.get_tweets(query = 'Bitcoin',count=1000, page = 1, start=datetime.date.today()-datetime.timedelta(days=31), end=datetime.date.today())
+            tweets = self.get_tweets(query = 'Bitcoin',count=1000, page = 1, start=datetime.date.today()-datetime.timedelta(days=1), end=datetime.date.today())
 
             if tweets==None:
                 print('No Tweets')
@@ -160,7 +194,7 @@ class TwitterClient(object):
             #Use csv Writer
             csvWriter = csv.writer(csvfile)
             # calling function to get tweets
-            tweets = self.get_tweets(query = 'Litecoin',count=1000, page = 1, start=datetime.date.today()-datetime.timedelta(days=31), end=datetime.date.today())
+            tweets = self.get_tweets(query = 'Litecoin',count=1000, page = 1, start=datetime.date.today()-datetime.timedelta(days=1), end=datetime.date.today())
 
             if tweets==None:
                 print('No Tweets')
@@ -191,7 +225,7 @@ class TwitterClient(object):
             #Use csv Writer
             csvWriter = csv.writer(csvfile)
             # calling function to get tweets
-            tweets = self.get_tweets(query = 'Ethereum',count=1000, page = 1, start=datetime.date.today()-datetime.timedelta(days=31), end=datetime.date.today())
+            tweets = self.get_tweets(query = 'Ethereum',count=1000, page = 1, start=datetime.date.today()-datetime.timedelta(days=1), end=datetime.date.today())
 
             if tweets==None:
                 print('No Tweets')
