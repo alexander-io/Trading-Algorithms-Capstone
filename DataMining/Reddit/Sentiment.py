@@ -1,6 +1,18 @@
-import datetime, csv, praw, time, threading, os
+import datetime, csv, praw, time, threading, os, sys, inspect
 from threading import Thread
 from textblob import TextBlob
+
+#importing mongo push module
+import importlib.util
+
+path=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+path=path[0:51]
+path+='db/serve.py'
+
+spec = importlib.util.spec_from_file_location("serve.py", path)
+serve = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(serve)
+#end of module importation
 
 '''
 possible subreddits:
@@ -37,12 +49,24 @@ class redditSentiment():
 		#print(comments)
 		comment_blob = TextBlob(''.join(comments))
 		#print('RedditSentimentBTC.csv')
+
+		post={
+			'date' : str(datetime.datetime.now()),
+			'polarity' : str(comment_blob.sentiment.polarity),
+			'subjectivity' : str(comment_blob.sentiment.subjectivity)
+		}
+
+		serve.serve(post, 'BitcoinReddit')
+
+
+		''' CSV saving
 		with open('RedditSentimentBTC.csv', 'a', newline='') as csvfile:    
 			#Use csv Writer
 			csvWriter = csv.writer(csvfile, delimiter=',')
 			#writes the message
 			csvWriter.writerow([datetime.datetime.now(),comment_blob.sentiment.polarity,comment_blob.sentiment.subjectivity])
 		csvfile.close()
+		'''
 
 	def getSentimentETH():
 		user_agent='MacOS:Reddit Sentiment Scraper:v1.2 (by /u/zsmerritt)'
@@ -61,12 +85,22 @@ class redditSentiment():
 				comments.append(comment.body)
 		#print(comments)
 		comment_blob = TextBlob(''.join(comments))
+
+		post={
+			'date' : str(datetime.datetime.now()),
+			'polarity' : str(comment_blob.sentiment.polarity),
+			'subjectivity' : str(comment_blob.sentiment.subjectivity)
+		}
+
+		serve.serve(post, 'EthereumReddit')
+		'''
 		with open('RedditSentimentETH.csv', 'a', newline='') as csvfile:    
 			#Use csv Writer
 			csvWriter = csv.writer(csvfile, delimiter=',')
 			#writes the message
 			csvWriter.writerow([datetime.datetime.now(),comment_blob.sentiment.polarity,comment_blob.sentiment.subjectivity])
 		csvfile.close()
+		'''
 
 
 	def getSentimentLTC():
@@ -86,13 +120,22 @@ class redditSentiment():
 				comments.append(comment.body)
 		#print(comments)
 		comment_blob = TextBlob(''.join(comments))
+
+		post={
+			'date' : str(datetime.datetime.now()),
+			'polarity' : str(comment_blob.sentiment.polarity),
+			'subjectivity' : str(comment_blob.sentiment.subjectivity)
+		}
+
+		serve.serve(post, 'LitecoinReddit')
+		'''
 		with open('RedditSentimentLTC.csv', 'a', newline='') as csvfile:    
 			#Use csv Writer
 			csvWriter = csv.writer(csvfile, delimiter=',')
 			#writes the message
 			csvWriter.writerow([datetime.datetime.now(),comment_blob.sentiment.polarity,comment_blob.sentiment.subjectivity])
 		csvfile.close()
-
+		'''
 
 def main():
 	print("starting reddit sentiment")
