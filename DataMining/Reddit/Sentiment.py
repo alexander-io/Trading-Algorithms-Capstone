@@ -6,8 +6,10 @@ from textblob import TextBlob
 import importlib.util
 
 path=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-path=path[0:51]
-path+='db/serve.py'
+print(path)
+newPath=path[0:51]
+print(newPath)
+newPath+='db/serve.py'
 
 spec = importlib.util.spec_from_file_location("serve.py", path)
 serve = importlib.util.module_from_spec(spec)
