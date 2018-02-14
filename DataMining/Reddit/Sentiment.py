@@ -6,10 +6,8 @@ from textblob import TextBlob
 import importlib.util
 
 path=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-print(path)
-newPath=path[0:51]
-print(newPath)
-newPath+='db/serve.py'
+path=path[0:len(path)-17]
+path+='db/serve.py'
 
 spec = importlib.util.spec_from_file_location("serve.py", path)
 serve = importlib.util.module_from_spec(spec)
@@ -34,7 +32,7 @@ Choose by most paricipation
 class redditSentiment():
 
 	def getSentimentBTC():
-		user_agent='MacOS:Reddit Sentiment Scraper:v1.2 (by /u/zsmerritt)'
+		user_agent='MacOS:Reddit Sentiment Scraper:v2.0 (by /u/zsmerritt)'
 		client_id='h04EaRGHc4uPKQ'
 		client_secret='0JX1YF8_AHBSvKHgDGVKaN0aTMU'
 		r = praw.Reddit(client_id=client_id,client_secret=client_secret,user_agent=user_agent)
@@ -71,7 +69,7 @@ class redditSentiment():
 		'''
 
 	def getSentimentETH():
-		user_agent='MacOS:Reddit Sentiment Scraper:v1.2 (by /u/zsmerritt)'
+		user_agent='MacOS:Reddit Sentiment Scraper:v2.0 (by /u/zsmerritt)'
 		client_id='h04EaRGHc4uPKQ'
 		client_secret='0JX1YF8_AHBSvKHgDGVKaN0aTMU'
 		r = praw.Reddit(client_id=client_id,client_secret=client_secret,user_agent=user_agent)
@@ -106,7 +104,7 @@ class redditSentiment():
 
 
 	def getSentimentLTC():
-		user_agent='MacOS:Reddit Sentiment Scraper:v1.2 (by /u/zsmerritt)'
+		user_agent='MacOS:Reddit Sentiment Scraper:v2.0 (by /u/zsmerritt)'
 		client_id='h04EaRGHc4uPKQ'
 		client_secret='0JX1YF8_AHBSvKHgDGVKaN0aTMU'
 		r = praw.Reddit(client_id=client_id,client_secret=client_secret,user_agent=user_agent)
