@@ -20,7 +20,6 @@ path=path[0:len(path)-9]
 
 #infinite loop for gathering data
 while True:
-	print("in loop")
 	#get current time (seconds from 1970, posix/unix/epoch format) and divide by sixty to get minutes
 	currentTime = int(time.time())//60
 	#once a day stuff
