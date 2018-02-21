@@ -21,7 +21,6 @@ path=path[0:len(path)-9]
 
 def once_per_day_scripts():
     subprocess.Popen(['node', path+wiki])
-    subprocess.Popen(['python3', path+blockchain])
 
 def once_per_15_min_scripts():
     subprocess.Popen(['node', path+cmarketcap])
@@ -45,8 +44,28 @@ def fifteen_mins_have_elapsed(start_time, end_time):
         else: return False
     else: return (end_time.tm_min - start_time.tm_min >= 15)
 
-def start_server():
-    server_start_time = time.localtime()
-    print(server_start_time)
+def mins_to_secs(mins): return mins*60
+def secs_to_mins(secs): return secs/60
 
-start_server()
+def serve():
+    server_start_time = time.localtime()
+    print('server start time\n\t', server_start_time)
+
+    once_per_15_min_scripts()
+    once_per_day_scripts()
+
+    last_15_min_call = server_start_time
+    last_24_hr_call = server_start_time
+
+    while True:
+        current_time =  time.localtime()
+        print('::::: current time\n\t', current_time)
+        if (fifteen_mins_have_elapsed(last_15_min_call, current_time)):
+            last_15_min_call = current_time
+            once_per_15_min_scripts()
+        elif (twenty_four_hours_have_elapsed(last_24_hr_call, current_time)):
+            last_24_hr_call = current_time
+            once_per_day_scripts()
+        time.sleep(mins_to_secs(15))
+
+serve()
