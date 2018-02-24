@@ -1,4 +1,4 @@
-import os, subprocess, time, inspect, pymongo, progressbar, datetime
+import os, subprocess, time, inspect, pymongo, datetime
 
 # test class day
 class Day:
