@@ -5,4 +5,3 @@ def serve(post, collectionTitle):
 	db = client.crypto_trading
 	collection = db[collectionTitle]
 	postid=collection.insert_one(post).inserted_id
-	print(postid)
