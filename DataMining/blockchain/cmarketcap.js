@@ -1,5 +1,4 @@
 let request = require('request')
-
 let db_insert = require(__dirname + '/../../db/db_functions.js')
 
 let x = function() {
@@ -23,6 +22,7 @@ let x = function() {
           || info[x].id == 'litecoin'
           || info[x].id == 'bitcoin-cash'
         ) {
+          info[x].unix_time = Date.now()
           db_insert(info[x], 'coinmarketcap_ticker' /* collection title */)
         }
       }

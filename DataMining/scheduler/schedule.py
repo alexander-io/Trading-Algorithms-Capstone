@@ -4,7 +4,7 @@ from threading import Thread
 # we are here Trading-Algorithm/DataMining/scheduler/
 # scripts to call here :
 
-wiki="=Wiki/scrape.js"
+wiki="Wiki/scrape.js"
 reddit="Reddit/Sentiment.py"
 blockchain="blockchain/getData.py"
 twitter="Twitter/Sentiment.py"
