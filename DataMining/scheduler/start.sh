@@ -1,2 +1,2 @@
 echo "STARTING SCHEDULER"
-python3 ./schedule.py &
+python3 ./sched.py &

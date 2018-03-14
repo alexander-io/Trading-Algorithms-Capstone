@@ -21,8 +21,6 @@ model.monitor_
 model.monitor_.converged
 '''
 
-filename = "LONGcombinedData.1.26.18.txt"
-file = open(filename, "r")
 
 
 remodel = hmm.GaussianHMM(n_components=3, covariance_type="full", n_iter=100, verbose=True)
