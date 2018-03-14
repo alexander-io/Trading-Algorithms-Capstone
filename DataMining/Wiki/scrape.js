@@ -71,20 +71,19 @@ let x = function(pagetitle, date) {
     if (!error && response.statusCode == 200) {
       let info = JSON.parse(body)
       for (let x = 0; x <  info.items.length; x++) {
-        console.log(info.items[x].timestamp + ' : ' + info.items[x].views)
 
+        let collection_title = 'wiki_views'
         let insert_object =  {
           'pagetitle' : pagetitle,
           'timestamp' : info.items[x].timestamp.substring(0, info.items[x].timestamp.length -2),
           'year' : info.items[x].timestamp.substring(0,4),
           'month' : info.items[x].timestamp.substring(4,6),
           'day' : info.items[x].timestamp.substring(6,8),
-          'views' : info.items[x].views
+          'views' : info.items[x].views,
+          'unix_time' : Date.now()
         }
-        db_insert(insert_object, 'wiki_views' /* collection title */)
-        // TODO format to unix timestamp, $ date +%s
-        // TODO connect to mongo database and write response data to database
-
+        console.log('inserting into collection ' + collection_title)
+        db_insert(insert_object, collection_title /* collection title */)
       }
     } else {
       console.log(error)
@@ -93,8 +92,48 @@ let x = function(pagetitle, date) {
   request(options, callback);
 }
 
-// test function call
+// function call
 x('Bitcoin', {
+  'startingyear' : date.getFullYear(),
+  'startingmonth' : date.getMonth(),
+  'startingday' : date.getDate(),
+  'endingyear' : date.getFullYear(),
+  'endingmonth' : date.getMonth(),
+  'endingday' : date.getDate()
+})
+x('Ethereum', {
+  'startingyear' : date.getFullYear(),
+  'startingmonth' : date.getMonth(),
+  'startingday' : date.getDate(),
+  'endingyear' : date.getFullYear(),
+  'endingmonth' : date.getMonth(),
+  'endingday' : date.getDate()
+})
+x('Bitcoin_Cash', {
+  'startingyear' : date.getFullYear(),
+  'startingmonth' : date.getMonth(),
+  'startingday' : date.getDate(),
+  'endingyear' : date.getFullYear(),
+  'endingmonth' : date.getMonth(),
+  'endingday' : date.getDate()
+})
+x('Litecoin', {
+  'startingyear' : date.getFullYear(),
+  'startingmonth' : date.getMonth(),
+  'startingday' : date.getDate(),
+  'endingyear' : date.getFullYear(),
+  'endingmonth' : date.getMonth(),
+  'endingday' : date.getDate()
+})
+x('Dogecoin', {
+  'startingyear' : date.getFullYear(),
+  'startingmonth' : date.getMonth(),
+  'startingday' : date.getDate(),
+  'endingyear' : date.getFullYear(),
+  'endingmonth' : date.getMonth(),
+  'endingday' : date.getDate()
+})
+x('Ripple_(payment_protocol)', {
   'startingyear' : date.getFullYear(),
   'startingmonth' : date.getMonth(),
   'startingday' : date.getDate(),
