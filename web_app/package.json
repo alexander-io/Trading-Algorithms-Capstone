@@ -7,6 +7,7 @@
     "express": "^4.16.3",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "semantic-ui-react": "^0.78.3"
+    "semantic-ui-react": "^0.78.3",
+    "socket.io": "^2.0.4"
   }
 }
