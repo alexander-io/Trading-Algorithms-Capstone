@@ -6,16 +6,16 @@
 // https://www.npmjs.com/package/request#custom-http-headers
 // https://wikimedia.org/api
 
-let db_insert = require(__dirname + '/../../db/db_functions.js')
-let request = require('request') // include request npm package
-let date = new Date()
+var funx = require(__dirname + '/../../db/db_functions.js')
+var request = require('request') // include request npm package
+var date = new Date()
 
 /* this is a comment */
 // this works for one line
 
 // format  the date object to a string that fits the request api format
-let format_date_request = function(date) {
-  let date_string_builder
+var format_date_request = function(date) {
+  var date_string_builder
   if (date.startingmonth < 10) {date.startingmonth = '0' + date.startingmonth}
   if (date.startingday < 10) {date.startingday = '0' + date.startingday}
   if (date.endingmonth < 10) {date.endingmonth = '0' + date.endingmonth}
@@ -35,10 +35,10 @@ let format_date_request = function(date) {
  * pagetitle, title of the wiki page (case sensitive)
  */
 
-let x = function(pagetitle, date) {
+var x = function(pagetitle, date) {
 
-  let startingyear, startingmonth, startingday
-  let endingyear, endingmonth, endingday
+  var startingyear, startingmonth, startingday
+  var endingyear, endingmonth, endingday
 
   // if the date parameter  was  provided... assign all  of the afore-declared variables based on date object parameter
   if (date) {
@@ -50,10 +50,10 @@ let x = function(pagetitle, date) {
     date.endingmonth ? endingyear = date.endingmonth : console.log('no ending month provided')
     date.endingyear ? endingyear = date.endingday : console.log('no ending day provided')
   }
-  let date_request_string = format_date_request(date)
+  var date_request_string = format_date_request(date)
 
   // concatenate request_url string to contain the page  title and the date request string
-  let req_url =
+  var req_url =
     'https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/'
     + pagetitle
     + '/daily/'
@@ -69,11 +69,11 @@ let x = function(pagetitle, date) {
 
   function callback(error, response, body) {
     if (!error && response.statusCode == 200) {
-      let info = JSON.parse(body)
-      for (let x = 0; x <  info.items.length; x++) {
+      var info = JSON.parse(body)
+      for (var x = 0; x <  info.items.length; x++) {
 
-        let collection_title = 'wiki_views'
-        let insert_object =  {
+        var collection_title = 'wiki_views'
+        var insert_object =  {
           'pagetitle' : pagetitle,
           'timestamp' : info.items[x].timestamp.substring(0, info.items[x].timestamp.length -2),
           'year' : info.items[x].timestamp.substring(0,4),
@@ -83,7 +83,7 @@ let x = function(pagetitle, date) {
           'unix_time' : Date.now()
         }
         console.log('inserting into collection ' + collection_title)
-        db_insert(insert_object, collection_title /* collection title */)
+        funx.insert(insert_object, collection_title /* collection title */)
       }
     } else {
       console.log(error)

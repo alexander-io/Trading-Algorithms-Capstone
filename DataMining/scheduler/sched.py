@@ -20,10 +20,10 @@ path=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 path=path[0:len(path)-9]
 
 def once_per_day_scripts():
-    subprocess.Popen(['node', path+wiki])
+    subprocess.Popen(['nodejs', path+wiki])
 
 def once_per_15_min_scripts():
-    subprocess.Popen(['node', path+cmarketcap])
+    subprocess.Popen(['nodejs', path+cmarketcap])
     subprocess.Popen(['python3', path+blockchain])
     subprocess.Popen(['python3', path+twitter])
 

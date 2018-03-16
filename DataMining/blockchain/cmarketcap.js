@@ -1,20 +1,20 @@
-let request = require('request')
-let db_insert = require(__dirname + '/../../db/db_functions.js')
+var request = require('request')
+var funx = require(__dirname + '/../../db/db_functions.js')
 
-let x = function() {
-  let req_url = 'https://api.coinmarketcap.com/v1/ticker/'
+var x = function() {
+  var req_url = 'https://api.coinmarketcap.com/v1/ticker/'
 
-  let options =  {
+  var options =  {
     url : req_url,
     headers : {
       'User-Agent' : 'request'
     }
   }
 
-  let callback = function(error, response, body) {
+  var callback = function(error, response, body) {
     if (!error && response.statusCode == 200) {
-      let info = JSON.parse(body)
-      for (let x = 0; x < info.length;x++) {
+      var info = JSON.parse(body)
+      for (var x = 0; x < info.length;x++) {
         if (
           info[x].id == 'bitcoin'
           || info[x].id == 'ethereum'
@@ -23,7 +23,7 @@ let x = function() {
           || info[x].id == 'bitcoin-cash'
         ) {
           info[x].unix_time = Date.now()
-          db_insert(info[x], 'coinmarketcap_ticker' /* collection title */)
+          funx.insert(info[x], 'coinmarketcap_ticker' /* collection title */)
         }
       }
     }

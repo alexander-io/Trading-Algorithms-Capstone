@@ -1,9 +1,9 @@
 (function(){
 
   // require mongo, define host:port, define mongoclient
-  let mongo = require('mongodb'),
+  var mongo = require('mongodb'),
     url = 'mongodb://localhost:27017'
-  let  mongoclient = mongo.MongoClient
+  var  mongoclient = mongo.MongoClient
 
   // define database title
   const dbName = 'crypto_trading'
@@ -15,7 +15,7 @@
           console.log('successfully connected to server')
           // define db & collection
           const db = client.db(dbName)
-          let collection = db.collection(collection_title)
+          var collection = db.collection(collection_title)
           // insert entry into db collection
           collection.insert(entry, function(err, result) {
             if (err) {
@@ -28,12 +28,12 @@
         })
       },
     get_wiki_views_where_pagetitle :  function(pagetitle) {
-      let query = {"pagetitle" : pagetitle}
+      var query = {"pagetitle" : pagetitle}
       return new Promise(function(resolve, reject) {
         mongo.connect(url, function(err, client) {
           if (err) {console.log(err);reject(err)}
-          let collection = client.db(dbName).collection('wiki_views')
-          let x = collection.find(query).toArray()
+          var collection = client.db(dbName).collection('wiki_views')
+          var x = collection.find(query).toArray()
           client.close()
           resolve(x)
         })
@@ -41,7 +41,7 @@
     }
   }
 
-  let coins = ['Bitcoin', 'Litecoin', 'Bitcoin_Cash', 'Ripple_(payment_protocol)', 'Dogecoin', 'Ethereum']
+  var coins = ['Bitcoin', 'Litecoin', 'Bitcoin_Cash', 'Ripple_(payment_protocol)', 'Dogecoin', 'Ethereum']
   coins.forEach(function(x) {
     module.exports.get_wiki_views_where_pagetitle(x).then(function(resolve, reject) {
       console.log(resolve)
