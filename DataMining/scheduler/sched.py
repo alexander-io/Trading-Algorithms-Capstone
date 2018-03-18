@@ -45,10 +45,20 @@ def twenty_four_hours_have_elapsed(start_time, end_time):
 def one_hour_has_elapsed_unix(start_time, end_time):
     if (end_time - start_time >= 60*60):
         print('one hour has elapsed')
-
+        return True
+    else: return False
+    
 def fifteen_mins_have_elapsed_unix(start_time, end_time):
     if (end_time - start_time >= (60*15)):
         print('fifteen minutes have elapsed')
+        return True
+    else: return False
+
+def five_mins_have_elapsed_unix(start_time, end_time):
+    if (end_time - start_time >= (60*5)):
+        print('fifteen minutes have elapsed')
+        return True
+    else: return False
 
 # returns true if 15 minutes has elapsed
 def fifteen_mins_have_elapsed(start_time, end_time):
@@ -66,7 +76,7 @@ def mins_to_secs(mins): return mins*60
 def secs_to_mins(secs): return secs/60
 
 def server_start_txt():
-    client.api.account.messages.create(
+    client.messages.create(
         to="+12623542930",
         from_="+12623144555",
         body="starting server")
@@ -95,7 +105,7 @@ def serve():
             last_15_min_call = current_time
             once_per_15_min_scripts()
         if (fifteen_mins_have_elapsed_unix(last_15_min_call_unix, current_time_unix)):
-            client.api.account.messages.create(
+            client.messages.create(
                 to="+12623542930",
                 from_="+12623144555",
                 body="15 mins have elapsed\n"+((current_time_unix-server_start_time_unix)/60)+":"+(current_time_unix-server_start_time_unix)+" - mins:secs elapsed since server start\n")
