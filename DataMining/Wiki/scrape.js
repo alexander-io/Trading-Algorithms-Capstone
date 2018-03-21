@@ -68,6 +68,8 @@ var x = function(pagetitle, date) {
   };
 
   function callback(error, response, body) {
+
+    let d = new Date()
     if (!error && response.statusCode == 200) {
       var info = JSON.parse(body)
       for (var x = 0; x <  info.items.length; x++) {
@@ -80,7 +82,9 @@ var x = function(pagetitle, date) {
           'month' : info.items[x].timestamp.substring(4,6),
           'day' : info.items[x].timestamp.substring(6,8),
           'views' : info.items[x].views,
-          'unix_time' : Date.now()
+          'unix_time' : Date.now(),
+          'post_created_time_hour' : d.getHours(),
+          'post_created_time_minute' : d.getMinutes()
         }
         console.log('inserting into collection ' + collection_title)
         funx.insert(insert_object, collection_title /* collection title */)

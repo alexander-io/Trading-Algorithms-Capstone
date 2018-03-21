@@ -12,6 +12,7 @@ var x = function() {
   }
 
   var callback = function(error, response, body) {
+    let d = new Date()
     if (!error && response.statusCode == 200) {
       var info = JSON.parse(body)
       for (var x = 0; x < info.length;x++) {
@@ -23,6 +24,8 @@ var x = function() {
           || info[x].id == 'bitcoin-cash'
         ) {
           info[x].unix_time = Date.now()
+          info[x].post_created_time_hour = d.getHours()
+          info[x].post_created_time_minute = d.getMinutes()
           funx.insert(info[x], 'coinmarketcap_ticker' /* collection title */)
         }
       }
