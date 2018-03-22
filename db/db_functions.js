@@ -62,26 +62,27 @@
           } else { reject('err')}
         })
       })
-    }
+    },
+
+    get_earliest_coinmarketcap_data_entry_where_currency_title : function(currency_title) {
+      let query = {"id" : currency_title}
+      return new Promise(function(resolve, reject) {
+        mongo.connect(url, function(err, client) {
+          if (err) {console.log(err);reject(err)}
+          let x = client.db(dbName).collection('coinmarketcap_ticker').find(query).sort({unix_time : 1}).limit(1).toArray()
+          client.close()
+          resolve(x)
+        })
+      })
+    },
   }
 
-  var map_of_coin_to_array_data = {}
-
+  // SANDBOX for unit testing
   let coins_wiki_titles = ['Bitcoin', 'Litecoin', 'Bitcoin_Cash', 'Ripple_(payment_protocol)', 'Dogecoin', 'Ethereum']
-
   let coins_lowercase = ['bitcoin', 'litecoin', 'ripple', 'bitcoin-cash', 'ethereum']
 
-  coins_lowercase.forEach((x) => map_of_coin_to_array_data[x] = null)
 
-  for (x in map_of_coin_to_array_data) {
-    console.log(x)
-    map_of_coin_to_array_data[x] = null
-  }
-
-  var coins = ['Bitcoin', 'Litecoin', 'Bitcoin_Cash', 'Ripple_(payment_protocol)', 'Dogecoin', 'Ethereum']
-  coins.forEach(function(x) {
-    module.exports.get_array_wiki_views_where_pagetitle(x).then(function(resolve, reject) {
-      console.log(resolve)
-    })
+  module.exports.get_earliest_coinmarketcap_data_entry_where_currency_title('ethereum').then((resolution, rejection) => {
+    console.log(resolution)
   })
 }())
