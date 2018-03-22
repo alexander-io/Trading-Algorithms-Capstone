@@ -10,5 +10,6 @@ echo -n $'#!/bin/bash\npython3 ' > /usr/local/bin/crypto_datamining_sched.sh
 echo -n $PWD >> /usr/local/bin/crypto_datamining_sched.sh
 echo -n '/sched.py' >> /usr/local/bin/crypto_datamining_sched.sh
 systemctl daemon-reload
+systemctl enable mongod.service
 systemctl enable crypto_datamining_sched
 systemctl restart crypto_datamining_sched

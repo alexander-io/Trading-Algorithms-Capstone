@@ -3,10 +3,10 @@ import numpy
 #calculates error from probability function. 
 def calculateErrorSimple(inputVariable, actualValues, probabilityFunction):
 	error=0
-	for x in range(0,len(inputVariable)):
+	for x in range(1,len(inputVariable)):
 		predicted=probabilityFunction(inputVariable,inputVariable[x])
-		error+=abs(predicted-actualValues[x])
-	return (error/len(inputVariable))
+		error+=((actualValues[x]-predicted)**2)/x
+	return error
 
 #calculates error from probability function. leaves one datum out to use as test set
 def calculateErrorRobust(inputVariable, actualValues, probabilityFunction):
@@ -15,14 +15,14 @@ def calculateErrorRobust(inputVariable, actualValues, probabilityFunction):
 		trainSet=inputVariable[0:x-1]+inputVariable[x+1:len(inputVariable)]
 		testSet=inputVariable[x]
 		predicted=probabilityFunction(trainSet,testSet)
-		error+=abs(predicted-actualValues[x])
-	return (error/len(inputVariable))
+		error+=((actualValues[x]-predicted)**2)/x
+	return error
 
 #uses a general linear model to approximate value of bitcoin from wikipedia page views
 #in order to keep functions working correctly with other functions, it must have two
 #input variables even though it only uses one
 def simple_GLM_WIKI_to_BTC_Value(inputVariable,value):
-	return (value*0.09126)+297.6
+	return (value*0.09126)
 
 #uses normal curve generated from mean and standard devation of input data to approximate
 #the bitcoin price from wikipedia page views
@@ -50,8 +50,8 @@ def calculateModelErrorWithSizeLimit(inputVariable, actualValues, probabilityFun
 	for x in range(size,len(inputVariable)-size):
 		trainingSet=inputVariable[x-size:x]+inputVariable[x+1:x+size+1]
 		predicted=probabilityFunction(trainingSet,actualValues[x])
-		error+=abs(predicted-actualValues[x])
-	return error/size
+		error+=((actualValues[x]-predicted)**2)/x
+	return error
 
 #####################################################
 #													#
