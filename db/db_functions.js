@@ -27,7 +27,12 @@
           client.close()
         })
       },
-    get_wiki_views_where_pagetitle :  function(pagetitle) {
+    /*
+     * funx get_wiki_views_where_pagetitle
+     * @param pagetitle, the Wikipedia official page title
+     *  ex : if (wiki_url == 'https://en.wikipedia.org/wiki/Ethereum') let pagetitle = 'Ethereum'
+     */
+    get_array_wiki_views_where_pagetitle :  function(pagetitle) {
       let query = {"pagetitle" : pagetitle}
       return new Promise(function(resolve, reject) {
         mongo.connect(url, function(err, client) {
@@ -38,13 +43,38 @@
           resolve(x)
         })
       })
+    },
+    get_array_coinmarketcap_data_where_currency_title : function(currency_title) {
+      let query = {"id" : currency_title}
+      return new Promise(function(resolve, reject) {
+        mongo.connect(url, function(err, client) {
+          if (err) {console.log(err);reject(err)}
+          let collection = client.db(dbName).collection('coinmarketcap_ticker')
+          let x  = collection.find(query).toArray()
+          client.close()
+          if (x.length != 0) {
+            resolve(x)
+          } else { reject('err')}
+        })
+      })
     }
   }
 
-  let coins = ['Bitcoin', 'Litecoin', 'Bitcoin_Cash', 'Ripple_(payment_protocol)', 'Dogecoin', 'Ethereum']
-  coins.forEach(function(x) {
-    module.exports.get_wiki_views_where_pagetitle(x).then(function(resolve, reject) {
-      console.log(resolve)
-    })
-  })
+  var map_of_coin_to_array_data = {}
+
+  let coins_wiki_titles = ['Bitcoin', 'Litecoin', 'Bitcoin_Cash', 'Ripple_(payment_protocol)', 'Dogecoin', 'Ethereum']
+
+  let coins_lowercase = ['bitcoin', 'litecoin', 'ripple', 'bitcoin-cash', 'ethereum']
+
+  coins_lowercase.forEach((x) => map_of_coin_to_array_data[x] = null)
+
+  // console.log(map_of_coin_to_array_data)
+
+  
+
+  for (x in map_of_coin_to_array_data) {
+    console.log(x)
+    map_of_coin_to_array_data[x] =
+  }
+
 }())
