@@ -33,7 +33,7 @@
      *  ex : if (wiki_url == 'https://en.wikipedia.org/wiki/Ethereum') let pagetitle = 'Ethereum'
      */
     get_array_wiki_views_where_pagetitle :  function(pagetitle) {
-      let query = {"pagetitle" : pagetitle}S
+      let query = {"pagetitle" : pagetitle}
       return new Promise(function(resolve, reject) {
         mongo.connect(url, function(err, client) {
           if (err) {console.log(err);reject(err)}
@@ -80,7 +80,7 @@
 
   var coins = ['Bitcoin', 'Litecoin', 'Bitcoin_Cash', 'Ripple_(payment_protocol)', 'Dogecoin', 'Ethereum']
   coins.forEach(function(x) {
-    module.exports.get_wiki_views_where_pagetitle(x).then(function(resolve, reject) {
+    module.exports.get_array_wiki_views_where_pagetitle(x).then(function(resolve, reject) {
       console.log(resolve)
     })
   })
