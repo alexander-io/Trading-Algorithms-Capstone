@@ -126,6 +126,16 @@
           resolve(x)
         })
       })
+    },
+    get_most_recent_data_entry_where_collection_AND_query : function(collection_title, query) {
+      return new Promise((resolve, reject) => {
+        mongo.connect(url, (err, client) => {
+          if (err) {console.log(err); reject(err)}
+          let x = client.db(dbName).collection(collection_title).find(query).sort({unix_time : -1}).limit(1).toArray()
+          client.close()
+          resolve(x)
+        })
+      })
     }
   }
 
@@ -155,7 +165,13 @@
     hour_time_differential ? console.log('hour time  differential', hour_time_differential) : console.log(rejection)
   })
 
+  // TEST get_earliest_data_entry_where_collection_AND_query
   module.exports.get_earliest_data_entry_where_collection_AND_query('wiki_views', {pagetitle : 'Litecoin'}).then((resolution, rejection) => {
+    resolution ? console.log(resolution) : console.log(rejection)
+  })
+
+  // TEST get_most_recent_data_entry_where_collection_AND_query()
+  module.exports.get_most_recent_data_entry_where_collection_AND_query('wiki_views', {pagetitle : 'Litecoin'}).then((resolution, rejection) => {
     resolution ? console.log(resolution) : console.log(rejection)
   })
 }())
