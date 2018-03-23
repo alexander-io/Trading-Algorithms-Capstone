@@ -86,6 +86,34 @@
           resolve(x)
         })
       })
+    },
+    get_unix_time_differential_earliest_vs_most_recent_where_currency_title : function(currency_title) {
+      return new Promise((resolve, reject) => {
+        try {
+          this.get_most_recent_coinmarketcap_data_entry_where_currency_title(currency_title).then((recent_resolution, recent_rejection) => {
+            this.get_earliest_coinmarketcap_data_entry_where_currency_title(currency_title).then((earliest_resolution, earliest_rejection) => {
+              if (recent_resolution && earliest_resolution) {
+                let most_recent_entry_timestamp = recent_resolution[0].unix_time
+                let earliest_entry_timestamp = earliest_resolution[0].unix_time
+                // console.log(most_recent_entry_timestamp)
+                // console.log(earliest_entry_timestamp)
+                resolve(most_recent_entry_timestamp-earliest_entry_timestamp)
+              }
+            })
+          })
+        } catch (e) {
+           reject(e)
+        }
+      })
+      // let query = {"id" : currency_title}
+      // return  new Promise((resolve, reject) => {
+      //   mongo.connect(url, (err,  client) => {
+      //     if (err) {console.log(err); reject(err)}
+      //     let   = client.db(dbName).collection('coinmarketcap_ticker').find(query).sort({unix_time : -1}).limit(1).toArray()
+      //     client.close()
+      //     resolve(x)
+      //   })
+      // })
     }
   }
 
@@ -93,12 +121,24 @@
   let coins_wiki_titles = ['Bitcoin', 'Litecoin', 'Bitcoin_Cash', 'Ripple_(payment_protocol)', 'Dogecoin', 'Ethereum']
   let coins_lowercase = ['bitcoin', 'litecoin', 'ripple', 'bitcoin-cash', 'ethereum']
 
+  // TEST get_earliest_coinmarketcap_data_entry_where_currency_title()
+  // module.exports.get_earliest_coinmarketcap_data_entry_where_currency_title('ethereum').then((resolution, rejection) => {
+  //   console.log(resolution)
+  // })
 
-  module.exports.get_earliest_coinmarketcap_data_entry_where_currency_title('ethereum').then((resolution, rejection) => {
-    console.log(resolution)
-  })
+  // TEST get_most_recent_coinmarketcap_data_entry_where_currency_title()
+  // module.exports.get_most_recent_coinmarketcap_data_entry_where_currency_title('ethereum').then((resolution, rejection) => {
+  //   console.log(resolution)
+  // })
 
-  module.exports.get_most_recent_coinmarketcap_data_entry_where_currency_title('ethereum').then((resolution, rejection) => {
-    console.log(resolution)
+  // TEST get_unix_time_differential_earliest_vs_most_recent_where_currency_title()
+  // module.exports.get_unix_time_differential_earliest_vs_most_recent_where_currency_title('ethereum').then((resolution, rejection) => {
+  //
+  // })
+
+  module.exports.get_unix_time_differential_earliest_vs_most_recent_where_currency_title('ethereum').then(function(resolution, rejection) {
+    if (resolution) {
+      console.log(resolution)
+    } else console.log(rejection)
   })
 }())
