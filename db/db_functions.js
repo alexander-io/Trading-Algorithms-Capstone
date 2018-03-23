@@ -158,6 +158,17 @@
           reject(e)
         }
       })
+    },
+    get_num_entries_where_collection_AND_query : function(collection_title, query) {
+      return new Promise((resolve, reject) => {
+        mongo.connect(url, (err, client) => {
+          if (err) {console.log(err); reject(err)}
+          let x  = client.db(dbName).collection(collection_title).find(query).count()
+          console.log(x)
+          client.close()
+          resolve(x)
+        })
+      })
     }
   }
 
@@ -205,5 +216,10 @@
   // TEST get_hour_time_differential_earliest_vs_most_recent_where_collection_AND_query()
   // module.exports.get_hour_time_differential_earliest_vs_most_recent_where_collection_AND_query('wiki_views', {pagetitle : 'Litecoin'}).then((resolution, rejection) => {
   //   resolution ? console.log('hour time differential', resolution) : console.log(rejection)
+  // })
+
+  // TEST get_num_entries_where_collection_AND_query()
+  // module.exports.get_num_entries_where_collection_AND_query('wiki_views', {pagetitle : 'Litecoin'}).then((resolution, rejection) => {
+  //   console.log('num elems', resolution)
   // })
 }())
