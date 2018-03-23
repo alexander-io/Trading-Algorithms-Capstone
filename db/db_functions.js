@@ -93,8 +93,6 @@
               if (recent_resolution && earliest_resolution) {
                 let most_recent_entry_timestamp = recent_resolution[0].unix_time
                 let earliest_entry_timestamp = earliest_resolution[0].unix_time
-                // console.log(most_recent_entry_timestamp)
-                // console.log(earliest_entry_timestamp)
                 resolve(most_recent_entry_timestamp-earliest_entry_timestamp)
               }
             })
@@ -108,9 +106,7 @@
       return new Promise((resolve, reject) => {
         try {
           this.get_cmarketcap_unix_time_differential_earliest_vs_most_recent_where_currency_title(currency_title).then((unix_time_differential, rejection) => {
-            // resolve((unix_time_differential/60)/60)
-            resolve(new Date(unix_time_differential*1000).getHours())
-            // let hours = date.
+            resolve(unix_time_differential / (1000*60*60) % 24)
           })
         } catch (e) {
           reject(e)
@@ -151,6 +147,17 @@
           reject(e)
         }
       })
+    },
+    get_hour_time_differential_earliest_vs_most_recent_where_collection_AND_query : function(collection_title, query) {
+      return new Promise((resolve, reject) => {
+        try {
+            this.get_unix_time_differential_earliest_vs_most_recent_where_collection_AND_query(collection_title, query).then((unix_time_differential, rejection) => {
+              resolve(unix_time_differential / (1000*60*60) % 24)
+            })
+        } catch (e) {
+          reject(e)
+        }
+      })
     }
   }
 
@@ -169,29 +176,34 @@
   // })
 
   // TEST get_cmarketcap_unix_time_differential_earliest_vs_most_recent_where_currency_title()
-  module.exports.get_cmarketcap_unix_time_differential_earliest_vs_most_recent_where_currency_title('ethereum').then(function(resolution, rejection) {
-    if (resolution) {
-      console.log('unix time differential', resolution)
-    } else console.log(rejection)
-  })
+  // module.exports.get_cmarketcap_unix_time_differential_earliest_vs_most_recent_where_currency_title('ethereum').then(function(resolution, rejection) {
+  //   if (resolution) {
+  //     console.log('unix time differential', resolution)
+  //   } else console.log(rejection)
+  // })
 
   // TEST get_cmarketcap_hours_time_differential_earliest_vs_most_recent_where_currency_title()
-  module.exports.get_cmarketcap_hours_time_differential_earliest_vs_most_recent_where_currency_title('ethereum').then((hour_time_differential, rejection) => {
-    hour_time_differential ? console.log('hour time  differential', hour_time_differential) : console.log(rejection)
-  })
+  // module.exports.get_cmarketcap_hours_time_differential_earliest_vs_most_recent_where_currency_title('ethereum').then((hour_time_differential, rejection) => {
+  //   hour_time_differential ? console.log('hour time  differential', hour_time_differential) : console.log(rejection)
+  // })
 
   // TEST get_earliest_data_entry_where_collection_AND_query
-  module.exports.get_earliest_data_entry_where_collection_AND_query('wiki_views', {pagetitle : 'Litecoin'}).then((resolution, rejection) => {
-    resolution ? console.log(resolution) : console.log(rejection)
-  })
+  // module.exports.get_earliest_data_entry_where_collection_AND_query('wiki_views', {pagetitle : 'Litecoin'}).then((resolution, rejection) => {
+  //   resolution ? console.log(resolution) : console.log(rejection)
+  // })
 
   // TEST get_most_recent_data_entry_where_collection_AND_query()
-  module.exports.get_most_recent_data_entry_where_collection_AND_query('wiki_views', {pagetitle : 'Litecoin'}).then((resolution, rejection) => {
-    resolution ? console.log(resolution) : console.log(rejection)
-  })
+  // module.exports.get_most_recent_data_entry_where_collection_AND_query('wiki_views', {pagetitle : 'Litecoin'}).then((resolution, rejection) => {
+  //   resolution ? console.log(resolution) : console.log(rejection)
+  // })
 
   // TEST  get_unix_time_differential_earliest_vs_most_recent_where_collection_AND_query()
-  module.exports.get_unix_time_differential_earliest_vs_most_recent_where_collection_AND_query('wiki_views', {pagetitle : 'Litecoin'}).then((resolution, rejection) => {
-    resolution ? console.log('unix time differential', resolution) : console.log(rejection)
-  })
+  // module.exports.get_unix_time_differential_earliest_vs_most_recent_where_collection_AND_query('wiki_views', {pagetitle : 'Litecoin'}).then((resolution, rejection) => {
+  //   resolution ? console.log('unix time differential', resolution) : console.log(rejection)
+  // })
+
+  // TEST get_hour_time_differential_earliest_vs_most_recent_where_collection_AND_query()
+  // module.exports.get_hour_time_differential_earliest_vs_most_recent_where_collection_AND_query('wiki_views', {pagetitle : 'Litecoin'}).then((resolution, rejection) => {
+  //   resolution ? console.log('hour time differential', resolution) : console.log(rejection)
+  // })
 }())
