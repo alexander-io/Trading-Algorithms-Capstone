@@ -1,28 +1,24 @@
+'''
+ideas:
+
+	1)
+	currently, normal function looks at x datum before and after data point y.
+	It would be more realistic if it just looked at the past x datum in refferance to y
+	this makes it less accurate however. Instead use past x, but assign lower weights to 
+	data farther from y. IDK how the stats would work for this. 
+
+	Maybe keep going back until the weight sums to one or the integral of the curve is 
+	equal to one. Im not sure
+
+	2) 
+	y=current index of pageviews, x=amount of data, z=number of normal curves
+
+	include x of the past datum, starting from y into a normal curve. Then use a weighted average of the past
+	z normal curves drawn in this fashion while decreasing y iterativly.
+
+'''
 import numpy
 
-#calculates error from probability function. 
-def calculateErrorSimple(inputVariable, actualValues, probabilityFunction):
-	error=0
-	for x in range(1,len(inputVariable)):
-		predicted=probabilityFunction(inputVariable,inputVariable[x])
-		error+=((actualValues[x]-predicted)**2)/x
-	return error
-
-#calculates error from probability function. leaves one datum out to use as test set
-def calculateErrorRobust(inputVariable, actualValues, probabilityFunction):
-	error=0
-	for x in range(1,len(inputVariable)):
-		trainSet=inputVariable[0:x-1]+inputVariable[x+1:len(inputVariable)]
-		testSet=inputVariable[x]
-		predicted=probabilityFunction(trainSet,testSet)
-		error+=((actualValues[x]-predicted)**2)/x
-	return error
-
-#uses a general linear model to approximate value of bitcoin from wikipedia page views
-#in order to keep functions working correctly with other functions, it must have two
-#input variables even though it only uses one
-def simple_GLM_WIKI_to_BTC_Value(inputVariable,value):
-	return (value*0.09126)
 
 #uses normal curve generated from mean and standard devation of input data to approximate
 #the bitcoin price from wikipedia page views
@@ -33,25 +29,6 @@ def normalized_model_WIKI_to_BTC_value(inputVariable, value):
 	standardDeviation=numpy.std(inputVariable)
 	return numpy.random.normal(mean,standardDeviation)
 
-#finds and ranks the best ranges for the normal curve ** In progress, So far has only returned that more data is better **
-def findBestNormalRange(inputVariable, actualValues, probabilityFunction):
-	errors=[]
-	for size in range(1,len(inputVariable)//2):
-		modelError=calculateModelErrorWithSizeLimit(inputVariable,actualValues,probabilityFunction,size)
-		errors.append((modelError,size))
-	errors.sort()
-	print(errors)
-
-
-#calculates model with normal distribution but limits range for normal distribution.
-def calculateModelErrorWithSizeLimit(inputVariable, actualValues, probabilityFunction, size):
-	error=0
-	#all points with  at least 'size' many datum on either side
-	for x in range(size,len(inputVariable)-size):
-		trainingSet=inputVariable[x-size:x]+inputVariable[x+1:x+size+1]
-		predicted=probabilityFunction(trainingSet,actualValues[x])
-		error+=((actualValues[x]-predicted)**2)/x
-	return error
 
 #####################################################
 #													#
@@ -61,29 +38,6 @@ def calculateModelErrorWithSizeLimit(inputVariable, actualValues, probabilityFun
 #													#
 #####################################################
 
-def main():
-	print('\n\n\n\n\n')
-	price,views=[],[]
-	with open('marketPriceBTC.csv') as marketPrice:
-		for line in marketPrice:
-			price.append(float(line))
-	with open('pageviewsBTC.csv') as pageViews:
-		for line in pageViews:
-			views.append(float(line))
-	print('robust GLM',calculateErrorRobust(views,price,simple_GLM_WIKI_to_BTC_Value))
-	print('simple GLM',calculateErrorSimple(views,price,simple_GLM_WIKI_to_BTC_Value))
-	print('robust NORMAL',calculateErrorRobust(views,price,normalized_model_WIKI_to_BTC_value))
-	print('simple NORMAL',calculateErrorSimple(views,price,normalized_model_WIKI_to_BTC_value))
-	print('\n\n\n\n\n')
-	print('normalized model')
-	findBestNormalRange(views,price,normalized_model_WIKI_to_BTC_value)
-	print('\n\n\n\n\n')
-	print('glm model')
-	findBestNormalRange(views,price,simple_GLM_WIKI_to_BTC_Value)
-
-if __name__ == "__main__":
-	# calling main function
-	main()
 
 #import csv
 
