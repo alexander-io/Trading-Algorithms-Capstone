@@ -136,6 +136,21 @@
           resolve(x)
         })
       })
+    },
+    get_unix_time_differential_earliest_vs_most_recent_where_collection_AND_query : function(collection_title, query) {
+      return new Promise((resolve, reject) => {
+        try {
+          this.get_earliest_data_entry_where_collection_AND_query(collection_title, query).then((earliest_resolution, earliest_rejection) => {
+            this.get_most_recent_data_entry_where_collection_AND_query(collection_title, query).then((most_recent_resolution, most_recent_rejection) => {
+              let earliest_unix_timestamp = earliest_resolution[0].unix_time
+              let most_recent_unix_timestamp = most_recent_resolution[0].unix_time
+              resolve(most_recent_unix_timestamp - earliest_unix_timestamp)
+            })
+          })
+        } catch (e) {
+          reject(e)
+        }
+      })
     }
   }
 
@@ -173,5 +188,10 @@
   // TEST get_most_recent_data_entry_where_collection_AND_query()
   module.exports.get_most_recent_data_entry_where_collection_AND_query('wiki_views', {pagetitle : 'Litecoin'}).then((resolution, rejection) => {
     resolution ? console.log(resolution) : console.log(rejection)
+  })
+
+  // TEST  get_unix_time_differential_earliest_vs_most_recent_where_collection_AND_query()
+  module.exports.get_unix_time_differential_earliest_vs_most_recent_where_collection_AND_query('wiki_views', {pagetitle : 'Litecoin'}).then((resolution, rejection) => {
+    resolution ? console.log('unix time differential', resolution) : console.log(rejection)
   })
 }())
