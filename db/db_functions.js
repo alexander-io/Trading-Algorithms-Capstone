@@ -63,7 +63,6 @@
         })
       })
     },
-
     get_earliest_coinmarketcap_data_entry_where_currency_title : function(currency_title) {
       let query = {"id" : currency_title}
       return new Promise(function(resolve, reject) {
@@ -75,7 +74,6 @@
         })
       })
     },
-
     get_most_recent_coinmarketcap_data_entry_where_currency_title : function(currency_title) {
       let query = {"id" : currency_title}
       return  new Promise((resolve, reject) => {
@@ -87,7 +85,7 @@
         })
       })
     },
-    get_unix_time_differential_earliest_vs_most_recent_where_currency_title : function(currency_title) {
+    get_cmarketcap_unix_time_differential_earliest_vs_most_recent_where_currency_title : function(currency_title) {
       return new Promise((resolve, reject) => {
         try {
           this.get_most_recent_coinmarketcap_data_entry_where_currency_title(currency_title).then((recent_resolution, recent_rejection) => {
@@ -105,15 +103,29 @@
            reject(e)
         }
       })
-      // let query = {"id" : currency_title}
-      // return  new Promise((resolve, reject) => {
-      //   mongo.connect(url, (err,  client) => {
-      //     if (err) {console.log(err); reject(err)}
-      //     let   = client.db(dbName).collection('coinmarketcap_ticker').find(query).sort({unix_time : -1}).limit(1).toArray()
-      //     client.close()
-      //     resolve(x)
-      //   })
-      // })
+    },
+    get_cmarketcap_hours_time_differential_earliest_vs_most_recent_where_currency_title : function(currency_title) {
+      return new Promise((resolve, reject) => {
+        try {
+          this.get_cmarketcap_unix_time_differential_earliest_vs_most_recent_where_currency_title(currency_title).then((unix_time_differential, rejection) => {
+            // resolve((unix_time_differential/60)/60)
+            resolve(new Date(unix_time_differential*1000).getHours())
+            // let hours = date.
+          })
+        } catch (e) {
+          reject(e)
+        }
+      })
+    },
+    get_earliest_data_entry_where_collection_AND_query : function(collection_title, query) {
+      return new Promise((resolve, reject) => {
+        mongo.connect(url, (err, client) => {
+          if (err) {console.log(err); reject(err)}
+          let x = client.db(dbName).collection(collection_title).find(query).sort({unix_time : 1}).limit(1).toArray()
+          client.close()
+          resolve(x)
+        })
+      })
     }
   }
 
@@ -131,14 +143,19 @@
   //   console.log(resolution)
   // })
 
-  // TEST get_unix_time_differential_earliest_vs_most_recent_where_currency_title()
-  // module.exports.get_unix_time_differential_earliest_vs_most_recent_where_currency_title('ethereum').then((resolution, rejection) => {
-  //
-  // })
-
-  module.exports.get_unix_time_differential_earliest_vs_most_recent_where_currency_title('ethereum').then(function(resolution, rejection) {
+  // TEST get_cmarketcap_unix_time_differential_earliest_vs_most_recent_where_currency_title()
+  module.exports.get_cmarketcap_unix_time_differential_earliest_vs_most_recent_where_currency_title('ethereum').then(function(resolution, rejection) {
     if (resolution) {
-      console.log(resolution)
+      console.log('unix time differential', resolution)
     } else console.log(rejection)
+  })
+
+  // TEST get_cmarketcap_hours_time_differential_earliest_vs_most_recent_where_currency_title()
+  module.exports.get_cmarketcap_hours_time_differential_earliest_vs_most_recent_where_currency_title('ethereum').then((hour_time_differential, rejection) => {
+    hour_time_differential ? console.log('hour time  differential', hour_time_differential) : console.log(rejection)
+  })
+
+  module.exports.get_earliest_data_entry_where_collection_AND_query('wiki_views', {pagetitle : 'Litecoin'}).then((resolution, rejection) => {
+    resolution ? console.log(resolution) : console.log(rejection)
   })
 }())
