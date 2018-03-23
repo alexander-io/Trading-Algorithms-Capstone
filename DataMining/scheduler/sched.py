@@ -1,4 +1,5 @@
 import os, subprocess, time, inspect, pymongo, datetime
+import datetime
 
 from twilio.rest import Client
 x = "AC067a5e1514f4e1592f6a8912a4f84590"
@@ -25,8 +26,21 @@ path=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 #chop off last 9 charecters (scheduler) from the end
 path=path[0:len(path)-9]
 
+
+def time_update_txt_daily():
+    now = datetime.datetime.now()
+    today = str(now.year) + " " + str(now.month) + " " + str(now.day) + " " + str(now.hour) + " " + str(now.minute)
+
+    today = "daily server update " + today
+
+    client.messages.create(
+        to="+12623542930",
+        from_="+12623144555",
+        body=today)
+
 def once_per_day_scripts():
     subprocess.Popen(['nodejs', path+wiki])
+    time_update_txt_daily()
 
 def once_per_15_min_scripts():
     subprocess.Popen(['nodejs', path+cmarketcap])
@@ -34,12 +48,12 @@ def once_per_15_min_scripts():
     subprocess.Popen(['python3', path+twitter])
 
 def once_per_hour_scripts():
-    subprocess.Popen(['nodejs', path+wiki])
+    pass
 
-
-# returns true if 24 hours has elapsed
-def twenty_four_hours_have_elapsed(start_time, end_time):
-    if ((end_time.tm_mday > start_time.tm_mday and end_time.tm_hour >= start_time.tm_hour) or end_time.tm_mon > start_time.tm_mon): return True
+def twenty_four_hours_have_elapsed_unix(start_time, end_time):
+    if (end_time - start_time >= ((60*60)*24)):
+        print('twenty_four_hours_have_elapsed_unix')
+        return True
     else: return False
 
 def one_hour_has_elapsed_unix(start_time, end_time):
@@ -47,7 +61,7 @@ def one_hour_has_elapsed_unix(start_time, end_time):
         print('one hour has elapsed')
         return True
     else: return False
-    
+
 def fifteen_mins_have_elapsed_unix(start_time, end_time):
     if (end_time - start_time >= (60*15)):
         print('fifteen minutes have elapsed')
@@ -60,29 +74,18 @@ def five_mins_have_elapsed_unix(start_time, end_time):
         return True
     else: return False
 
-# returns true if 15 minutes has elapsed
-def fifteen_mins_have_elapsed(start_time, end_time):
-    is_next_month = end_time.tm_mon != start_time.tm_mon
-    is_next_day = end_time.tm_mday != start_time.tm_mday
-    is_next_hour = end_time.tm_hour != start_time.tm_hour
-
-    if (is_next_month or is_next_day or is_next_hour):
-        if ((60 - start_time.tm_min) + end_time.tm_min >= 15):
-            return True
-        else: return False
-    else: return (end_time.tm_min - start_time.tm_min >= 15)
+def one_min_has_elapsed_unix(start_time, end_time):
+    if (end_time - start_time >= (60*1)):
+        print('fifteen minutes have elapsed')
+        return True
+    else: return False
 
 def mins_to_secs(mins): return mins*60
 def secs_to_mins(secs): return secs/60
 
-def server_start_txt():
-    client.messages.create(
-        to="+12623542930",
-        from_="+12623144555",
-        body="starting server")
 def serve():
 
-    server_start_txt()
+    time_update_txt_daily()
 
     server_start_time = time.localtime()
     server_start_time_unix = time.time()
@@ -94,27 +97,25 @@ def serve():
     last_15_min_call = server_start_time
     last_24_hr_call = server_start_time
 
+    last_1_min_call_unix = server_start_time_unix
+    last_5_min_call_unix = server_start_time_unix
     last_15_min_call_unix = server_start_time_unix
     last_60_min_call_unix = server_start_time_unix
+    last_24_hr_call_unix = server_start_time_unix
 
     while True:
         current_time =  time.localtime()
         current_time_unix = time.time()
         print('::::: current time\n\t', current_time)
-        if (fifteen_mins_have_elapsed(last_15_min_call, current_time)):
-            last_15_min_call = current_time
-            once_per_15_min_scripts()
+
         if (fifteen_mins_have_elapsed_unix(last_15_min_call_unix, current_time_unix)):
-            client.messages.create(
-                to="+12623542930",
-                from_="+12623144555",
-                body="15 mins have elapsed\n"+((current_time_unix-server_start_time_unix)/60)+":"+(current_time_unix-server_start_time_unix)+" - mins:secs elapsed since server start\n")
-        if (twenty_four_hours_have_elapsed(last_24_hr_call, current_time)):
-            last_24_hr_call = current_time
+            last_15_min_call_unix = current_time_unix
+            once_per_15_min_scripts()
+
+        if (twenty_four_hours_have_elapsed_unix(last_24_hr_call_unix, current_time_unix)):
+            last_24_hr_call_unix = current_time_unix
             once_per_day_scripts()
-        if (one_hour_has_elapsed_unix(last_60_min_call_unix, current_time_unix)):
-            last_60_min_call_unix = time.time()
-            pass
-        time.sleep(mins_to_secs(15))
+
+        time.sleep(mins_to_secs(5))
 
 serve()
