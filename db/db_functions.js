@@ -53,12 +53,9 @@
       return new Promise(function(resolve, reject) {
         mongo.connect(url, function(err, client) {
           if (err) {console.log(err);reject(err)}
-          let collection = client.db(dbName).collection('coinmarketcap_ticker')
-          let x  = collection.find(query).toArray()
+          let x = client.db(dbName).collection('coinmarketcap_ticker').find(query).toArray()
           client.close()
-          if (x.length != 0) {
-            resolve(x)
-          } else { reject('err')}
+          resolve(x)
         })
       })
     },
@@ -219,25 +216,85 @@
   let coins_wiki_titles = ['Bitcoin', 'Litecoin', 'Bitcoin_Cash', 'Ripple_(payment_protocol)', 'Dogecoin', 'Ethereum']
   let coins_lowercase = ['bitcoin', 'litecoin', 'ripple', 'bitcoin-cash', 'ethereum']
 
+  let unix_to_date_string = function(unix_time_ms) {
+        var date = new Date(unix_time_ms);
 
-  coins_lowercase.forEach((x) => {
-    module.exports.get_cmarketcap_highest_price_usd(x).then((resolution, rejection) => {
-      console.log('\nhighest price in usd for : ' + x, resolution)
-      var date = new Date(resolution[0].last_updated*1000);
+        let month = date.getMonth()
+        let day_of_month = date.getDate()
+        let hours = date.getHours()
+        let minutes = "0" + date.getMinutes()
+        let seconds = "0" + date.getSeconds()
 
-      let month = date.getMonth()
-      let day_of_month = date.getDate()
-      let hours = date.getHours()
-      let minutes = "0" + date.getMinutes()
-      let seconds = "0" + date.getSeconds()
+        let formattedTime = 'month:'+month+'\ndate:'+day_of_month+'\n'+hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+        return formattedTime
+  }
 
-      let formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
 
-      console.log('month :', month)
-      console.log('date :', day_of_month)
-      console.log('time :', formattedTime)
-    })
+  // module.exports.aggregate_cmarketcap_highest_price_usd().then((resolution, rejection) => {
+  //   console.log(resolution)
+  // })
+
+
+  // module.exports.get_cmarketcap_highest_price_usd('bitcoin-cash').then((resolution, rejection) => {
+  //   console.log('highest price :', resolution)
+  // })
+  // module.exports.get_cmarketcap_lowest_price_usd('bitcoin-cash').then((resolution, rejection) => {
+  //   console.log('lowest price :',resolution)
+  // })
+
+  module.exports.get_earliest_coinmarketcap_data_entry_where_currency_title('bitcoin').then((resolution, rejection) => {
+    console.log(resolution)
+    console.log(unix_to_date_string(resolution[0].unix_time))
   })
+
+  // module.exports.get_array_coinmarketcap_data_where_currency_title('bitcoin-cash').then((resolution, rejection) => {
+  //   // console.log(resolution)
+  // })
+  //
+  // module.exports.get_cmarketcap_highest_price_usd('bitcoin').then((resolution, rejection) => {
+  //   console.log('highest price :', resolution)
+  // })
+  // module.exports.get_cmarketcap_lowest_price_usd('bitcoin').then((resolution, rejection) => {
+  //   console.log('lowest price :',resolution)
+  // })
+
+  // coins_lowercase.forEach((x) => {
+  //   module.exports.get_cmarketcap_highest_price_usd(x).then((resolution, rejection) => {
+  //     console.log('\nhighest price in usd for : ' + x, resolution)
+  //     var date = new Date(resolution[0].last_updated*1000);
+  //
+  //     let month = date.getMonth()
+  //     let day_of_month = date.getDate()
+  //     let hours = date.getHours()
+  //     let minutes = "0" + date.getMinutes()
+  //     let seconds = "0" + date.getSeconds()
+  //
+  //     let formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+  //
+  //     console.log('month :', month)
+  //     console.log('date :', day_of_month)
+  //     console.log('time :', formattedTime)
+  //   })
+  // })
+
+  // coins_lowercase.forEach((x) => {
+  //   module.exports.get_cmarketcap_lowest_price_usd(x).then((resolution, rejection) => {
+  //     console.log('\nlowest price in usd for : ' + x, resolution)
+  //     var date = new Date(resolution[0].last_updated*1000);
+  //
+  //     let month = date.getMonth()
+  //     let day_of_month = date.getDate()
+  //     let hours = date.getHours()
+  //     let minutes = "0" + date.getMinutes()
+  //     let seconds = "0" + date.getSeconds()
+  //
+  //     let formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+  //
+  //     console.log('month :', month)
+  //     console.log('date :', day_of_month)
+  //     console.log('time :', formattedTime)
+  //   })
+  // })
 
   // TEST get_earliest_coinmarketcap_data_entry_where_currency_title()
   // module.exports.get_earliest_coinmarketcap_data_entry_where_currency_title('ethereum').then((resolution, rejection) => {
