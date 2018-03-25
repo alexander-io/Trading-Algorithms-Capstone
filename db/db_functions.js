@@ -9,8 +9,7 @@
   const dbName = 'crypto_trading'
 
   // define insert function
-  module.exports = {
-    insert : function(entry, collection_title/*, db, callback*/) {
+  module.exports = {    insert : function(entry, collection_title/*, db, callback*/) {
       mongo.connect(url, function(err, client) {
           console.log('successfully connected to server')
           // define db & collection
@@ -164,7 +163,51 @@
         mongo.connect(url, (err, client) => {
           if (err) {console.log(err); reject(err)}
           let x  = client.db(dbName).collection(collection_title).find(query).count()
-          console.log(x)
+          // console.log(x)
+          client.close()
+          resolve(x)
+        })
+      })
+    },
+    get_wiki_entry_highest_views_where_pagetitle : function(pagetitle) {
+      let query = {"pagetitle" : pagetitle}
+      return new Promise((resolve, reject) => {
+        mongo.connect(url, (err, client) => {
+          if (err) {console.log(err); reject(err)}
+          let x = client.db(dbName).collection('wiki_views').find(query).sort({views : -1}).limit(1).toArray()
+          client.close()
+          resolve(x)
+        })
+      })
+    },
+    get_wiki_entry_lowest_views_where_pagetitle : function(pagetitle) {
+      let query = {"pagetitle" : pagetitle}
+      return new Promise((resolve, reject) => {
+        mongo.connect(url, (err, client) => {
+          if (err) {console.log(err); reject(err)}
+          let x = client.db(dbName).collection('wiki_views').find(query).sort({views : 1}).limit(1).toArray()
+          client.close()
+          resolve(x)
+        })
+      })
+    },
+    get_cmarketcap_highest_price_usd : function(currency_title) {
+      let query = {"id" : currency_title}
+      return new Promise((resolve, reject) => {
+        mongo.connect(url, (err, client) => {
+          if (err) {console.log(err); reject(err)}
+          let x = client.db(dbName).collection('coinmarketcap_ticker').find(query).sort({price_usd : -1}).limit(1).toArray()
+          client.close()
+          resolve(x)
+        })
+      })
+    },
+    get_cmarketcap_lowest_price_usd : function(currency_title) {
+      let query = {"id" : currency_title}
+      return new Promise((resolve, reject) => {
+        mongo.connect(url, (err, client) => {
+          if (err) {console.log(err); reject(err)}
+          let x = client.db(dbName).collection('coinmarketcap_ticker').find(query).sort({price_usd : 1}).limit(1).toArray()
           client.close()
           resolve(x)
         })
@@ -175,6 +218,26 @@
   // SANDBOX for unit testing
   let coins_wiki_titles = ['Bitcoin', 'Litecoin', 'Bitcoin_Cash', 'Ripple_(payment_protocol)', 'Dogecoin', 'Ethereum']
   let coins_lowercase = ['bitcoin', 'litecoin', 'ripple', 'bitcoin-cash', 'ethereum']
+
+
+  coins_lowercase.forEach((x) => {
+    module.exports.get_cmarketcap_highest_price_usd(x).then((resolution, rejection) => {
+      console.log('\nhighest price in usd for : ' + x, resolution)
+      var date = new Date(resolution[0].last_updated*1000);
+
+      let month = date.getMonth()
+      let day_of_month = date.getDate()
+      let hours = date.getHours()
+      let minutes = "0" + date.getMinutes()
+      let seconds = "0" + date.getSeconds()
+
+      let formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+
+      console.log('month :', month)
+      console.log('date :', day_of_month)
+      console.log('time :', formattedTime)
+    })
+  })
 
   // TEST get_earliest_coinmarketcap_data_entry_where_currency_title()
   // module.exports.get_earliest_coinmarketcap_data_entry_where_currency_title('ethereum').then((resolution, rejection) => {
@@ -215,11 +278,23 @@
 
   // TEST get_hour_time_differential_earliest_vs_most_recent_where_collection_AND_query()
   // module.exports.get_hour_time_differential_earliest_vs_most_recent_where_collection_AND_query('wiki_views', {pagetitle : 'Litecoin'}).then((resolution, rejection) => {
-  //   resolution ? console.log('hour time differential', resolution) : console.log(rejection)
+  //   resolution ? console.log('hour time differential between eariest and most recent Litecoin wiki_views entries :', resolution) : console.log(rejection)
   // })
 
   // TEST get_num_entries_where_collection_AND_query()
   // module.exports.get_num_entries_where_collection_AND_query('wiki_views', {pagetitle : 'Litecoin'}).then((resolution, rejection) => {
-  //   console.log('num elems', resolution)
+  //   console.log('number of wiki_views Litecoin entries :', resolution)
   // })
+
+
+  // TEST get_wiki_entry_highest_views_where_pagetitle()
+  // module.exports.get_wiki_entry_highest_views_where_pagetitle('Ethereum').then((resolution, rejection) => {
+  //   console.log('entry with highest views for ethereum :', resolution)
+  // })
+
+  // TEST get_wiki_entry_lowest_views_where_pagetitle()
+  // module.exports.get_wiki_entry_lowest_views_where_pagetitle('Ethereum').then((resolution, rejection) => {
+  //   console.log('entry with lowest views for ethereum :', resolution)
+  // })
+
 }())
