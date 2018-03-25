@@ -209,6 +209,19 @@
           resolve(x)
         })
       })
+    },
+    get_cm_array_where_currency_title : function(currency_title) {
+      let query = {"id" : currency_title}
+      return new Promise((resolve, reject) => {
+        mongo.connect(url, (err, client) => {
+          if (err) {console.log(err); reject(err)}
+          let x = client.db(dbName).collection('coinmarketcap_ticker').find(query).toArray(function(err, docs) {
+            resolve(docs)
+            client.close()
+          })
+          // resolve(x)
+        })
+      })
     }
   }
 
@@ -229,22 +242,51 @@
         return formattedTime
   }
 
+  let unix_to_num_days = function(unix_time_ms) {
+    return unix_time_ms/86400000.00007714
+  }
 
   // module.exports.aggregate_cmarketcap_highest_price_usd().then((resolution, rejection) => {
   //   console.log(resolution)
   // })
 
 
-  // module.exports.get_cmarketcap_highest_price_usd('bitcoin-cash').then((resolution, rejection) => {
-  //   console.log('highest price :', resolution)
-  // })
+  module.exports.get_cmarketcap_highest_price_usd('bitcoin-cash').then((resolution, rejection) => {
+    console.log('highest price :', resolution)
+  })
   // module.exports.get_cmarketcap_lowest_price_usd('bitcoin-cash').then((resolution, rejection) => {
   //   console.log('lowest price :',resolution)
   // })
 
-  module.exports.get_earliest_coinmarketcap_data_entry_where_currency_title('bitcoin').then((resolution, rejection) => {
-    console.log(resolution)
-    console.log(unix_to_date_string(resolution[0].unix_time))
+  // module.exports.get_earliest_coinmarketcap_data_entry_where_currency_title('bitcoin').then((resolution, rejection) => {
+  //   console.log(resolution)
+  //   console.log(unix_to_date_string(resolution[0].unix_time))
+  // })
+  //
+  // module.exports.get_most_recent_coinmarketcap_data_entry_where_currency_title('bitcoin').then((resolution, rejection) => {
+  //   console.log(resolution)
+  //   console.log(unix_to_date_string(resolution[0].unix_time))
+  // })
+  //
+  // module.exports.get_cmarketcap_unix_time_differential_earliest_vs_most_recent_where_currency_title('bitcoin').then((resolution, rejection) => {
+  //   console.log(unix_to_num_days(resolution))
+  // })
+
+  module.exports.get_cm_array_where_currency_title('bitcoin-cash').then((resolution, rejection) => {
+    // console.log(resolution)
+    resolution = resolution.sort()
+    let max = resolution[0]
+    for (let x = 1; x<resolution.length;x++) {
+      console.log(resolution[x].price_usd)
+      if (parseInt(resolution[x].price_usd) > parseInt(max.price_usd)) {
+        console.log(resolution[x].price_usd + " > " + max.price_usd + " ? TRUE")
+        max = resolution[x]
+      } else {
+        console.log(resolution[x].price_usd + " > " + max.price_usd + " ? false")
+
+      }
+    }
+    console.log('max:',max)
   })
 
   // module.exports.get_array_coinmarketcap_data_where_currency_title('bitcoin-cash').then((resolution, rejection) => {
