@@ -37,9 +37,10 @@
         mongo.connect(url, function(err, client) {
           if (err) {console.log(err);reject(err)}
           var collection = client.db(dbName).collection('wiki_views')
-          var x = collection.find(query).toArray()
-          client.close()
-          resolve(x)
+          var x = collection.find(query).toArray((err, docs) => {
+            client.close()
+            resolve(docs)
+          })
         })
       })
     },
@@ -53,9 +54,10 @@
       return new Promise(function(resolve, reject) {
         mongo.connect(url, function(err, client) {
           if (err) {console.log(err);reject(err)}
-          let x = client.db(dbName).collection('coinmarketcap_ticker').find(query).toArray()
-          client.close()
-          resolve(x)
+          let x = client.db(dbName).collection('coinmarketcap_ticker').find(query).toArray((err, docs) => {
+            client.close()
+            resolve(docs)
+          })
         })
       })
     },
@@ -101,8 +103,8 @@
           this.get_most_recent_coinmarketcap_data_entry_where_currency_title(currency_title).then((recent_resolution, recent_rejection) => {
             this.get_earliest_coinmarketcap_data_entry_where_currency_title(currency_title).then((earliest_resolution, earliest_rejection) => {
               if (recent_resolution && earliest_resolution) {
-                let most_recent_entry_timestamp = recent_resolution[0].unix_time
-                let earliest_entry_timestamp = earliest_resolution[0].unix_time
+                let most_recent_entry_timestamp = recent_resolution.unix_time
+                let earliest_entry_timestamp = earliest_resolution.unix_time
                 resolve(most_recent_entry_timestamp-earliest_entry_timestamp)
               }
             })
@@ -254,6 +256,28 @@
           })
         })
       })
+    },
+    seconds_to_hours : function(seconds) {
+      return seconds/3600
+    },
+    seconds_to_days : function(seconds) {
+      let hours = seconds/3600
+      let days = hours/24
+      return days
+    },
+    ms_to_seconds : function(ms) {
+      return ms/1000
+    },
+    ms_to_hours : function(ms) {
+      let seconds = ms/1000
+      let hours = seconds/3600
+      return hours
+    },
+    ms_to_days : function(ms) {
+      let seconds = ms/1000
+      let hours = seconds/3600
+      let days = hours/24
+      return days
     }
   }
 
@@ -273,6 +297,8 @@
         let formattedTime = 'month:'+month+'\ndate:'+day_of_month+'\n'+hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
         return formattedTime
   }
+
+
 
   let unix_to_num_days = function(unix_time_ms) {
     return unix_time_ms/86400000.00007714
@@ -301,6 +327,10 @@
   module.exports.get_most_recent_coinmarketcap_data_entry_where_currency_title('bitcoin-cash').then((resolution, rejection) => {
     console.log('earliest', resolution)
     console.log(unix_to_date_string(resolution.unix_time))
+  })
+
+  module.exports.get_cmarketcap_unix_time_differential_earliest_vs_most_recent_where_currency_title('bitcoin-cash').then((resolution, rejection) => {
+    console.log(module.exports.ms_to_hours(resolution))
   })
 
   // module.exports.get_cmarketcap_unix_time_differential_earliest_vs_most_recent_where_currency_title('bitcoin-cash').then((resolution, rejection) => {
