@@ -213,8 +213,10 @@
       })
     },
     /*
-     *
-     *
+     * return the number of entries in the specified collection and according to the specifiied query
+     * @param collection_title
+     * @param query
+     * @resolve number of matching entries
      */
     get_num_entries_where_collection_AND_query : function(collection_title, query) {
       return new Promise((resolve, reject) => {
@@ -228,32 +230,44 @@
       })
     },
     /*
-     *
-     *
+     * get entry with highest wiki_views with matching pagetitle
+     * @param pagetitle
+     * @resolve entry with highest views
      */
     get_wiki_entry_highest_views_where_pagetitle : function(pagetitle) {
       let query = {"pagetitle" : pagetitle}
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
           if (err) {console.log(err); reject(err)}
-          let x = client.db(dbName).collection('wiki_views').find(query).sort({views : -1}).limit(1).toArray()
-          client.close()
-          resolve(x)
+          let x = client.db(dbName).collection('wiki_views').find(query).toArray((err, docs) => {
+            client.close()
+            let max = docs[0]
+            for (let i = 0; i < docs.length; i++) {
+              if (docs[i].views > max.views) max = docs[i]
+            }
+            resolve(max)
+          })
         })
       })
     },
     /*
-     *
-     *
+     * get entry with lowest wiki_views via pagetitle
+     * @param pagetitle
+     * @resolve the entry with minimum views
      */
     get_wiki_entry_lowest_views_where_pagetitle : function(pagetitle) {
       let query = {"pagetitle" : pagetitle}
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
           if (err) {console.log(err); reject(err)}
-          let x = client.db(dbNaget_most_recent_data_entry_where_collection_AND_queryme).collection('wiki_views').find(query).sort({views : 1}).limit(1).toArray()
-          client.close()
-          resolve(x)
+          let x = client.db(dbName).collection('wiki_views').find(query).toArray((err, docs) => {
+            client.close()
+            let min = docs[0]
+            for (let i = 0; i < docs.length; i++) {
+              if (docs[i].views < min.views) min = docs[i]
+            }
+            resolve(min)
+          })
         })
       })
     },
@@ -269,7 +283,7 @@
           // let x = client.db(dbName).collection('coinmarketcap_ticker').find(query).sort({price_usd : -1}).limit(1).toArray()
           let x = client.db(dbName).collection('coinmarketcap_ticker').find(query).toArray(function(err, docs) {
             if (err) {console.lent.close()
-            resoog(err); reject(err)}
+            resolve(err); reject(err)}
             client.close()
             let max = docs[0]
             for (let i = 0; i < docs.length; i++) {
@@ -364,20 +378,29 @@
   }
 
 
-
   let unix_to_num_days = function(unix_time_ms) {
     return unix_time_ms/86400000.00007714
   }
 
-  module.exports.get_unix_time_ms_differential_earliest_vs_most_recent_where_collection_AND_query('coinmarketcap_ticker', {id:'litecoin'}).then((resolution, rejection) => {
+  module.exports.get_wiki_entry_highest_views_where_pagetitle('Bitcoin').then((resolution, rejection) => {
     console.log(resolution)
-    console.log('days', module.exports.ms_to_days(resolution))
   })
 
-  module.exports.get_hour_time_differential_earliest_vs_most_recent_where_collection_AND_query('coinmarketcap_ticker', {id:'litecoin'}).then((resolution, rejection) => {
-    console.log('hour differential', resolution )
+  module.exports.get_wiki_entry_lowest_views_where_pagetitle('Bitcoin').then((resolution, rejection) => {
+    console.log(resolution)
   })
 
+
+
+
+  // module.exports.get_unix_time_ms_differential_earliest_vs_most_recent_where_collection_AND_query('coinmarketcap_ticker', {id:'litecoin'}).then((resolution, rejection) => {
+  //   console.log(resolution)
+  //   console.log('days', module.exports.ms_to_days(resolution))
+  // })
+  //
+  // module.exports.get_hour_time_differential_earliest_vs_most_recent_where_collection_AND_query('coinmarketcap_ticker', {id:'litecoin'}).then((resolution, rejection) => {
+  //   console.log('hour differential', resolution )
+  // })
 
 
   // module.exports.get_most_recent_data_entry_where_collection_AND_query('coinmarketcap_ticker', {id:'litecoin'}).then((resolution, rejection) => {
