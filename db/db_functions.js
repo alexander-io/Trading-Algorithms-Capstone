@@ -177,16 +177,16 @@
       })
     },
     /*
-     *
-     *
+     * get the ms time differential between earliest and most recent posts
+     * @resolve milliseconds, ms time differential between earliest and most-recent post
      */
-    get_unix_time_differential_earliest_vs_most_recent_where_collection_AND_query : function(collection_title, query) {
+    get_unix_time_ms_differential_earliest_vs_most_recent_where_collection_AND_query : function(collection_title, query) {
       return new Promise((resolve, reject) => {
         try {
           this.get_earliest_data_entry_where_collection_AND_query(collection_title, query).then((earliest_resolution, earliest_rejection) => {
             this.get_most_recent_data_entry_where_collection_AND_query(collection_title, query).then((most_recent_resolution, most_recent_rejection) => {
-              let earliest_unix_timestamp = earliest_resolution[0].unix_time
-              let most_recent_unix_timestamp = most_recent_resolution[0].unix_time
+              let earliest_unix_timestamp = earliest_resolution.unix_time
+              let most_recent_unix_timestamp = most_recent_resolution.unix_time
               resolve(most_recent_unix_timestamp - earliest_unix_timestamp)
             })
           })
@@ -202,7 +202,7 @@
     get_hour_time_differential_earliest_vs_most_recent_where_collection_AND_query : function(collection_title, query) {
       return new Promise((resolve, reject) => {
         try {
-            this.get_unix_time_differential_earliest_vs_most_recent_where_collection_AND_query(collection_title, query).then((unix_time_differential, rejection) => {
+            this.get_unix_time_ms_differential_earliest_vs_most_recent_where_collection_AND_query(collection_title, query).then((unix_time_differential, rejection) => {
               resolve(unix_time_differential / (1000*60*60) % 24)
             })
         } catch (e) {
@@ -367,6 +367,13 @@
     return unix_time_ms/86400000.00007714
   }
 
+  module.exports.get_unix_time_ms_differential_earliest_vs_most_recent_where_collection_AND_query('coinmarketcap_ticker', {id:'litecoin'}).then((resolution, rejection) => {
+    console.log(resolution)
+    console.log('days', module.exports.ms_to_days(resolution))
+  })
+
+
+
   // module.exports.get_most_recent_data_entry_where_collection_AND_query('coinmarketcap_ticker', {id:'litecoin'}).then((resolution, rejection) => {
   //   console.log(resolution)
   //   console.log(unix_ms_to_date_string(resolution.unix_time))
@@ -523,8 +530,8 @@
   //   resolution ? console.log(resolution) : console.log(rejection)
   // })
 
-  // TEST  get_unix_time_differential_earliest_vs_most_recent_where_collection_AND_query()
-  // module.exports.get_unix_time_differential_earliest_vs_most_recent_where_collection_AND_query('wiki_views', {pagetitle : 'Litecoin'}).then((resolution, rejection) => {
+  // TEST  get_unix_time_ms_differential_earliest_vs_most_recent_where_collection_AND_query()
+  // module.exports.get_unix_time_ms_differential_earliest_vs_most_recent_where_collection_AND_query('wiki_views', {pagetitle : 'Litecoin'}).then((resolution, rejection) => {
   //   resolution ? console.log('unix time differential', resolution) : console.log(rejection)
   // })
 
