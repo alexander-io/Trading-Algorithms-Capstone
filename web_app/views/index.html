@@ -9,8 +9,12 @@
     <script>
       var socket = io.connect('http://localhost');
       socket.on('data', function (data) {
-      console.log(data);
-      socket.emit('other data', { my: 'world  hello' });
+        console.log(data)
+
+      })
+      socket.emit('other data', {data :'hello world'})
+      // console.log(data);
+      // socket.emit('other data', { my: 'world  hello' });
 
     </script>
   </body>
