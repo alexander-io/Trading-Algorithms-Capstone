@@ -61,6 +61,11 @@
         })
       })
     },
+    /*
+     * from coinmarketcap_ticker collection
+     * get earliest data entry
+     * @param currency_title
+     */
     get_earliest_coinmarketcap_data_entry_where_currency_title : function(currency_title) {
       let query = {"id" : currency_title}
       return new Promise(function(resolve, reject) {
@@ -79,6 +84,12 @@
         })
       })
     },
+    /*
+     * from coinmarketcap_ticker collection
+     * get most recent data entry
+     * @param currency_title
+     * @resolve json obj, most-recent entry
+     */
     get_most_recent_coinmarketcap_data_entry_where_currency_title : function(currency_title) {
       let query = {"id" : currency_title}
       return  new Promise((resolve, reject) => {
@@ -97,6 +108,12 @@
         })
       })
     },
+    /*
+     * from coinmarketcap_ticker collection
+     * get unix time differential between earliest and most-recent entries
+     * @param currency_title
+     * @resolve time in ms difference between earliest and most-recent post
+     */
     get_cmarketcap_unix_time_differential_earliest_vs_most_recent_where_currency_title : function(currency_title) {
       return new Promise((resolve, reject) => {
         try {
@@ -114,37 +131,55 @@
         }
       })
     },
-    get_cmarketcap_hours_time_differential_earliest_vs_most_recent_where_currency_title : function(currency_title) {
-      return new Promise((resolve, reject) => {
-        try {
-          this.get_cmarketcap_unix_time_differential_earliest_vs_most_recent_where_currency_title(currency_title).then((unix_time_differential, rejection) => {
-            resolve(unix_time_differential / (1000*60*60) % 24)
-          })
-        } catch (e) {
-          reject(e)
-        }
-      })
-    },
+    /*
+     * using unix_timestamp, return the earliest entry in the specified collection according to specified query
+     * @param collection_title
+     * @param query
+     */
     get_earliest_data_entry_where_collection_AND_query : function(collection_title, query) {
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
           if (err) {console.log(err); reject(err)}
-          let x = client.db(dbName).collection(collection_title).find(query).sort({unix_time : 1}).limit(1).toArray()
-          client.close()
-          resolve(x)
+          let x = client.db(dbName).collection(collection_title).find(query).toArray((err, docs) => {
+            client.close()
+            let min = docs[0]
+            for (let i = 0; i < docs.length; i++) {
+              if (docs[i].unix_time < min.unix_time) {
+                min = docs[i]
+              }
+            }
+            resolve(min)
+          })
         })
       })
     },
+    /*
+     * get most recent entry, specify collection and query
+     * @param collection_title
+     * @oaram query
+     * @resolves json obj that corresponds with the most recent data entry
+     */
     get_most_recent_data_entry_where_collection_AND_query : function(collection_title, query) {
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
           if (err) {console.log(err); reject(err)}
-          let x = client.db(dbName).collection(collection_title).find(query).sort({unix_time : -1}).limit(1).toArray()
-          client.close()
-          resolve(x)
+          let x = client.db(dbName).collection(collection_title).find(query).toArray((err, docs) => {
+            client.close()
+            let max = docs[0]
+            for (let i = 0; i < docs.length; i++) {
+              if (docs[i].unix_time > max.unix_time) {
+                max = docs[i]
+              }
+            }
+            resolve(max)
+          })
         })
       })
     },
+    /*
+     *
+     *
+     */
     get_unix_time_differential_earliest_vs_most_recent_where_collection_AND_query : function(collection_title, query) {
       return new Promise((resolve, reject) => {
         try {
@@ -160,6 +195,10 @@
         }
       })
     },
+    /*
+     *
+     *
+     */
     get_hour_time_differential_earliest_vs_most_recent_where_collection_AND_query : function(collection_title, query) {
       return new Promise((resolve, reject) => {
         try {
@@ -171,6 +210,10 @@
         }
       })
     },
+    /*
+     *
+     *
+     */
     get_num_entries_where_collection_AND_query : function(collection_title, query) {
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
@@ -182,6 +225,10 @@
         })
       })
     },
+    /*
+     *
+     *
+     */
     get_wiki_entry_highest_views_where_pagetitle : function(pagetitle) {
       let query = {"pagetitle" : pagetitle}
       return new Promise((resolve, reject) => {
@@ -193,17 +240,25 @@
         })
       })
     },
+    /*
+     *
+     *
+     */
     get_wiki_entry_lowest_views_where_pagetitle : function(pagetitle) {
       let query = {"pagetitle" : pagetitle}
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
           if (err) {console.log(err); reject(err)}
-          let x = client.db(dbName).collection('wiki_views').find(query).sort({views : 1}).limit(1).toArray()
+          let x = client.db(dbNaget_most_recent_data_entry_where_collection_AND_queryme).collection('wiki_views').find(query).sort({views : 1}).limit(1).toArray()
           client.close()
           resolve(x)
         })
       })
     },
+    /*
+     *
+     *
+     */
     get_cmarketcap_highest_price_usd : function(currency_title) {
       let query = {"id" : currency_title}
       return new Promise((resolve, reject) => {
@@ -225,6 +280,10 @@
         })
       })
     },
+    /*
+     *
+     *
+     */
     get_cmarketcap_lowest_price_usd : function(currency_title) {
       let query = {"id" : currency_title}
       return new Promise((resolve, reject) => {
@@ -244,6 +303,10 @@
         })
       })
     },
+    /*
+     *
+     *
+     */
     get_cm_array_where_currency_title : function(currency_title) {
       let query = {"id" : currency_title}
       return new Promise((resolve, reject) => {
@@ -285,7 +348,7 @@
   let coins_wiki_titles = ['Bitcoin', 'Litecoin', 'Bitcoin_Cash', 'Ripple_(payment_protocol)', 'Dogecoin', 'Ethereum']
   let coins_lowercase = ['bitcoin', 'litecoin', 'ripple', 'bitcoin-cash', 'ethereum']
 
-  let unix_to_date_string = function(unix_time_ms) {
+  let unix_ms_to_date_string = function(unix_time_ms) {
         var date = new Date(unix_time_ms);
 
         let month = date.getMonth()
@@ -304,6 +367,17 @@
     return unix_time_ms/86400000.00007714
   }
 
+  // module.exports.get_most_recent_data_entry_where_collection_AND_query('coinmarketcap_ticker', {id:'litecoin'}).then((resolution, rejection) => {
+  //   console.log(resolution)
+  //   console.log(unix_ms_to_date_string(resolution.unix_time))
+  // })
+
+
+  // module.exports.get_earliest_data_entry_where_collection_AND_query('coinmarketcap_ticker', {id: 'bitcoin-cash'}).then((resolution, rejection) => {
+  //   console.log('earliest', resolution)
+  //
+  //   console.log(unix_ms_to_date_string(resolution.unix_time))
+  // })
 
   // module.exports.get_cmarketcap_highest_price_usd('bitcoin-cash').then((resolution, rejection) => {
   //   console.log(resolution)
@@ -319,19 +393,19 @@
   //   console.log(resolution)
   // })
 
-  module.exports.get_earliest_coinmarketcap_data_entry_where_currency_title('bitcoin-cash').then((resolution, rejection) => {
-    console.log('earliest', resolution)
-    console.log(unix_to_date_string(resolution.unix_time))
-  })
+  // module.exports.get_earliest_coinmarketcap_data_entry_where_currency_title('bitcoin-cash').then((resolution, rejection) => {
+  //   console.log('earliest', resolution)
+  //   console.log(unix_to_date_string(resolution.unix_time))
+  // })
 
-  module.exports.get_most_recent_coinmarketcap_data_entry_where_currency_title('bitcoin-cash').then((resolution, rejection) => {
-    console.log('earliest', resolution)
-    console.log(unix_to_date_string(resolution.unix_time))
-  })
+  // module.exports.get_most_recent_coinmarketcap_data_entry_where_currency_title('bitcoin-cash').then((resolution, rejection) => {
+  //   console.log('earliest', resolution)
+  //   console.log(unix_to_date_string(resolution.unix_time))
+  // })
 
-  module.exports.get_cmarketcap_unix_time_differential_earliest_vs_most_recent_where_currency_title('bitcoin-cash').then((resolution, rejection) => {
-    console.log(module.exports.ms_to_hours(resolution))
-  })
+  // module.exports.get_cmarketcap_unix_time_differential_earliest_vs_most_recent_where_currency_title('bitcoin-cash').then((resolution, rejection) => {
+  //   console.log(module.exports.ms_to_hours(resolution))
+  // })
 
   // module.exports.get_cmarketcap_unix_time_differential_earliest_vs_most_recent_where_currency_title('bitcoin-cash').then((resolution, rejection) => {
   //   console.log(resolution)
