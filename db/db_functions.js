@@ -196,14 +196,16 @@
       })
     },
     /*
-     *
-     *
+     * get hour time differential between earliest and most-recent entry, specify collection and query
+     * @param collection_title
+     * @param query
+     * @resolve hours
      */
     get_hour_time_differential_earliest_vs_most_recent_where_collection_AND_query : function(collection_title, query) {
       return new Promise((resolve, reject) => {
         try {
             this.get_unix_time_ms_differential_earliest_vs_most_recent_where_collection_AND_query(collection_title, query).then((unix_time_differential, rejection) => {
-              resolve(unix_time_differential / (1000*60*60) % 24)
+              resolve(this.ms_to_hours(unix_time_differential))
             })
         } catch (e) {
           reject(e)
@@ -370,6 +372,10 @@
   module.exports.get_unix_time_ms_differential_earliest_vs_most_recent_where_collection_AND_query('coinmarketcap_ticker', {id:'litecoin'}).then((resolution, rejection) => {
     console.log(resolution)
     console.log('days', module.exports.ms_to_days(resolution))
+  })
+
+  module.exports.get_hour_time_differential_earliest_vs_most_recent_where_collection_AND_query('coinmarketcap_ticker', {id:'litecoin'}).then((resolution, rejection) => {
+    console.log('hour differential', resolution )
   })
 
 
