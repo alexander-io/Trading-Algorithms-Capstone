@@ -27,6 +27,23 @@
     <svg width="960" height="500"></svg>
 
     <script>
+    var socket = io.connect('http://localhost:8080');
+
+    // socket.emit('req ema n periods', {currency : 'litecoin', periods : 20})
+    // socket.on('res ema n periods', function(data) {})
+
+    function price_to_percent_change(price_array) {
+      var percent_change_array = []
+      for (let i = 0; i < price_array.length-1;i++) {
+        percent_change_array.push(percent_change(price_array[i], price_array[i+1]))
+      }
+      let min = Math.abs(d3.min(percent_change_array))
+
+      for (let i = 0; i < percent_change_array.length;i++) {
+        percent_change_array[i] += min
+      }
+      return percent_change_array;
+    }
 
     var percent_change = function(today_price, yesterday_price) {
       return ((today_price - yesterday_price)/yesterday_price)*100
@@ -40,38 +57,12 @@
       return arr_builder
     }
 
-
-      var socket = io.connect('http://localhost:8080');
-
-      // socket.emit('req ema n periods', {currency : 'litecoin', periods : 20})
-      // socket.on('res ema n periods', function(data) {})
-
       var time_periods = 120
-
+      // send socket request to server for price data
       socket.emit('req price n periods', {currency : 'litecoin', periods : time_periods})
+
+      // define behavior of client on server response
       socket.on('res price n periods', function(price_data){
-        console.log(price_data.price_array)
-        // return price_data.price_array
-
-
-
-        function price_to_percent_change(price_array) {
-          var percent_change_array = []
-
-          for (let i = 0; i < price_array.length-1;i++) {
-            percent_change_array.push(percent_change(price_array[i], price_array[i+1]))
-          }
-
-          let min = Math.abs(d3.min(percent_change_array))
-          console.log(min)
-
-          for (let i = 0; i < percent_change_array.length;i++) {
-            percent_change_array[i] += min
-          }
-
-          console.log(percent_change_array)
-          return percent_change_array;
-        }
 
         var price_array_to_reduced_price_array = function(price_array) {
           let min = d3.min(price_array)
@@ -87,10 +78,8 @@
         // Each yz[i] is an array of m non-negative numbers representing a y-value for xz[i].
         // The y01z array has the same structure as yz, but with stacked [y₀, y₁] instead of y.
         var xz = d3.range(m)
-
-
+        // inverse
         xz = inverse_array(xz)
-
         var yz = d3.range(n).map(function() { return price_array_to_reduced_price_array(price_data.price_array); }),
             y01z = d3.stack().keys(d3.range(n))(d3.transpose(yz)),
             yMax = d3.max(yz, function(y) { return d3.max(y); }),
@@ -183,34 +172,5 @@
         }
       })
     </script>
-
   </body>
 </html>
-
-
-
-
-
-<!-- <!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>crypto</title>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="jquery.min.js"></script>
-    <script src="d3.v4.min.js"></script>
-  </head>
-  <body>
-    <script>
-      var socket = io.connect('http://localhost:8080');
-
-      socket.emit('req ema n periods', {currency : 'litecoin', periods : 20})
-      socket.on('res ema n periods', function(data) {})
-
-      var time_periods = 20
-
-      socket.emit('req price n periods', {currency : 'litecoin', periods : time_periods})
-      socket.on('res price n periods', function(price_data){})
-    </script>
-  </body>
-</html> -->
