@@ -1,22 +1,216 @@
 <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title></title>
-    <link rel="stylesheet" href="semantic-ui.min.css">
+    <title>crypto</title>
+    <style>
+      form {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        position: absolute;
+        left: 10px;
+        top: 10px;
+      }
+      label {
+        display: block;
+      }
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
     <script src="jquery.min.js"></script>
-    <script src="d3.min.js"></script>
-    <script src="semantic.min.js"></script>
+    <script src="d3.v4.min.js"></script>
   </head>
   <body>
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-      var socket = io.connect('http://localhost');
-      socket.on('data', function (data) {
-        console.log(data)
+    <form>
+      <label><input type="radio" name="mode" value="grouped"> Grouped</label>
+      <label><input type="radio" name="mode" value="stacked" checked> Stacked</label>
+    </form>
+    <svg width="960" height="500"></svg>
 
+    <script>
+
+    var percent_change = function(today_price, yesterday_price) {
+      return ((today_price - yesterday_price)/yesterday_price)*100
+    }
+
+    var inverse_array = function(arr) {
+      var arr_builder = []
+      for (let i = arr.length-1; i >= 0;i--){
+        arr_builder.push(arr[i])
+      }
+      return arr_builder
+    }
+
+
+      var socket = io.connect('http://localhost:8080');
+
+      // socket.emit('req ema n periods', {currency : 'litecoin', periods : 20})
+      // socket.on('res ema n periods', function(data) {})
+
+      var time_periods = 120
+
+      socket.emit('req price n periods', {currency : 'litecoin', periods : time_periods})
+      socket.on('res price n periods', function(price_data){
+        console.log(price_data.price_array)
+        // return price_data.price_array
+
+
+
+        function price_to_percent_change(price_array) {
+          var percent_change_array = []
+
+          for (let i = 0; i < price_array.length-1;i++) {
+            percent_change_array.push(percent_change(price_array[i], price_array[i+1]))
+          }
+
+          let min = Math.abs(d3.min(percent_change_array))
+          console.log(min)
+
+          for (let i = 0; i < percent_change_array.length;i++) {
+            percent_change_array[i] += min
+          }
+
+          console.log(percent_change_array)
+          return percent_change_array;
+        }
+
+        var price_array_to_reduced_price_array = function(price_array) {
+          let min = d3.min(price_array)
+          return price_array.map(x => x - min)
+        }
+
+
+        var n = 4, // The number of series.
+            m = time_periods; // The number of values per series.
+
+        // The xz array has m elements, representing the x-values shared by all series.
+        // The yz array has n elements, representing the y-values of each of the n series.
+        // Each yz[i] is an array of m non-negative numbers representing a y-value for xz[i].
+        // The y01z array has the same structure as yz, but with stacked [y₀, y₁] instead of y.
+        var xz = d3.range(m)
+
+
+        xz = inverse_array(xz)
+
+        var yz = d3.range(n).map(function() { return price_array_to_reduced_price_array(price_data.price_array); }),
+            y01z = d3.stack().keys(d3.range(n))(d3.transpose(yz)),
+            yMax = d3.max(yz, function(y) { return d3.max(y); }),
+            y1Max = d3.max(y01z, function(y) { return d3.max(y, function(d) { return d[1]; }); });
+
+        var svg = d3.select("svg"),
+            margin = {top: 40, right: 10, bottom: 20, left: 10},
+            width = +svg.attr("width") - margin.left - margin.right,
+            height = +svg.attr("height") - margin.top - margin.bottom,
+            g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var x = d3.scaleBand()
+            .domain(xz)
+            .rangeRound([0, width])
+            .padding(0.08);
+
+        var y = d3.scaleLinear()
+            .domain([0, y1Max])
+            .range([height, 0]);
+
+        var color = d3.scaleOrdinal()
+            .domain(d3.range(n))
+            .range(d3.schemeCategory20c);
+
+        var series = g.selectAll(".series")
+          .data(y01z)
+          .enter().append("g")
+            .attr("fill", function(d, i) { return color(i); });
+
+        var rect = series.selectAll("rect")
+          .data(function(d) { return d; })
+          .enter().append("rect")
+            .attr("x", function(d, i) { return x(i); })
+            .attr("y", height)
+            .attr("width", x.bandwidth())
+            .attr("height", 0);
+
+        rect.transition()
+            .delay(function(d, i) { return i * 10; })
+            .attr("y", function(d) { return y(d[1]); })
+            .attr("height", function(d) { return y(d[0]) - y(d[1]); });
+
+            // TODO fix axisbottom
+        g.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x)
+                .tickSize(0)
+                .tickPadding(6));
+
+        d3.selectAll("input")
+            .on("change", changed);
+
+        var timeout = d3.timeout(function() {
+          d3.select("input[value=\"grouped\"]")
+              .property("checked", true)
+              .dispatch("change");
+        }, 2000);
+
+        function changed() {
+          timeout.stop();
+          if (this.value === "grouped") transitionGrouped();
+          else transitionStacked();
+        }
+
+        function transitionGrouped() {
+          y.domain([0, yMax]);
+
+          rect.transition()
+              .duration(500)
+              .delay(function(d, i) { return i * 10; })
+              .attr("x", function(d, i) { return x(i) + x.bandwidth() / n * this.parentNode.__data__.key; })
+              .attr("width", x.bandwidth() / n)
+            .transition()
+              .attr("y", function(d) { return y(d[1] - d[0]); })
+              .attr("height", function(d) { return y(0) - y(d[1] - d[0]); });
+        }
+
+        function transitionStacked() {
+          y.domain([0, y1Max]);
+
+          rect.transition()
+              .duration(500)
+              .delay(function(d, i) { return i * 10; })
+              .attr("y", function(d) { return y(d[1]); })
+              .attr("height", function(d) { return y(d[0]) - y(d[1]); })
+            .transition()
+              .attr("x", function(d, i) { return x(i); })
+              .attr("width", x.bandwidth());
+        }
       })
-      socket.emit('other data', {data :'hello world'})
     </script>
+
   </body>
 </html>
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>crypto</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="jquery.min.js"></script>
+    <script src="d3.v4.min.js"></script>
+  </head>
+  <body>
+    <script>
+      var socket = io.connect('http://localhost:8080');
+
+      socket.emit('req ema n periods', {currency : 'litecoin', periods : 20})
+      socket.on('res ema n periods', function(data) {})
+
+      var time_periods = 20
+
+      socket.emit('req price n periods', {currency : 'litecoin', periods : time_periods})
+      socket.on('res price n periods', function(price_data){})
+    </script>
+  </body>
+</html> -->
