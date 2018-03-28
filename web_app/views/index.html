@@ -56,7 +56,7 @@
     <div id="00_seg" class="ui segment display_seg" style="width:70%;">
       <div class="ui right internal attached rail">
        <div class="ui segment">
-         Price change in usd ->  <h4 style="display:inline;" id="current_currency_text">bitcoin</h4>
+         Price change in usd ->  <h4 style="display:inline;" id="current_currency_text" class="current_currency_text">bitcoin</h4>
        </div>
      </div>
       <svg id="svg_00" class="00_svg display_svg" height="500"></svg>
@@ -67,11 +67,12 @@
     <div id="01_seg" class="ui segment display_seg" style="width:70%;">
       <div class="ui right internal attached rail">
        <div class="ui segment">
-         EMA in usd ->  <h4 style="display:inline;" id="current_currency_text">bitcoin</h4>
+         EMA in usd ->  <h4 style="display:inline;" id="current_currency_text" class="current_currency_text">bitcoin</h4>
        </div>
      </div>
       <svg id="svg_01" class="01_svg display_svg" height="500"></svg>
     </div>
+
 
 
     <script type="text/javascript">
@@ -92,7 +93,7 @@
 
 
     <script>
-    var time_periods = 500
+    var time_periods = 50
     var currency = 'bitcoin'
 
     var socket = io.connect('http://localhost:8080');
@@ -112,7 +113,12 @@
         socket.emit('req price n periods', {currency : this.getAttribute('currency'), periods : time_periods})
         socket.emit('req ema n periods', {currency : this.getAttribute('currency'), periods : time_periods})
 
-        document.getElementById('current_currency_text').innerHTML = this.getAttribute('currency')
+        var current_currency_text = document.getElementsByClassName('current_currency_text')
+        for (var i = 0; i < current_currency_text.length; i++) {
+          current_currency_text[i].innerHTML = this.getAttribute('currency')
+        }
+
+        // document.getElementById('current_currency_text').innerHTML = this.getAttribute('currency')
 
         while(document.getElementById('svg_00').hasChildNodes()) {
             document.getElementById('svg_00').removeChild(document.getElementById('svg_00').lastChild)
@@ -163,10 +169,6 @@
         var n = 2, // The number of series.
             m = time_periods; // The number of values per series.
 
-        // The xz array has m elements, representing the x-values shared by all series.
-        // The yz array has n elements, representing the y-values of each of the n series.
-        // Each yz[i] is an array of m non-negative numbers representing a y-value for xz[i].
-        // The y01z array has the same structure as yz, but with stacked [y₀, y₁] instead of y.
         var xz = d3.range(m)
         // inverse
         xz = inverse_array(xz)
