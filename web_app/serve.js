@@ -17,14 +17,14 @@ app.get('/', function(req,  res) {
 io.on('connection', function(socket) {
   socket.on('req ema n periods', function(data) {
     funx.get_ema_cmarketcap_for_n_time_period_by_currency_title(data.currency, data.periods).then((resolution, rejection) => {
-      console.log(resolution)
-      socket.emit('res ema n periods', {ema_array: resolution})
+      // console.log(resolution)
+      socket.emit('res ema n periods', {price_array: resolution})
     })
   })
 
   socket.on('req price n periods', function(data) {
     funx.get_array_n_most_recent_prices_cmarketcap_by_currency_title(data.currency, data.periods).then((resolution, rejection) => {
-      console.log(resolution)
+      // console.log(resolution)
       socket.emit('res price n periods', {price_array: resolution})
     })
   })

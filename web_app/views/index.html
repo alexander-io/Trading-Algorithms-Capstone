@@ -18,19 +18,110 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="jquery.min.js"></script>
     <script src="d3.v4.min.js"></script>
+    <script src="semantic.min.js"></script>
+    <link rel="stylesheet" href="semantic.min.css">
   </head>
   <body>
-    <form>
-      <label><input type="radio" name="mode" value="grouped"> Grouped</label>
-      <label><input type="radio" name="mode" value="stacked" checked> Stacked</label>
+
+    <div class="ui visible sidebar inverted vertical  menu ">
+      <button class="active fluid ui button curr_button blue" currency="bitcoin">Bitcoin (BTC)</button>
+      <button class="fluid ui button curr_button blue" currency="ripple">Ripple (XRP)</button>
+      <button class="fluid ui button curr_button blue" currency="bitcoin-cash">Bitcoin-Cash (BCH)</button>
+      <button class="fluid ui button curr_button blue" currency="ethereum">Ethereum (LTC)</button>
+      <button class="fluid ui button curr_button blue" currency="litecoin">Litecoin (LTC)</button>
+      <style media="screen">
+        .curr_button {
+          height:20%;
+        }
+      </style>
+
+    </div>
+
+  <div id="pusher" class="pusher" style="width:100%;padding:5%;">
+
+    <form class="radio checkbox">
+      <label><input class="input_00" type="radio" name="mode" value="grouped"> Grouped</label>
+      <label><input class="input_00" type="radio" name="mode" value="stacked" checked> Stacked</label>
+
+    <!-- </form>
+    <form > -->
+
+      <label><input class="input_01" type="radio" name="mode" value="grouped"> Grouped</label>
+      <label><input class="input_01" type="radio" name="mode" value="stacked" checked> Stacked</label>
     </form>
-    <svg width="960" height="500"></svg>
+    <!-- <form class="radio checkbox">
+
+    </form> -->
+
+    <div id="00_seg" class="ui segment display_seg" style="width:70%;">
+      <div class="ui right internal attached rail">
+       <div class="ui segment">
+         Price change in usd ->  <h4 style="display:inline;" id="current_currency_text">bitcoin</h4>
+       </div>
+     </div>
+      <svg id="svg_00" class="00_svg display_svg" height="500"></svg>
+    </div>
+
+
+
+    <div id="01_seg" class="ui segment display_seg" style="width:70%;">
+      <div class="ui right internal attached rail">
+       <div class="ui segment">
+         EMA in usd ->  <h4 style="display:inline;" id="current_currency_text">bitcoin</h4>
+       </div>
+     </div>
+      <svg id="svg_01" class="01_svg display_svg" height="500"></svg>
+    </div>
+
+
+    <script type="text/javascript">
+      // set the width of  the  svg according to the width of the pusher
+      var width_of_seg = document.getElementById('00_seg').getBoundingClientRect().width
+
+      let display_svgs = document.getElementsByClassName('display_svg')
+
+      // console.log(display_svgs)
+      for (var i = 0; i < display_svgs.length; i++) {
+        display_svgs[i].setAttribute("width", width_of_seg)
+      }
+
+    </script>
+
+
+
+
 
     <script>
+    var time_periods = 500
+    var currency = 'bitcoin'
+
     var socket = io.connect('http://localhost:8080');
 
-    // socket.emit('req ema n periods', {currency : 'litecoin', periods : 20})
-    // socket.on('res ema n periods', function(data) {})
+    // define event handler for the currency buttons
+    let curr_buttons = document.getElementsByClassName('curr_button')
+    // console.log(curr_buttons)
+    for (var i = 0; i < curr_buttons.length; i++) {
+      curr_buttons[i].addEventListener('click', function() {
+
+        for (let ii = 0; ii < curr_buttons.length; ii++) {
+          curr_buttons[ii].classList.remove('active')
+
+        }
+        this.className += " active"
+        console.log(this.getAttribute('currency'))
+        socket.emit('req price n periods', {currency : this.getAttribute('currency'), periods : time_periods})
+        socket.emit('req ema n periods', {currency : this.getAttribute('currency'), periods : time_periods})
+
+        document.getElementById('current_currency_text').innerHTML = this.getAttribute('currency')
+
+        while(document.getElementById('svg_00').hasChildNodes()) {
+            document.getElementById('svg_00').removeChild(document.getElementById('svg_00').lastChild)
+            document.getElementById('svg_01').removeChild(document.getElementById('svg_01').lastChild)
+
+        }
+
+      })
+    }
 
     function price_to_percent_change(price_array) {
       var percent_change_array = []
@@ -57,20 +148,19 @@
       return arr_builder
     }
 
-      var time_periods = 120
+    var price_array_to_reduced_price_array = function(price_array) {
+      let min = d3.min(price_array)
+      return price_array.map(x => x - min)
+    }
+
       // send socket request to server for price data
-      socket.emit('req price n periods', {currency : 'litecoin', periods : time_periods})
+      socket.emit('req price n periods', {currency : currency, periods : time_periods})
 
       // define behavior of client on server response
       socket.on('res price n periods', function(price_data){
+        // console.log(price_data.price_array)
 
-        var price_array_to_reduced_price_array = function(price_array) {
-          let min = d3.min(price_array)
-          return price_array.map(x => x - min)
-        }
-
-
-        var n = 4, // The number of series.
+        var n = 2, // The number of series.
             m = time_periods; // The number of values per series.
 
         // The xz array has m elements, representing the x-values shared by all series.
@@ -80,16 +170,25 @@
         var xz = d3.range(m)
         // inverse
         xz = inverse_array(xz)
-        var yz = d3.range(n).map(function() { return price_array_to_reduced_price_array(price_data.price_array); }),
-            y01z = d3.stack().keys(d3.range(n))(d3.transpose(yz)),
-            yMax = d3.max(yz, function(y) { return d3.max(y); }),
-            y1Max = d3.max(y01z, function(y) { return d3.max(y, function(d) { return d[1]; }); });
+        var yz = d3.range(n).map(function() {
+          return price_array_to_reduced_price_array(price_data.price_array);
+        })
+        var y01z = d3.stack().keys(d3.range(n))(d3.transpose(yz))
+        // console.log(y01z)
+        var yMax = d3.max(yz, function(y) {
+          return d3.max(y);
+        })
+        var y1Max = d3.max(y01z, function(y) {
+          return d3.max(y, function(d) {
+            return d[1];
+          });
+        });
 
-        var svg = d3.select("svg"),
+        var svg = d3.select("#svg_00"),
             margin = {top: 40, right: 10, bottom: 20, left: 10},
             width = +svg.attr("width") - margin.left - margin.right,
             height = +svg.attr("height") - margin.top - margin.bottom,
-            g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            g = svg.append("g").attr("transform", "translate(" + 0 + "," + margin.top + ")");
 
         var x = d3.scaleBand()
             .domain(xz)
@@ -122,15 +221,7 @@
             .attr("y", function(d) { return y(d[1]); })
             .attr("height", function(d) { return y(d[0]) - y(d[1]); });
 
-            // TODO fix axisbottom
-        g.append("g")
-            .attr("class", "axis axis--x")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x)
-                .tickSize(0)
-                .tickPadding(6));
-
-        d3.selectAll("input")
+        d3.selectAll(".input_00")
             .on("change", changed);
 
         var timeout = d3.timeout(function() {
@@ -171,6 +262,156 @@
               .attr("width", x.bandwidth());
         }
       })
+
+      socket.emit('req ema n periods', {currency : 'bitcoin', periods : time_periods})
+      socket.on('res ema n periods', function(price_data) {
+        var n = 2, // The number of series.
+            m = time_periods; // The number of values per series.
+
+        // The xz array has m elements, representing the x-values shared by all series.
+        // The yz array has n elements, representing the y-values of each of the n series.
+        // Each yz[i] is an array of m non-negative numbers representing a y-value for xz[i].
+        // The y01z array has the same structure as yz, but with stacked [y₀, y₁] instead of y.
+        var xz = d3.range(m)
+        // inverse
+        xz = inverse_array(xz)
+        var yz = d3.range(n).map(function() {
+          return price_array_to_reduced_price_array(price_data.price_array);
+        })
+        var y01z = d3.stack().keys(d3.range(n))(d3.transpose(yz))
+        // console.log(y01z)
+        var yMax = d3.max(yz, function(y) {
+          return d3.max(y);
+        })
+        var y1Max = d3.max(y01z, function(y) {
+          return d3.max(y, function(d) {
+            return d[1];
+          });
+        });
+
+        var svg = d3.select("#svg_01"),
+            margin = {top: 40, right: 10, bottom: 20, left: 10},
+            width = +svg.attr("width") - margin.left - margin.right,
+            height = +svg.attr("height") - margin.top - margin.bottom,
+            g = svg.append("g").attr("transform", "translate(" + 0 + "," + margin.top + ")");
+
+        var x = d3.scaleBand()
+            .domain(xz)
+            .rangeRound([0, width])
+            .padding(0.08);
+
+        var y = d3.scaleLinear()
+            .domain([0, y1Max])
+            .range([height, 0]);
+
+        var color = d3.scaleOrdinal()
+            .domain(d3.range(n))
+            .range(d3.schemeCategory20);
+
+        // var color = d3.scaleOrdinal(d3["schemeCategory20"])
+
+        var series = g.selectAll(".series")
+          .data(y01z)
+          .enter().append("g")
+            .attr("fill", function(d, i) { return color(i); });
+
+        var rect = series.selectAll("rect")
+          .data(function(d) { return d; })
+          .enter().append("rect")
+            .attr("x", function(d, i) { return x(i); })
+            .attr("y", height)
+            .attr("width", x.bandwidth())
+            .attr("height", 0);
+
+        rect.transition()
+            .delay(function(d, i) { return i * 10; })
+            .attr("y", function(d) { return y(d[1]); })
+            .attr("height", function(d) { return y(d[0]) - y(d[1]); });
+
+        d3.selectAll(".input_01")
+            .on("change", changed);
+
+        var timeout = d3.timeout(function() {
+          d3.select("input[value=\"grouped\"]")
+              .property("checked", true)
+              .dispatch("change");
+        }, 2000);
+
+        function changed() {
+          timeout.stop();
+          if (this.value === "grouped") transitionGrouped();
+          else transitionStacked();
+        }
+
+        function transitionGrouped() {
+          y.domain([0, yMax]);
+
+          rect.transition()
+              .duration(500)
+              .delay(function(d, i) { return i * 10; })
+              .attr("x", function(d, i) { return x(i) + x.bandwidth() / n * this.parentNode.__data__.key; })
+              .attr("width", x.bandwidth() / n)
+            .transition()
+              .attr("y", function(d) { return y(d[1] - d[0]); })
+              .attr("height", function(d) { return y(0) - y(d[1] - d[0]); });
+        }
+
+        function transitionStacked() {
+          y.domain([0, y1Max]);
+
+          rect.transition()
+              .duration(500)
+              .delay(function(d, i) { return i * 10; })
+              .attr("y", function(d) { return y(d[1]); })
+              .attr("height", function(d) { return y(d[0]) - y(d[1]); })
+            .transition()
+              .attr("x", function(d, i) { return x(i); })
+              .attr("width", x.bandwidth());
+        }
+
+      })
+
+
+
+    </script>
+
+  </div>
+    <!-- <div class="ui inverted segment">
+      <button class="ui inverted yellow basic button">Basic Yellow</button>
+    </div> -->
+
+    <!-- <div style="width:20%;  background-color:yellow;">
+      <div class="ui segments" style="background-color:black;">
+        <div class="ui segment curr_seg" style="background-color:black;">
+          <button class="ui inverted yellow basic button">Basic Yellow</button>
+        </div>
+        <div class="ui segment curr_seg" style="background-color:black;">
+          <button class="ui inverted yellow basic button">Bitcoin (BTC)</button>
+        </div>
+        <div class="ui segment curr_seg" style="background-color:black;">
+          <button class="ui inverted yellow basic button">Ethereum (ETH)</button>
+        </div>
+        <div class="ui segment curr_seg" style="background-color:black;">
+          <button class="ui inverted yellow basic button">Litecoin (LTC)</button>
+        </div>
+        <div class="ui segment curr_seg" style="background-color:black;">
+          <button class="ui inverted yellow basic button">Ripple (XRP)</button>
+        </div>
+        <div class="ui segment curr_seg" style="background-color:black;">
+          <button class="ui inverted yellow basic button">Ripple (XRP)</button>
+        </div>
+      </div>
+    </div> -->
+
+    <script type="text/javascript">
+      $('.ui.sidebar')
+        .sidebar({
+          dimPage : false,
+          closable : false
+        })
+
+      // $('.ui.sidebar')
+      //   .sidebar('toggle');
     </script>
   </body>
 </html>
