@@ -110,7 +110,7 @@
       var n = 4 // number of series
       var m = time_periods
 
-      var res_price_n_periods = function(price_data) {
+      var res_price_n_periods = function(price_data, svg_appendage) {
         console.log('got price response from server')
         var xz = d3.range(m)
         xz = inverse_array(xz) // inverse
@@ -127,7 +127,9 @@
           });
         });
 
-        var svg = d3.select("#svg_00"),
+        // var svg = d3.select("#svg_00"),
+
+        var svg = d3.select("#svg_"+svg_appendage),
             margin = {top: 40, right: 10, bottom: 20, left: 10},
             width = +svg.attr("width") - margin.left - margin.right,
             height = +svg.attr("height") - margin.top - margin.bottom,
@@ -165,7 +167,7 @@
             .attr("height", function(d) { return y(d[0]) - y(d[1]); });
       }
 
-      var res_ema_n_periods = function(price_data) {
+      var res_ema_n_periods = function(price_data, svg_appendage) {
         console.log('got ema response from server')
         var xz = d3.range(m)
         xz = inverse_array(xz) // inverse
@@ -182,7 +184,7 @@
           });
         });
 
-        var svg = d3.select("#svg_01"),
+        var svg = d3.select("#svg_"+svg_appendage),
             margin = {top: 40, right: 10, bottom: 20, left: 10},
             width = +svg.attr("width") - margin.left - margin.right,
             height = +svg.attr("height") - margin.top - margin.bottom,
@@ -227,11 +229,11 @@
       var color_arr = [d3.schemeCategory20b[8], d3.schemeCategory20b[9], d3.schemeCategory20b[10], d3.schemeCategory20b[11]]
 
       socket.on('res price n periods', function(price_data){
-        res_price_n_periods(price_data)
+        res_price_n_periods(price_data, "00")
       })
 
       socket.on('res ema n periods', function(price_data) {
-        res_ema_n_periods(price_data)
+        res_price_n_periods(price_data, "01")
       })
     </script>
   </body>
