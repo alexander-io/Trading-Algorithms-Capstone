@@ -14,10 +14,14 @@
       var currency = 'bitcoin'
       var socket = io.connect('http://localhost:8080');
       socket.emit('req price n periods', {currency : currency, periods : initial_time_periods})
-      socket.emit('req ema n periods', {currency : 'bitcoin', periods : initial_time_periods})
+      // socket.emit('req ema n periods', {currency : 'bitcoin', periods : initial_time_periods})
+
     </script>
   </head>
   <body>
+
+
+
     <div class="ui internally celled grid">
       <div class="row">
         <div class="three wide column">
@@ -32,40 +36,89 @@
                <h4 style="display:inline;" id="current_currency_text" class="current_currency_text">bitcoin</h4>
 
               <div class="ui four top attached buttons">
-                  <div class="ui active button">price</div>
-                  <div class="ui button">EMA</div>
-                  <div class="ui button">SMA</div>
-                  <div class="ui button">Wiki Views</div>
+                  <div class="ui active button price_button 00_button" funx="price">price</div>
+                  <div class="ui button ema_button 00_button" funx="ema">EMA</div>
+                  <div class="ui button sma_button 00_button" funx="sma">SMA</div>
+                  <div class="ui button wiki_views_button 00_button" funx="wiki">Wiki Views</div>
+
               </div>
 
               <svg id="svg_00" class="00_svg display_svg" height="500"></svg>
-            </div>
 
-            <div id="01_seg" class="ui segment display_seg" style="width:100%;">
-              <div class="ui right internal attached rail">
-               <div class="ui segment">
-                 EMA in usd ->  <h4 style="display:inline;" id="current_currency_text" class="current_currency_text">bitcoin</h4>
-               </div>
-             </div>
-              <svg id="svg_01" class="01_svg display_svg" height="500"></svg>
             </div>
+            <script type="text/javascript">
+              let funx = {
+                price : function() {
+                  console.log('price called')
+                  socket.emit('req price n periods', {currency : currency, periods : initial_time_periods})
+                },
+                ema : function() {
+                  console.log('ema called')
+                  socket.emit('req ema n periods', {currency : currency, periods : initial_time_periods})
+                },
+                sma : function() {
+                  console.log('sma c alled')
+                  socket.emit('req sma n periods', {currency : currency, periods : initial_time_periods})
+                }
+              }
 
+              let svg_elem = document.getElementById('svg_00')
+              let list_of_buttons = document.getElementsByClassName('00_button')
+              for (let i = 0; i < list_of_buttons.length; i++) {
+                list_of_buttons[i].addEventListener('click', function() {
+                  for (let ii = 0; ii < list_of_buttons.length; ii++) {
+                    list_of_buttons[ii].classList.remove('active')
+                  }
+                  this.classList.add('active')
+
+                  d3.select("#svg_00")
+                    .selectAll("*")
+                    .remove()
+
+                  funx[this.getAttribute("funx")]()
+                })
+              }
+            </script>
           </div>
         </div>
         <div class="three wide column">
-          <img>
         </div>
       </div>
+
       <div class="row">
-        <div class="three wide column">
-          <img>
-        </div>
+        <div class="three wide column"></div>
         <div class="ten wide column">
-          <p></p>
+          <div class="ui center aligned container" style="padding:5%;width:100%;">
+            <div id="01_seg" class="ui segment display_seg" style="width:100%;">
+              <svg id="svg_01" class="01_svg display_svg" height="500"></svg>
+            </div>
+          </div>
         </div>
-        <div class="three wide column">
-          <img>
+        <div class="three wide column"></div>
+      </div>
+
+      <div class="row">
+        <div class="three wide column"></div>
+        <div class="ten wide column">
+          <div class="ui center aligned container" style="padding:5%;width:100%;">
+            <div id="02_seg" class="ui segment display_seg" style="width:100%;">
+              <svg id="svg_02" class="21_svg display_svg" height="500"></svg>
+            </div>
+          </div>
         </div>
+        <div class="three wide column"></div>
+      </div>
+
+      <div class="row">
+        <div class="three wide column"></div>
+        <div class="ten wide column">
+          <div class="ui center aligned container" style="padding:5%;width:100%;">
+            <div id="03_seg" class="ui segment display_seg" style="width:100%;">
+              <svg id="svg_03" class="03_svg display_svg" height="500"></svg>
+            </div>
+          </div>
+        </div>
+        <div class="three wide column"></div>
       </div>
     </div>
 
@@ -105,12 +158,17 @@
         let min = d3.min(price_array)
         return price_array.map(x => x - min)
       }
+    </script>
 
-      var time_periods = 400
-      var n = 4 // number of series
-      var m = time_periods
 
-      var res_price_n_periods = function(price_data, svg_appendage) {
+    <script type="text/javascript">
+
+      // var time_periods = 400
+
+      var res_price_n_periods = function(price_data, svg_appendage, time_periods) {
+        var n = 4 // number of series
+        var m = time_periods
+        console.log('time period', time_periods)
         console.log('got price response from server')
         var xz = d3.range(m)
         xz = inverse_array(xz) // inverse
@@ -127,10 +185,8 @@
           });
         });
 
-        // var svg = d3.select("#svg_00"),
-
         var svg = d3.select("#svg_"+svg_appendage),
-            margin = {top: 40, right: 10, bottom: 20, left: 10},
+            margin = {top: 10, right: 10, bottom: 10, left: 10},
             width = +svg.attr("width") - margin.left - margin.right,
             height = +svg.attr("height") - margin.top - margin.bottom,
             g = svg.append("g").attr("transform", "translate(" + 0 + "," + margin.top + ")");
@@ -162,78 +218,26 @@
             .attr("height", 0);
 
         rect.transition()
-            .delay(function(d, i) { return i * 10; })
-            .attr("y", function(d) { return y(d[1]); })
-            .attr("height", function(d) { return y(d[0]) - y(d[1]); });
-      }
-
-      var res_ema_n_periods = function(price_data, svg_appendage) {
-        console.log('got ema response from server')
-        var xz = d3.range(m)
-        xz = inverse_array(xz) // inverse
-        var yz = d3.range(n).map(function() {
-          return price_array_to_reduced_price_array(price_data.price_array);
-        })
-        var y01z = d3.stack().keys(d3.range(n))(d3.transpose(yz))
-        var yMax = d3.max(yz, function(y) {
-          return d3.max(y);
-        })
-        var y1Max = d3.max(y01z, function(y) {
-          return d3.max(y, function(d) {
-            return d[1];
-          });
-        });
-
-        var svg = d3.select("#svg_"+svg_appendage),
-            margin = {top: 40, right: 10, bottom: 20, left: 10},
-            width = +svg.attr("width") - margin.left - margin.right,
-            height = +svg.attr("height") - margin.top - margin.bottom,
-            g = svg.append("g").attr("transform", "translate(" + 0 + "," + margin.top + ")");
-
-        var x = d3.scaleBand()
-            .domain(xz)
-            .rangeRound([0, width])
-            .padding(0.08);
-
-        var y = d3.scaleLinear()
-            .domain([0, y1Max])
-            .range([height, 0]);
-
-
-        var color = d3.scaleOrdinal()
-            .domain(d3.range(n))
-            .range(color_arr);
-
-        var series = g.selectAll(".series")
-          .data(y01z)
-          .enter().append("g")
-            .attr("fill", function(d, i) { return color(i); });
-
-        var rect = series.selectAll("rect")
-          .data(function(d) { return d; })
-          .enter().append("rect")
-            .attr("x", function(d, i) { return x(i); })
-            .attr("y", height)
-            .attr("width", x.bandwidth())
-            .attr("height", 0);
-
-        rect.transition()
-            .delay(function(d, i) { return i * 10; })
+            .delay(function(d, i) { return i ; })
             .attr("y", function(d) { return y(d[1]); })
             .attr("height", function(d) { return y(d[0]) - y(d[1]); });
       }
     </script>
 
-
     <script>
       var color_arr = [d3.schemeCategory20b[8], d3.schemeCategory20b[9], d3.schemeCategory20b[10], d3.schemeCategory20b[11]]
 
       socket.on('res price n periods', function(price_data){
-        res_price_n_periods(price_data, "00")
+        console.log(price_data)
+        res_price_n_periods(price_data, "00", price_data.price_array.length)
       })
 
       socket.on('res ema n periods', function(price_data) {
-        res_price_n_periods(price_data, "01")
+        res_price_n_periods(price_data, "00", price_data.price_array.length)
+      })
+
+      socket.on('res sma n periods', function(price_data) {
+        res_price_n_periods(price_data, "00", price_data.price_array.length)
       })
     </script>
   </body>

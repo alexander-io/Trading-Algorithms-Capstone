@@ -27,6 +27,14 @@ io.on('connection', function(socket) {
       socket.emit('res price n periods', {price_array: resolution})
     })
   })
+
+  socket.on('req sma n periods', function(data) {
+    console.log('received request for  sma')
+    funx.get_sma_array_for_n_recent_periods_cmarketcap_price_where_currency_title(data.currency, data.periods).then((resolution, rejection) => {
+      // console.log(resolution)
+      socket.emit('res sma n periods', {price_array : resolution})
+    })
+  })
 })
 
 server.listen(port, function() {
