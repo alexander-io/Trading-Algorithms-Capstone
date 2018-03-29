@@ -24,10 +24,12 @@ import numpy
 #the bitcoin price from wikipedia page views
 #in order to keep functions working correctly with other functions, it must have two
 #input variables even though it only uses one
-def normalized_model_WIKI_to_BTC_value(inputVariable, value):
+def BTC_WIKI_to_BTC_value(inputVariable, value):
 	mean=numpy.mean(inputVariable)
 	standardDeviation=numpy.std(inputVariable)
 	return numpy.random.normal(mean,standardDeviation)
+
+def 
 
 
 #####################################################
