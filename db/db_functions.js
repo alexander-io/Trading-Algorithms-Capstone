@@ -45,7 +45,7 @@
       })
     },
     /*
-     * funx get_array_coinmarketcap_data_where_currency_title
+     *  get_array_coinmarketcap_data_where_currency_title
      * @param currency_title, select from db.coinmarketcap_ticker by currency_title
      *  ex : if (currency_title == 'ethereum') return collection.coinmarketcap_ticker where id is 'ethereum'
      */
@@ -297,8 +297,9 @@
       })
     },
     /*
-     *
-     *
+    * get coin market cap data entry with lowest price_usd via currency_title
+    * @param currency_title, ex : 'litecoin', 'bitcoin', 'ripple'
+    * @resolve json object, corresponding with lowest price value
      */
     get_cmarketcap_lowest_price_usd : function(currency_title) {
       let query = {"id" : currency_title}
@@ -320,14 +321,15 @@
       })
     },
     /*
-     *
-     *
+     * get array of json entries from coin market cap where currency tiitle
+     * @param currency_title, ex : 'litcoin', 'bitcoin', 'ripple'
+     * @resolve array of json entries corresponding to currency_title
      */
     get_cm_array_where_currency_title : function(currency_title) {
       let query = {"id" : currency_title}
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
-          if (err) {console.logent.close()
+          if (err) {console.log.close()
             resolve(err); reject(err)}
           let x = client.db(dbName).collection('coinmarketcap_ticker').find(query).toArray(function(err, docs) {
             resolve(docs)
@@ -336,6 +338,11 @@
         })
       })
     },
+    /*
+     * get average cmarket cap price where currency_title
+     * @param currency_title
+     * @resolve average  cmarket cap price by currency
+     */
     get_average_cm_price_where_currency_title : function(currency_title) {
       let query = {"id" : currency_title}
       return new Promise((resolve, reject) => {
@@ -357,7 +364,7 @@
      * get simple moving average for  n most-recent periods by currency title
      * @param currency_title
      * @param time_periods
-     * @ resolve simple moving average of time periods
+     * @ resolve simple moving average of n time periods
      */
     get_sma_for_n_recent_periods_cmarketcap_price_where_currency_title : function(currency_title, time_periods) {
       let query = {"id" : currency_title}
@@ -420,11 +427,17 @@
         })
       })
     },
+    /*
+     * get exponential moving average estimate for  next  time period by currency title
+     * @param  currency_title
+     * @param  time_periods
+     * @resolve ema price estimate  for next time  period
+     */
     get_ema_next_period_for_n_time_period_by_currency_title : function(currency_title, time_periods) {
       return new Promise((resolve, reject) => {
         this.get_ema_cmarketcap_for_n_time_period_by_currency_title(currency_title, time_periods).then((resolution, rejection) => {
           this.get_most_recent_coinmarketcap_data_entry_where_currency_title(currency_title).then((most_recent_entry_resolution, most_recent_rejection) => {
-            console.log(most_recent_entry_resolution)
+            // console.log(most_recent_entry_resolution)
             let most_recent_price = parseFloat(most_recent_entry_resolution.price_usd)
             let alpha = 2 / (time_periods+1)
             let ema_today = (most_recent_price*alpha) + (resolution[0] * (1-alpha))
@@ -437,6 +450,12 @@
         })
       })
     },
+    /*
+     * get array of n most recent cmarket cap entries by currency_title
+     * @param currency_title
+     * @param  time_periods
+     * @resolve array of most recent cmarketcap entries
+     */
     get_array_n_most_recent_entries_cmarketcap_by_currency_title : function(currency_title, time_periods) {
       let query = {"id" : currency_title}
       return new Promise((resolve, reject) => {
@@ -447,6 +466,22 @@
             let array_of_n_periods = []
             for (let i = 0; i < time_periods; i++) {
               array_of_n_periods.push(docs[i])
+            }
+            resolve(array_of_n_periods)
+          })
+        })
+      })
+    },
+    get_array_n_most_recent_prices_cmarketcap_by_currency_title : function(currency_title, time_periods) {
+      let query = {"id" : currency_title}
+      return new Promise((resolve, reject) => {
+        mongo.connect(url, (err, client) => {
+          if (err) {console.log(err); reject(err)}
+          let x = client.db(dbName).collection('coinmarketcap_ticker').find(query).sort({unix_time : -1}).toArray((err, docs) => {
+            client.close()
+            let array_of_n_periods = []
+            for (let i = 0; i < time_periods; i++) {
+              array_of_n_periods.push(parseFloat(docs[i].price_usd))
             }
             resolve(array_of_n_periods)
           })
@@ -497,15 +532,15 @@
   }
 
 
-  module.exports.get_ema_cmarketcap_for_n_time_period_by_currency_title('bitcoin', 40).then((resolution, rejection) => {
-    console.log(resolution)
-  })
+  // module.exports.get_ema_cmarketcap_for_n_time_period_by_currency_title('bitcoin', 40).then((resolution, rejection) => {
+  //   console.log(resolution)
+  // })
 
   // module.exports.get_sma_for_n_recent_periods_cmarketcap_price_where_currency_title('bitcoin', 20 ).then((resolution,rejection) => {
   //   console.log(resolution)
   // })
 
-  // module.exports.get_ema_next_period_for_n_time_period_by_currency_title('ripple', 100).then((resolution, rejection) => {
+  // module.exports.get_ema_next_period_for_n_time_period_by_currency_title('ripple', 60).then((resolution, rejection) => {
   //   console.log(resolution)
   // })
   // module.exports.get_ema_next_period_for_n_time_period_by_currency_title('bitcoin', 10).then((resolution, rejection) => {
