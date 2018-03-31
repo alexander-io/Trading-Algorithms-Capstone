@@ -38,17 +38,25 @@ def time_update_txt_daily():
         from_="+12623144555",
         body=today)
 
-def once_per_day_scripts():
-    subprocess.Popen(['nodejs', path+wiki])
-    time_update_txt_daily()
 
-def once_per_15_min_scripts():
+def once_per_1_min_scripts():
     subprocess.Popen(['nodejs', path+cmarketcap])
+
+
+def once_per_5_min_scripts():
+    # subprocess.Popen(['nodejs'], path+cmarketcap)
+    pass
+def once_per_15_min_scripts():
+    # subprocess.Popen(['nodejs', path+cmarketcap])
     subprocess.Popen(['python3', path+blockchain])
     subprocess.Popen(['python3', path+twitter])
 
 def once_per_hour_scripts():
     pass
+
+def once_per_day_scripts():
+    subprocess.Popen(['nodejs', path+wiki])
+    time_update_txt_daily()
 
 def twenty_four_hours_have_elapsed_unix(start_time, end_time):
     if (end_time - start_time >= ((60*60)*24)):
@@ -91,6 +99,7 @@ def serve():
     server_start_time_unix = time.time()
     print('server start time\n\t', server_start_time, server_start_time_unix)
 
+    once_per_1_min_scripts()
     once_per_15_min_scripts()
     once_per_day_scripts()
 
@@ -108,6 +117,15 @@ def serve():
         current_time_unix = time.time()
         print('::::: current time\n\t', current_time)
 
+
+        if (one_min_has_elapsed_unix(last_1_min_call_unix, current_time_unix)):
+            last_1_min_call_unix = current_time_unix
+            once_per_1_min_scripts()
+
+        if (five_mins_have_elapsed_unix(last_5_min_call_unix, current_time_unix)):
+            last_5_min_call_unix = current_time_unix
+            # once_per_5_min_scripts()
+
         if (fifteen_mins_have_elapsed_unix(last_15_min_call_unix, current_time_unix)):
             last_15_min_call_unix = current_time_unix
             once_per_15_min_scripts()
@@ -116,6 +134,6 @@ def serve():
             last_24_hr_call_unix = current_time_unix
             once_per_day_scripts()
 
-        time.sleep(mins_to_secs(5))
+        time.sleep(mins_to_secs(1))
 
 serve()
