@@ -17,20 +17,113 @@ ideas:
 	z normal curves drawn in this fashion while decreasing y iterativly.
 
 '''
-import numpy
+import numpy,random, scipy.stats, math
 
 
-#uses normal curve generated from mean and standard devation of input data to approximate
-#the bitcoin price from wikipedia page views
-#in order to keep functions working correctly with other functions, it must have two
-#input variables even though it only uses one
-def BTC_WIKI_to_BTC_value(inputVariable, value):
-	mean=numpy.mean(inputVariable)
-	standardDeviation=numpy.std(inputVariable)
+#########################################
+#										#
+#				Averages 				#
+#										#
+#########################################
+
+def simpleAverage(inputVariable):
+	return numpy.mean(inputVariable)
+
+def calWeights(n):
+	triangleNumber=(n*(n+1))/2
+	weights=[]
+	for x in range(1,n+1):
+		weights.append(x/triangleNumber)
+	return weights
+
+def movingAverage(inputVariable):
+	weight=calWeights(len(inputVariable))
+	return numpy.ma.average(inputVariable,weights=weight)
+
+
+#########################################
+#										#
+#		Probability Distributions		#
+#										#
+#########################################
+
+distributions=['RECENTtriangular','MEANtriangular','triangularDist','betaDist','exponentialDist','lognormalDist','uniformDist','cauchyDist','geometricDist','poissonDist','binomialDist','normalDist']
+
+def getDistributions():
+	return distributions
+
+def normalDist(inputVariable):
+	mean=movingAverage(inputVariable)
+	standardDeviation=numpy.std(inputVariable) 
 	return numpy.random.normal(mean,standardDeviation)
 
-def 
+def binomialDist(inputVariable): 
+	recentValue=inputVariable[len(inputVariable)-1]
+	highValue=max(inputVariable[0:len(inputVariable)-1])
+	return numpy.random.binomial(highValue,recentValue/highValue)
 
+def poissonDist(inputVariable):
+	mean=movingAverage(inputVariable)
+	return numpy.random.poisson(mean)
+
+def geometricDist(inputVariable):
+	mean=movingAverage(inputVariable)
+	return numpy.random.geometric(1/mean)
+
+def cauchyDist(inputVariable):
+	mean=movingAverage(inputVariable[0:len(inputVariable)-1])
+	recentValue=inputVariable[len(inputVariable)-1]
+	standardDeviation=numpy.std(inputVariable[0:len(inputVariable)-1])
+	return -scipy.stats.cauchy.logpdf(recentValue,mean,standardDeviation)
+
+def uniformDist(inputVariable):
+	highValue=max(inputVariable)
+	lowValue=min(inputVariable)
+	return numpy.random.uniform(lowValue,highValue)
+
+def lognormalDist(inputVariable):
+	mean=movingAverage(inputVariable)
+	standardDeviation=numpy.std(inputVariable) 
+	return numpy.random.lognormal(mean,standardDeviation)
+
+def exponentialDist(inputVariable):
+	mean=movingAverage(inputVariable)
+	return numpy.random.exponential(mean)
+
+def betaDist(inputVariable):
+	mean=movingAverage(inputVariable)
+	standardDeviation=numpy.std(inputVariable)
+	modifiedMean=1/math.log(mean,math.e)
+	modifiedSTD=1/math.log(standardDeviation,math.e)
+	#print('mean',modifiedMean)
+	#print('std',modifiedSTD)
+	alpha=(((1-modifiedMean)/modifiedSTD)-(1/modifiedMean))*modifiedMean**2
+	#print('alpha',alpha)
+	beta=alpha*((1/modifiedMean)-1)
+	if beta <=0 or alpha <=0: return 0
+	#print('beta',beta)
+	output= numpy.random.beta(alpha,beta)
+	return 1/(output**e)
+
+def triangularDist(inputVariable):
+	mode=(scipy.stats.mode(inputVariable))[0][0]
+	highValue=max(inputVariable)
+	lowValue=min(inputVariable)
+	return numpy.random.triangular(lowValue,mode,highValue)
+
+#the next 2 methods are in testing phase still
+
+def MEANtriangularDist(inputVariable):
+	mean=movingAverage(inputVariable)
+	highValue=max(inputVariable)
+	lowValue=min(inputVariable)
+	return numpy.random.triangular(lowValue,mean,highValue)
+
+def RECENTtriangularDist(inputVariable):
+	recentValue=inputVariable[len(inputVariable)-1]
+	highValue=max(inputVariable[0:len(inputVariable)-1])
+	lowValue=min(inputVariable[0:len(inputVariable)-1])
+	return numpy.random.triangular(lowValue,recentValue,highValue)
 
 #####################################################
 #													#
@@ -40,77 +133,26 @@ def
 #													#
 #####################################################
 
-
-#import csv
-
-
-'''
-def defineStates(datafile):
-	This function takes a datafile name as its argument and returns price tranition
-	probabilities for price data asociate with Bitcoin, Litecoin, and Ethereum.
-	It is designed to take candle data. Divides data into 11 states: 0% change, 
-	+-2% change, +-5% change, +-10% change, +-15% change, greater than +-25% change. 
-	states=[]
-	with open(dataFile) as csvfile:
-		reader = csv.DictReader(csvfile)
-		for row in range(1,len(reader)):
-			percentChange=(reader[row][1]-reader[row-1][1])/reader[row-1][1]
-			if percentChange == 0: states.append(0)
-			elif percentChange < 0:
-				if percentChange >=-2: states.append(-2)
-				elif percentChange >=-5: states.append(-5)
-				elif percentChange >=-10: states.append(-10)
-				elif percentChange >=-15: states.append(-15)
-				else: states.append(-25)
-			else:
-				if percentChange <=2: states.append(2)
-				elif percentChange <=5: states.append(5)
-				elif percentChange <=10: states.append(10)
-				elif percentChange <=15: states.append(15)
-				else: states.append(25)
-	return states
-'''
+def main():
+	a=[1,2,3,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6,7,8,9,10]
+	print('array',a)
+	random.shuffle(a)
+	print('shuffled',a)
+	print('MA',movingAverage(a))
+	print('SA',simpleAverage(a))
+	print('normal',normalDist(a))
+	print('poisson',poissonDist(a))
+	print('geometric',geometricDist(a))
+	print('binomial',binomialDist(a))
+	print('cauchy',cauchyDist(a))
+	print('uniform',uniformDist(a))
+	print('beta',betaDist(a))
+	print('triangular',triangularDist(a))
+	print('MEANtriangular',MEANtriangularDist(a))
+	print('RECENTtriangularDist',RECENTtriangularDist(a))
 
 
-'''
-#importing gdax candle  module
-import importlib.util,os,inspect
-
-path=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-path=path[0:len(path)-4]
-
-#import candles to collect new candles from GDAX if need be
-spec = importlib.util.spec_from_file_location("candles.py", path+'/DataMining/GdaxScraper/candles.py')
-candles = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(candles)
-
-#import query to query db for entries.
-spec = importlib.util.spec_from_file_location("query.py", path+'/db/query.py')
-query = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(query)
-#end of module importation
-
-gdaxFileNames=['LONGgdaxCandleDataBTC.csv','LONGgdaxCandleDataETH.csv','LONGgdaxCandleDataLTC.csv','SHORTgdaxCandleDataBTC.csv','SHORTgdaxCandleDataETH.csv','SHORTgdaxCandleDataLTC.csv']
-'''
-
-
-
-'''
-def collectCSVdata():
-	#get data as csv from candles.py
-	candles.runAllDefault()
-	#list to hold all percent changes
-	percentChanges
-	#input each datafile to get transition probability
-	for dataFile in range(0,len(gdaxFileNames)):
-		states=defineStates(path+'/DataMining/GdaxScraper/'+gdaxFileNames[dataFile])
-'''
-
-
-
-
-
-
-
+if __name__ == '__main__':
+	main()
 
 			

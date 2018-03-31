@@ -1,5 +1,44 @@
 import bayesianNetwork as BN
 import generalLinearModel as GLM
+import itertools
+
+'''
+Gives a 2d list of all possible distribution combonations. 
+i.e. with n of 2, and only binomial and normal distributions, the output would look like:
+			[['normal','normal'],['normal','binomial'],['binomial','normal'],['binomial','binomial']]
+param 		n 		the number of variables. The length of each substring
+return 				all combonations of distributions
+'''
+def distributionCombos(n):
+	dists=BN.getDistributions()
+	#print(dists)
+	return list(itertools.product(dists,repeat=n))
+
+
+
+def findBestDistributions(inputVariables,outputVariable):
+	#number of iterations of tests to run to find best distributions
+	numberTests=10000
+	distCombos=distributionCombos(len(inputVariables))
+	GLMfunctions=GLM.getFunctions()
+	for dist in distCombos:
+		#for use when multiple accuracy trials are run
+		#for x in range(numberTests)
+			#distOutputs=[]
+		price=GLM.intercept()
+		for y in range(len(inputVariables)):
+			#dist[y] is distribution fuction
+			output=BN.dist[y](inputVariables[y])
+			#glmfunctions[y] is glm function for input
+			price+=GLM.GLMfunctions[y](output)
+
+		
+
+
+
+
+		
+
 
 
 #calculates error from probability function. 
@@ -18,6 +57,7 @@ def calculateErrorRobust(inputVariable, actualValues, probabilityFunction):
 		testSet=inputVariable[x]
 		predicted=probabilityFunction(trainSet,testSet)
 		error+=((actualValues[x]-predicted)**2)/len(inputVariable)
+
 	return error/len(inputVariable)
 
 #calculates model with normal distribution but limits range for normal distribution.
