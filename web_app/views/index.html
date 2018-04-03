@@ -16,19 +16,11 @@
 
 
     <div class="ui internally celled grid" id="svg_root">
-      <div class="row">
+      <div class="row" style="visibility:hidden;height:0px;">
         <div class="three wide column"></div>
         <div class="ten wide column">
           <div  class="ui center aligned container" style="width:100%;padding:5%;">
             <div id="00_seg" class="ui segment display_seg" style="width:100%;">
-               <h4 style="display:inline;" id="current_currency_text" class="current_currency_text">bitcoin</h4>
-
-              <div class="ui four top attached buttons">
-                  <div class="ui active button price_button 00_button" funx="price">price</div>
-                  <div class="ui button ema_button 00_button" funx="ema">EMA</div>
-                  <div class="ui button sma_button 00_button" funx="sma">SMA</div>
-                  <div class="ui button wiki_views_button 00_button" funx="wiki">Wiki Views</div>
-              </div>
               <svg id="svg_00" class="00_svg display_svg" height="500"></svg>
             </div>
           </div>
@@ -39,21 +31,19 @@
 
     <script type="text/javascript">
       let funx = {
-        price : function() {
+        price : function(symbol) {
           console.log('price called')
-          socket.emit('req price n periods', {currency : currency, periods : initial_time_periods})
+          socket.emit('req price n periods', {currency : symbol, periods : initial_time_periods})
         },
-        ema : function() {
+        ema : function(symbol) {
           console.log('ema called')
-          socket.emit('req ema n periods', {currency : currency, periods : initial_time_periods})
+          socket.emit('req ema n periods', {currency : symbol, periods : initial_time_periods})
         },
-        sma : function() {
-          console.log('sma c alled')
-          socket.emit('req sma n periods', {currency : currency, periods : initial_time_periods})
+        sma : function(symbol) {
+          console.log('sma called')
+          socket.emit('req sma n periods', {currency : symbol, periods : initial_time_periods})
         }
       }
-
-
 
       var  create_markup_structure = function(data) {
         // make svgs for each currency
@@ -79,7 +69,9 @@
           ui_segment_display.setAttribute("currency", data.currencies[i])
 
           let ui_four_top_attached_buttons = document.createElement('div')
-          ui_four_top_attached_buttons.classList = ['ui four top attached buttons']
+          ui_four_top_attached_buttons.classList = ['ui four top attached buttons ctrl_buttons']
+          ui_four_top_attached_buttons.setAttribute("currency", data.currencies[i])
+
 
           var ui_active_button_price = document.createElement('div')
           ui_active_button_price.classList = ['ui active button price_button ' + data.currencies[i]]
@@ -139,47 +131,47 @@
         var width_of_seg = document.getElementById('00_seg').getBoundingClientRect().width
         let display_svgs = document.getElementsByTagName('svg')
 
-        console.log(display_svgs)
+        // console.log(display_svgs)
         for (var i = 0; i < display_svgs.length; i++) {
           display_svgs[i].setAttribute("width", width_of_seg-20)
           // display_svgs[i].setAttribute("width", "100%")
         }
 
-      }
+        // let svg_elem = document.getElementById('svg_00')
+        let ctrl_buttons = document.getElementsByClassName('ctrl_buttons')
+        for (let x = 0; x < ctrl_buttons.length;x++) {
+          console.log(ctrl_buttons[x].childNodes.length)
 
+          for (let i = 0; i < ctrl_buttons[x].childNodes.length; i++) {
+            ctrl_buttons[x].childNodes[i].addEventListener('click', function() {
+              console.log('click')
+              for (let ii = 0; ii < ctrl_buttons[x].childNodes.length; ii++) {
+                ctrl_buttons[x].childNodes[ii].classList.remove('active')
+              }
+              this.classList.add('active')
+              d3.select("#"+ctrl_buttons[x].getAttribute('currency'))
+                .selectAll("*")
+                .remove()
+                console.log(ctrl_buttons[x].getAttribute('currency'))
 
+                funx[this.getAttribute("funx")](ctrl_buttons[x].getAttribute('currency'))
 
-      // let svg_elem = document.getElementById('svg_00')
-      let list_of_buttons = document.getElementsByClassName('00_button')
-      for (let i = 0; i < list_of_buttons.length; i++) {
-        list_of_buttons[i].addEventListener('click', function() {
-          for (let ii = 0; ii < list_of_buttons.length; ii++) {
-            list_of_buttons[ii].classList.remove('active')
+            })
           }
-          this.classList.add('active')
-          d3.select("#svg_00")
-            .selectAll("*")
-            .remove()
-
-          funx[this.getAttribute("funx")]()
-        })
+        }
       }
     </script>
 
 
     <script type="text/javascript">
-      var initial_time_periods = 100
+      var initial_time_periods = 200
       var currency = 'BTC'
       var socket = io.connect('http://localhost:8080');
 
       socket.on('currencies', function(data) {
-        console.log(data.currencies)
-
         create_markup_structure(data)
-
         for (let i  = 0; i <  data.currencies.length; i++) {
           socket.emit('req price n periods', {currency : data.currencies[i], periods : initial_time_periods})
-          // socket.emit('req price n periods', {currency : data.currencies[i], periods : initial_time_periods})
         }
       })
 
@@ -236,7 +228,7 @@
       // var time_periods = 400
 
       var res_price_n_periods = function(price_data, time_periods) {
-        var n = 1 // number of series
+        var n = 3 // number of series
         var m = time_periods
         // console.log('time period', time_periods)
         // console.log('got price response from server')
@@ -257,8 +249,8 @@
         });
 
 
+        // console.log(price_data.symbol)
         console.log(price_data.symbol)
-
         var svg = d3.select("#"+price_data.symbol)
         // var svg = d3.select("#BTC")
             margin = {top: 5, right: 5, bottom: 5, left: 5},
