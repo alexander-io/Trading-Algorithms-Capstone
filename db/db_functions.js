@@ -370,7 +370,6 @@
       let query = {"id" : currency_title}
       return new Promise((resolve, reject) => {
         this.get_num_entries_where_collection_AND_query('coinmarketcap_ticker', query).then((resolution, rejection) => {
-          console.log('num entries', resolution)
           if (time_periods > resolution) {
             time_periods = resolution
             console.log('only', resolution, 'available time periods')
@@ -391,6 +390,39 @@
               } catch(e) {
                 reject(e)
               }
+            })
+          })
+        })
+      })
+    },
+    get_sma_array_for_n_recent_periods_cmarketcap_price_where_currency_title : function(currency_title, time_periods) {
+      let query = {"id" : currency_title}
+      return new Promise((resolve, reject) => {
+        this.get_num_entries_where_collection_AND_query('coinmarketcap_ticker', query).then((resolution, rejection) => {
+          if (time_periods > resolution) {
+            time_periods = resolution
+            console.log('only', resolution, 'available time periods')
+          }
+          mongo.connect(url, (err, client) => {
+            if (err) {console.log(err); reject(err)}
+            let x = client.db(dbName).collection('coinmarketcap_ticker').find(query).sort({unix_time : -1}).limit(time_periods).toArray((err, docs) => {
+              if (err) {console.log(err); reject(err)}
+              client.close()
+              let period = 10
+              let sma_array = []
+              let init_running_total = 0
+              for (let i = docs.length-1; i >= 0; i--) {
+                init_running_total+=parseFloat(docs[i].price_usd)
+                if (i < docs.length - period) {
+                  // console.log(docs[i+period].price_usd)
+                  init_running_total -= parseFloat(docs[i+period].price_usd)
+                  // console.log(init_running_total)
+
+                  sma_array[i] = init_running_total/period
+                }
+              }
+              // console.log(sma_array.length)
+              resolve(sma_array)
             })
           })
         })
