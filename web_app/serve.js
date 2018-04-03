@@ -4,6 +4,8 @@ let server = require('http').createServer(app)
 let io = require('socket.io')(server)
 const { fork } = require('child_process')
 
+var currencies = require(__dirname + '/../DataMining/scheduler/currencies.json')
+
 const port = 8080
 
 
@@ -13,6 +15,8 @@ app.get('/', function(req,  res) {
 })
 
 io.on('connection', function(socket) {
+  socket.emit('currencies', currencies)
+
 
   socket.on('req ema n periods', function(data) {
     console.log('received request for ema')

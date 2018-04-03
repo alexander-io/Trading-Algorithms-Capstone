@@ -9,20 +9,13 @@
     <script src="d3.v4.min.js"></script>
     <script src="semantic.min.js"></script>
     <link rel="stylesheet" href="semantic.min.css">
-    <script type="text/javascript">
-      var initial_time_periods = 500
-      var currency = 'bitcoin'
-      var socket = io.connect('http://localhost:8080');
-      socket.emit('req price n periods', {currency : currency, periods : initial_time_periods})
-      // socket.emit('req ema n periods', {currency : 'bitcoin', periods : initial_time_periods})
 
-    </script>
   </head>
   <body>
 
 
 
-    <div class="ui internally celled grid">
+    <div class="ui internally celled grid" id="svg_root">
       <div class="row">
         <div class="three wide column">
           <img>
@@ -70,7 +63,6 @@
                     list_of_buttons[ii].classList.remove('active')
                   }
                   this.classList.add('active')
-
                   d3.select("#svg_00")
                     .selectAll("*")
                     .remove()
@@ -85,7 +77,7 @@
         </div>
       </div>
 
-      <div class="row">
+      <!-- <div class="row">
         <div class="three wide column"></div>
         <div class="ten wide column">
           <div class="ui center aligned container" style="padding:5%;width:100%;">
@@ -95,31 +87,58 @@
           </div>
         </div>
         <div class="three wide column"></div>
-      </div>
+      </div> -->
 
-      <div class="row">
-        <div class="three wide column"></div>
-        <div class="ten wide column">
-          <div class="ui center aligned container" style="padding:5%;width:100%;">
-            <div id="02_seg" class="ui segment display_seg" style="width:100%;">
-              <svg id="svg_02" class="21_svg display_svg" height="500"></svg>
-            </div>
-          </div>
-        </div>
-        <div class="three wide column"></div>
-      </div>
+      <script type="text/javascript">
+        var initial_time_periods = 50
+        var currency = 'BTC'
+        var socket = io.connect('http://localhost:8080');
 
-      <div class="row">
-        <div class="three wide column"></div>
-        <div class="ten wide column">
-          <div class="ui center aligned container" style="padding:5%;width:100%;">
-            <div id="03_seg" class="ui segment display_seg" style="width:100%;">
-              <svg id="svg_03" class="03_svg display_svg" height="500"></svg>
-            </div>
-          </div>
-        </div>
-        <div class="three wide column"></div>
-      </div>
+        socket.on('currencies', function(data) {
+          console.log(data.currencies)
+
+          // make svgs for each currency
+          var svg_root = document.getElementById('svg_root')
+          for (let i  = 0; i <  data.currencies.length; i++) {
+            let row = document.createElement('div')//.classList.add("row")
+            row.classList.add("row")
+            row.setAttribute("currency", data.currencies[i])
+
+            let three_wide_col = document.createElement('div')
+            three_wide_col.classList = ['three wide column']
+
+            let ten_wide_col = document.createElement('div')
+            ten_wide_col.classList = ['ten wide column']
+
+
+            // <div class="ui center aligned container" style="padding:5%;width:100%;">
+            let ui_align_container = document.createElement('div')
+            ui_align_container.classList =  ['ui center aligned container']
+            ui_align_container.setAttribute("style", "padding:5%; width:100%;")
+
+            ten_wide_col.appendChild(ui_align_container)
+
+
+            let three_wide_col_second = document.createElement('div')
+            three_wide_col_second.classList = ['three wide column']
+
+
+            row.appendChild(three_wide_col)
+            row.appendChild(ten_wide_col)
+            row.appendChild(three_wide_col_second)
+
+
+            svg_root.appendChild(row)
+          }
+
+          for (let i  = 0; i <  data.currencies.length; i++) {
+            socket.emit('req price n periods', {currency : 'BTC', periods : initial_time_periods})
+            // socket.emit('req price n periods', {currency : data.currencies[i], periods : initial_time_periods})
+          }
+        })
+
+      </script>
+
     </div>
 
     <script type="text/javascript">
