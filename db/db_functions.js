@@ -16,6 +16,7 @@
           const db = client.db(dbName)
           var collection = db.collection(collection_title)
           // insert entry into db collection
+          console.log('inserting :', entry)
           collection.insert(entry, function(err, result) {
             if (err) {
               console.log('error', err)
@@ -277,7 +278,7 @@
      * @resolve json object, corresponding with highest price value
      */
     get_cmarketcap_highest_price_usd : function(currency_title) {
-      let query = {"id" : currency_title}
+      let query = {"symbol" : currency_title}
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
           if (err) {console.log(err); reject(err)}
@@ -302,7 +303,7 @@
     * @resolve json object, corresponding with lowest price value
      */
     get_cmarketcap_lowest_price_usd : function(currency_title) {
-      let query = {"id" : currency_title}
+      let query = {"symbol" : currency_title}
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
           if (err) {console.log(err); reject(err)}
@@ -326,7 +327,7 @@
      * @resolve array of json entries corresponding to currency_title
      */
     get_cm_array_where_currency_title : function(currency_title) {
-      let query = {"id" : currency_title}
+      let query = {"symbol" : currency_title}
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
           if (err) {console.log.close()
@@ -344,7 +345,7 @@
      * @resolve average  cmarket cap price by currency
      */
     get_average_cm_price_where_currency_title : function(currency_title) {
-      let query = {"id" : currency_title}
+      let query = {"symbol" : currency_title}
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
           if (err) {console.log(err); reject(err)}
@@ -367,7 +368,7 @@
      * @ resolve simple moving average of n time periods
      */
     get_sma_for_n_recent_periods_cmarketcap_price_where_currency_title : function(currency_title, time_periods) {
-      let query = {"id" : currency_title}
+      let query = {"symbol" : currency_title}
       return new Promise((resolve, reject) => {
         this.get_num_entries_where_collection_AND_query('coinmarketcap_ticker', query).then((resolution, rejection) => {
           if (time_periods > resolution) {
@@ -396,7 +397,7 @@
       })
     },
     get_sma_array_for_n_recent_periods_cmarketcap_price_where_currency_title : function(currency_title, time_periods) {
-      let query = {"id" : currency_title}
+      let query = {"symbol" : currency_title}
       return new Promise((resolve, reject) => {
         this.get_num_entries_where_collection_AND_query('coinmarketcap_ticker', query).then((resolution, rejection) => {
           if (time_periods > resolution) {
@@ -437,7 +438,7 @@
      *  index[time_periods] -> east-recent
      */
     get_ema_cmarketcap_for_n_time_period_by_currency_title : function(currency_title, time_periods) {
-      let query = {"id" : currency_title}
+      let query = {"symbol" : currency_title}
       return new Promise((resolve, reject) => {
         this.get_array_n_most_recent_entries_cmarketcap_by_currency_title(currency_title, time_periods).then((resolution, rejection) => {
           this.get_sma_for_n_recent_periods_cmarketcap_price_where_currency_title(currency_title, time_periods).then((sma_resolution, sma_rejection) => {
@@ -489,7 +490,7 @@
      * @resolve array of most recent cmarketcap entries
      */
     get_array_n_most_recent_entries_cmarketcap_by_currency_title : function(currency_title, time_periods) {
-      let query = {"id" : currency_title}
+      let query = {"symbol" : currency_title}
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
           if (err) {console.log(err); reject(err)}
@@ -505,7 +506,7 @@
       })
     },
     get_array_n_most_recent_prices_cmarketcap_by_currency_title : function(currency_title, time_periods) {
-      let query = {"id" : currency_title}
+      let query = {"symbol" : currency_title}
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
           if (err) {console.log(err); reject(err)}
