@@ -8,7 +8,6 @@
     <script src="d3.v4.min.js"></script>
     <script src="semantic.min.js"></script>
     <link rel="stylesheet" href="semantic.min.css">
-    <!-- <link rel="stylesheet" href="icon.css"> -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
 
@@ -16,7 +15,8 @@
 
   <body>
     <div class="ui internally celled grid" id="svg_root">
-      <div class="row" style="height:500px;">
+      <div class="row" style="height:0px;">
+
         <div class="three wide column">
           <div class="ui icon message">
             <i class="material-icons">attach_money</i>
@@ -39,7 +39,7 @@
         <div class="three wide column">
           <div class="ui icon message">
             <div class="content">
-              <i class="material-icons">assessment</i>
+              <i class="material-icons" >assessment</i>
               <p>rank</p>
               <p>current price usd</p>
               <p>current price btc</p>
@@ -74,6 +74,17 @@
     }
   }
 
+  var unix_ms_to_date_string = function(unix_time_ms) {
+        let date = new Date(unix_time_ms)
+        let month = date.getMonth()
+        let day_of_month = date.getDate()
+        let hours = date.getHours()
+        let minutes = "0" + date.getMinutes()
+        let seconds = "0" + date.getSeconds()
+        let formattedTime = (month+1)+':'+day_of_month+'; '+hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+        return formattedTime
+  }
+
   var  create_markup_structure = function(data) {
     // make svgs for each currency
     var svg_root = document.getElementById('svg_root')
@@ -84,6 +95,40 @@
 
       let three_wide_col = document.createElement('div')
       three_wide_col.classList = ['three wide column']
+
+
+      var left_ui_icon_message = document.createElement('div')
+      left_ui_icon_message.classList = ['ui icon message']
+
+      var left_ui_icon_message_content = document.createElement('div')
+      left_ui_icon_message_content.classList = ['content']
+
+      var left_ui_icon_message_content_icon = document.createElement('i')
+      left_ui_icon_message_content_icon.classList = ['material-icons']
+      var left_ui_icon_message_content_icon_text_node =  document.createTextNode("fingerprint")
+      left_ui_icon_message_content_icon.appendChild(left_ui_icon_message_content_icon_text_node)
+
+
+
+      var currency_id = document.createElement('p')
+      currency_id.setAttribute("currency", data.currencies[i])
+      currency_id.classList = ["currency_id_root " + data.currencies[i]]
+      currency_id.setAttribute("id", "currency_id_root_"+data.currencies[i])
+
+      var currency_symbol = document.createElement('p')
+      currency_symbol.setAttribute("currency", data.currencies[i])
+      currency_symbol.classList = ["currency_symbol_root " + data.currencies[i]]
+      currency_symbol.setAttribute("id", "currency_symbol_root_"+data.currencies[i])
+
+      left_ui_icon_message_content.appendChild(left_ui_icon_message_content_icon)
+      left_ui_icon_message_content.appendChild(currency_id)
+      left_ui_icon_message_content.appendChild(currency_symbol)
+
+
+
+      left_ui_icon_message.appendChild(left_ui_icon_message_content)
+      three_wide_col.appendChild(left_ui_icon_message)
+
 
       let ten_wide_col = document.createElement('div')
       ten_wide_col.classList = ['ten wide column']
@@ -142,24 +187,6 @@
       let three_wide_col_second = document.createElement('div')
       three_wide_col_second.classList = ['three wide column']
 
-      //
-      // <div class="three wide column">
-      //   <div class="ui icon message">
-      //     <div class="content">
-      //       <i class="material-icons">assessment</i>
-      //       <p>rank</p>
-      //       <p>current price usd</p>
-      //       <p>current price btc</p>
-      //       <p>24hr volume</p>
-      //       <p>total supply</p>
-      //       <p>% change 1hr</p>
-      //       <p>% change 24hr</p>
-      //       <p>% change 7d</p>
-      //       <p>last updated</p>
-      //     </div>
-      //   </div>
-      // </div>
-      //
 
       var ui_icon_message = document.createElement('div')
       ui_icon_message.classList = ['ui icon message']
@@ -286,7 +313,7 @@
 
 
 <script type="text/javascript">
-  var initial_time_periods = 200
+  var initial_time_periods = 100
   var currency = 'BTC'
   var socket = io.connect('http://localhost:8080');
 
@@ -422,22 +449,27 @@
     // 'percent_change_7_days_root_',
     // 'last_updated_root_']
 
-    document.getElementById('rank_root_'+data.price_assessment.symbol).innerHTML = data.price_assessment.rank
+    document.getElementById('currency_id_root_'+data.price_assessment.symbol).innerHTML = "<b>name : </b>" + data.price_assessment.id
 
-    document.getElementById('current_price_usd_root_'+data.price_assessment.symbol).innerHTML = data.price_assessment.price_usd
+    document.getElementById('currency_symbol_root_'+data.price_assessment.symbol).innerHTML = "<b>symbol : </b>" + data.price_assessment.symbol
 
-    document.getElementById('current_price_btc_root_'+data.price_assessment.symbol).innerHTML = data.price_assessment.price_btc
 
-    document.getElementById('twenty_four_hr_volume_root_'+data.price_assessment.symbol).innerHTML = data.price_assessment['24h_volume_usd']
+    document.getElementById('rank_root_'+data.price_assessment.symbol).innerHTML = "<b>rank : </b>" + data.price_assessment.rank
 
-    document.getElementById('total_supply_root_'+data.price_assessment.symbol).innerHTML = data.price_assessment.total_supply
+    document.getElementById('current_price_usd_root_'+data.price_assessment.symbol).innerHTML = "<b>$/usd : </b>" + data.price_assessment.price_usd
 
-    document.getElementById('percent_change_1_hr_root_'+data.price_assessment.symbol).innerHTML = data.price_assessment.percent_change_1h
+    document.getElementById('current_price_btc_root_'+data.price_assessment.symbol).innerHTML = "<b>$/btc : </b>" + data.price_assessment.price_btc
 
-    document.getElementById('percent_change_24_hr_root_'+data.price_assessment.symbol).innerHTML = data.price_assessment.percent_change_24h
+    document.getElementById('twenty_four_hr_volume_root_'+data.price_assessment.symbol).innerHTML = "<b>24hr vol. : </b>" + data.price_assessment['24h_volume_usd']
 
-    document.getElementById('percent_change_7_days_root_'+data.price_assessment.symbol).innerHTML = data.price_assessment.percent_change_7d
+    document.getElementById('total_supply_root_'+data.price_assessment.symbol).innerHTML = "<b>total supply : </b>" + data.price_assessment.total_supply
 
-    document.getElementById('last_updated_root_'+data.price_assessment.symbol).innerHTML = data.price_assessment.last_updated
+    document.getElementById('percent_change_1_hr_root_'+data.price_assessment.symbol).innerHTML = "<b>%change 1hr : </b>" + data.price_assessment.percent_change_1h
+
+    document.getElementById('percent_change_24_hr_root_'+data.price_assessment.symbol).innerHTML = "<b>%change 24hr : </b>" + data.price_assessment.percent_change_24h
+
+    document.getElementById('percent_change_7_days_root_'+data.price_assessment.symbol).innerHTML = "<b>%change 7d : </b>" + data.price_assessment.percent_change_7d
+
+    document.getElementById('last_updated_root_'+data.price_assessment.symbol).innerHTML = "<b>updated : </b>" + unix_ms_to_date_string(data.price_assessment.unix_time)
   })
 </script>
