@@ -10,7 +10,7 @@
     <script src="semantic.min.js"></script>
     <link rel="stylesheet" href="semantic.min.css">
     <script type="text/javascript">
-      var initial_time_periods = 400
+      var initial_time_periods = 500
       var currency = 'bitcoin'
       var socket = io.connect('http://localhost:8080');
       socket.emit('req price n periods', {currency : currency, periods : initial_time_periods})
@@ -156,7 +156,11 @@
 
       var price_array_to_reduced_price_array = function(price_array) {
         let min = d3.min(price_array)
-        return price_array.map(x => x - min)
+        for (let x = 0; x < price_array.length; x++) {
+          price_array[x] -= min
+        }
+        return price_array
+        // return price_array.map(x => x - min)
       }
     </script>
 
@@ -166,7 +170,7 @@
       // var time_periods = 400
 
       var res_price_n_periods = function(price_data, svg_appendage, time_periods) {
-        var n = 4 // number of series
+        var n = 1 // number of series
         var m = time_periods
         console.log('time period', time_periods)
         console.log('got price response from server')
@@ -175,6 +179,13 @@
         var yz = d3.range(n).map(function() {
           return price_array_to_reduced_price_array(price_data.price_array);
         })
+        // var yz = []
+        // var tmp = price_array_to_reduced_price_array(price_data.price_array)
+        // for (let i = 0; i < price_data.price_array.length;i++) {
+        //   yz[i] = [i, tmp[i]]
+        // }
+        // yz = price_array_to_reduced_price_array(price_data.price_array)
+        console.log(yz)
         var y01z = d3.stack().keys(d3.range(n))(d3.transpose(yz))
         var yMax = d3.max(yz, function(y) {
           return d3.max(y);
@@ -237,6 +248,7 @@
       })
 
       socket.on('res sma n periods', function(price_data) {
+        console.log(price_data)
         res_price_n_periods(price_data, "00", price_data.price_array.length)
       })
     </script>
