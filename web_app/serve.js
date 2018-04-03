@@ -21,21 +21,21 @@ io.on('connection', function(socket) {
   socket.on('req ema n periods', function(data) {
     console.log('received request for ema')
     funx.get_ema_cmarketcap_for_n_time_period_by_currency_title(data.currency, data.periods).then((resolution, rejection) => {
-      socket.emit('res ema n periods', {price_array: resolution})
+      socket.emit('res ema n periods', {price_array: resolution, symbol:data.currency})
     })
   })
 
   socket.on('req price n periods', function(data) {
     console.log('received request for price')
     funx.get_array_n_most_recent_prices_cmarketcap_by_currency_title(data.currency, data.periods).then((resolution, rejection) => {
-      socket.emit('res price n periods', {price_array: resolution})
+      socket.emit('res price n periods', {price_array: resolution, symbol:data.currency})
     })
   })
 
   socket.on('req sma n periods', function(data) {
     console.log('received request for  sma')
     funx.get_sma_array_for_n_recent_periods_cmarketcap_price_where_currency_title(data.currency, data.periods).then((resolution, rejection) => {
-      socket.emit('res sma n periods', {price_array : resolution})
+      socket.emit('res sma n periods', {price_array : resolution, symbol:data.currency})
     })
   })
 })

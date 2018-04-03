@@ -17,15 +17,10 @@
 
     <div class="ui internally celled grid" id="svg_root">
       <div class="row">
-        <div class="three wide column">
-          <img>
-        </div>
+        <div class="three wide column"></div>
         <div class="ten wide column">
           <div  class="ui center aligned container" style="width:100%;padding:5%;">
-
-
             <div id="00_seg" class="ui segment display_seg" style="width:100%;">
-
                <h4 style="display:inline;" id="current_currency_text" class="current_currency_text">bitcoin</h4>
 
               <div class="ui four top attached buttons">
@@ -33,121 +28,173 @@
                   <div class="ui button ema_button 00_button" funx="ema">EMA</div>
                   <div class="ui button sma_button 00_button" funx="sma">SMA</div>
                   <div class="ui button wiki_views_button 00_button" funx="wiki">Wiki Views</div>
-
               </div>
-
               <svg id="svg_00" class="00_svg display_svg" height="500"></svg>
-
             </div>
-            <script type="text/javascript">
-              let funx = {
-                price : function() {
-                  console.log('price called')
-                  socket.emit('req price n periods', {currency : currency, periods : initial_time_periods})
-                },
-                ema : function() {
-                  console.log('ema called')
-                  socket.emit('req ema n periods', {currency : currency, periods : initial_time_periods})
-                },
-                sma : function() {
-                  console.log('sma c alled')
-                  socket.emit('req sma n periods', {currency : currency, periods : initial_time_periods})
-                }
-              }
-
-              let svg_elem = document.getElementById('svg_00')
-              let list_of_buttons = document.getElementsByClassName('00_button')
-              for (let i = 0; i < list_of_buttons.length; i++) {
-                list_of_buttons[i].addEventListener('click', function() {
-                  for (let ii = 0; ii < list_of_buttons.length; ii++) {
-                    list_of_buttons[ii].classList.remove('active')
-                  }
-                  this.classList.add('active')
-                  d3.select("#svg_00")
-                    .selectAll("*")
-                    .remove()
-
-                  funx[this.getAttribute("funx")]()
-                })
-              }
-            </script>
           </div>
         </div>
-        <div class="three wide column">
-        </div>
+        <div class="three wide column"></div>
       </div>
-
-      <!-- <div class="row">
-        <div class="three wide column"></div>
-        <div class="ten wide column">
-          <div class="ui center aligned container" style="padding:5%;width:100%;">
-            <div id="01_seg" class="ui segment display_seg" style="width:100%;">
-              <svg id="svg_01" class="01_svg display_svg" height="500"></svg>
-            </div>
-          </div>
-        </div>
-        <div class="three wide column"></div>
-      </div> -->
-
-      <script type="text/javascript">
-        var initial_time_periods = 50
-        var currency = 'BTC'
-        var socket = io.connect('http://localhost:8080');
-
-        socket.on('currencies', function(data) {
-          console.log(data.currencies)
-
-          // make svgs for each currency
-          var svg_root = document.getElementById('svg_root')
-          for (let i  = 0; i <  data.currencies.length; i++) {
-            let row = document.createElement('div')//.classList.add("row")
-            row.classList.add("row")
-            row.setAttribute("currency", data.currencies[i])
-
-            let three_wide_col = document.createElement('div')
-            three_wide_col.classList = ['three wide column']
-
-            let ten_wide_col = document.createElement('div')
-            ten_wide_col.classList = ['ten wide column']
-
-
-            // <div class="ui center aligned container" style="padding:5%;width:100%;">
-            let ui_align_container = document.createElement('div')
-            ui_align_container.classList =  ['ui center aligned container']
-            ui_align_container.setAttribute("style", "padding:5%; width:100%;")
-
-            ten_wide_col.appendChild(ui_align_container)
-
-
-            let three_wide_col_second = document.createElement('div')
-            three_wide_col_second.classList = ['three wide column']
-
-
-            row.appendChild(three_wide_col)
-            row.appendChild(ten_wide_col)
-            row.appendChild(three_wide_col_second)
-
-
-            svg_root.appendChild(row)
-          }
-
-          for (let i  = 0; i <  data.currencies.length; i++) {
-            socket.emit('req price n periods', {currency : 'BTC', periods : initial_time_periods})
-            // socket.emit('req price n periods', {currency : data.currencies[i], periods : initial_time_periods})
-          }
-        })
-
-      </script>
-
     </div>
 
     <script type="text/javascript">
-      // set the width of  the  svg according to the width of the pusher
-      var width_of_seg = document.getElementById('00_seg').getBoundingClientRect().width
-      let display_svgs = document.getElementsByClassName('display_svg')
-      for (var i = 0; i < display_svgs.length; i++) {
-        display_svgs[i].setAttribute("width", width_of_seg)
+      let funx = {
+        price : function() {
+          console.log('price called')
+          socket.emit('req price n periods', {currency : currency, periods : initial_time_periods})
+        },
+        ema : function() {
+          console.log('ema called')
+          socket.emit('req ema n periods', {currency : currency, periods : initial_time_periods})
+        },
+        sma : function() {
+          console.log('sma c alled')
+          socket.emit('req sma n periods', {currency : currency, periods : initial_time_periods})
+        }
       }
+
+
+
+      var  create_markup_structure = function(data) {
+        // make svgs for each currency
+        var svg_root = document.getElementById('svg_root')
+        for (let i  = 0; i <  data.currencies.length; i++) {
+          let row = document.createElement('div')
+          row.classList.add("row")
+          row.setAttribute("currency", data.currencies[i])
+
+          let three_wide_col = document.createElement('div')
+          three_wide_col.classList = ['three wide column']
+
+          let ten_wide_col = document.createElement('div')
+          ten_wide_col.classList = ['ten wide column']
+
+          let ui_align_container = document.createElement('div')
+          ui_align_container.classList =  ['ui center aligned container']
+          ui_align_container.setAttribute("style", "padding:5%; width:100%;")
+
+          let ui_segment_display = document.createElement('div')
+          ui_segment_display.classList = ['ui segment display_seg']
+          ui_segment_display.setAttribute("style", "width:100%;")
+          ui_segment_display.setAttribute("currency", data.currencies[i])
+
+          let ui_four_top_attached_buttons = document.createElement('div')
+          ui_four_top_attached_buttons.classList = ['ui four top attached buttons']
+
+          var ui_active_button_price = document.createElement('div')
+          ui_active_button_price.classList = ['ui active button price_button ' + data.currencies[i]]
+          ui_active_button_price.setAttribute("funx", "price")
+          ui_active_button_price.appendChild(document.createTextNode("price"))
+
+          var ui_button_ema = document.createElement('div')
+          ui_button_ema.classList = ['ui button ema_button ' + data.currencies[i]]
+          ui_button_ema.setAttribute("funx", "ema")
+          ui_button_ema.appendChild(document.createTextNode("EMA"))
+
+
+          var ui_button_sma = document.createElement('div')
+          ui_button_sma.classList = ['ui button sma_button ' + data.currencies[i]]
+          ui_button_sma.setAttribute("funx", "sma")
+          ui_button_sma.appendChild(document.createTextNode("SMA"))
+
+          var ui_button_wiki = document.createElement('div')
+          ui_button_wiki.classList = ['ui button wiki_views_button ' + data.currencies[i]]
+          ui_button_wiki.setAttribute("funx", "wiki")
+          ui_button_wiki.appendChild(document.createTextNode("Wiki Views"))
+
+          ui_four_top_attached_buttons.appendChild(ui_active_button_price)
+          ui_four_top_attached_buttons.appendChild(ui_button_ema)
+          ui_four_top_attached_buttons.appendChild(ui_button_sma)
+          ui_four_top_attached_buttons.appendChild(ui_button_wiki)
+
+          ui_segment_display.appendChild(ui_four_top_attached_buttons)
+
+          // let svg = document.createElement('svg')
+          let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+
+          svg.classList = ['display_svg']
+          svg.setAttribute("height", "500")
+          // svg.setAttribute("width", "500")
+
+          // svg.setAttribute("style", "height:500px;")
+          svg.setAttribute("currency", data.currencies[i])
+          svg.setAttribute("id", data.currencies[i])
+
+          ui_segment_display.appendChild(svg)
+          ui_align_container.appendChild(ui_segment_display)
+          ten_wide_col.appendChild(ui_align_container)
+
+          let three_wide_col_second = document.createElement('div')
+          three_wide_col_second.classList = ['three wide column']
+
+          row.appendChild(three_wide_col)
+          row.appendChild(ten_wide_col)
+          row.appendChild(three_wide_col_second)
+
+          svg_root.appendChild(row)
+        }
+
+
+        // set the width of  the  svg according to the width of the pusher
+        var width_of_seg = document.getElementById('00_seg').getBoundingClientRect().width
+        let display_svgs = document.getElementsByTagName('svg')
+
+        console.log(display_svgs)
+        for (var i = 0; i < display_svgs.length; i++) {
+          display_svgs[i].setAttribute("width", width_of_seg-20)
+          // display_svgs[i].setAttribute("width", "100%")
+        }
+
+      }
+
+
+
+      // let svg_elem = document.getElementById('svg_00')
+      let list_of_buttons = document.getElementsByClassName('00_button')
+      for (let i = 0; i < list_of_buttons.length; i++) {
+        list_of_buttons[i].addEventListener('click', function() {
+          for (let ii = 0; ii < list_of_buttons.length; ii++) {
+            list_of_buttons[ii].classList.remove('active')
+          }
+          this.classList.add('active')
+          d3.select("#svg_00")
+            .selectAll("*")
+            .remove()
+
+          funx[this.getAttribute("funx")]()
+        })
+      }
+    </script>
+
+
+    <script type="text/javascript">
+      var initial_time_periods = 100
+      var currency = 'BTC'
+      var socket = io.connect('http://localhost:8080');
+
+      socket.on('currencies', function(data) {
+        console.log(data.currencies)
+
+        create_markup_structure(data)
+
+        for (let i  = 0; i <  data.currencies.length; i++) {
+          socket.emit('req price n periods', {currency : data.currencies[i], periods : initial_time_periods})
+          // socket.emit('req price n periods', {currency : data.currencies[i], periods : initial_time_periods})
+        }
+      })
+
+    </script>
+
+
+    <script type="text/javascript">
+      // // set the width of  the  svg according to the width of the pusher
+      // var width_of_seg = document.getElementById('00_seg').getBoundingClientRect().width
+      // let display_svgs = document.getElementsByTagName('svg')
+      //
+      // console.log(display_svgs)
+      // for (var i = 0; i < display_svgs.length; i++) {
+      //   display_svgs[i].setAttribute("width", width_of_seg)
+      // }
     </script>
 
 
@@ -188,23 +235,17 @@
 
       // var time_periods = 400
 
-      var res_price_n_periods = function(price_data, svg_appendage, time_periods) {
+      var res_price_n_periods = function(price_data, time_periods) {
         var n = 1 // number of series
         var m = time_periods
-        console.log('time period', time_periods)
-        console.log('got price response from server')
+        // console.log('time period', time_periods)
+        // console.log('got price response from server')
         var xz = d3.range(m)
         xz = inverse_array(xz) // inverse
         var yz = d3.range(n).map(function() {
           return price_array_to_reduced_price_array(price_data.price_array);
         })
-        // var yz = []
-        // var tmp = price_array_to_reduced_price_array(price_data.price_array)
-        // for (let i = 0; i < price_data.price_array.length;i++) {
-        //   yz[i] = [i, tmp[i]]
-        // }
-        // yz = price_array_to_reduced_price_array(price_data.price_array)
-        console.log(yz)
+        // console.log(yz)
         var y01z = d3.stack().keys(d3.range(n))(d3.transpose(yz))
         var yMax = d3.max(yz, function(y) {
           return d3.max(y);
@@ -215,8 +256,12 @@
           });
         });
 
-        var svg = d3.select("#svg_"+svg_appendage),
-            margin = {top: 10, right: 10, bottom: 10, left: 10},
+
+        console.log(price_data.symbol)
+
+        var svg = d3.select("#"+price_data.symbol)
+        // var svg = d3.select("#BTC")
+            margin = {top: 5, right: 5, bottom: 5, left: 5},
             width = +svg.attr("width") - margin.left - margin.right,
             height = +svg.attr("height") - margin.top - margin.bottom,
             g = svg.append("g").attr("transform", "translate(" + 0 + "," + margin.top + ")");
@@ -258,17 +303,17 @@
       var color_arr = [d3.schemeCategory20b[8], d3.schemeCategory20b[9], d3.schemeCategory20b[10], d3.schemeCategory20b[11]]
 
       socket.on('res price n periods', function(price_data){
-        console.log(price_data)
-        res_price_n_periods(price_data, "00", price_data.price_array.length)
+        // console.log(price_data)
+        res_price_n_periods(price_data, price_data.price_array.length)
       })
 
       socket.on('res ema n periods', function(price_data) {
-        res_price_n_periods(price_data, "00", price_data.price_array.length)
+        res_price_n_periods(price_data, price_data.price_array.length)
       })
 
       socket.on('res sma n periods', function(price_data) {
-        console.log(price_data)
-        res_price_n_periods(price_data, "00", price_data.price_array.length)
+        // console.log(price_data)
+        res_price_n_periods(price_data, price_data.price_array.length)
       })
     </script>
   </body>
