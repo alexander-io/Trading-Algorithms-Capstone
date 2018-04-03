@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
@@ -9,304 +8,436 @@
     <script src="d3.v4.min.js"></script>
     <script src="semantic.min.js"></script>
     <link rel="stylesheet" href="semantic.min.css">
+    <!-- <link rel="stylesheet" href="icon.css"> -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
 
   </head>
+
   <body>
-
-
-
     <div class="ui internally celled grid" id="svg_root">
-      <div class="row" style="visibility:hidden;height:0px;">
-        <div class="three wide column"></div>
-        <div class="ten wide column">
-          <div  class="ui center aligned container" style="width:100%;padding:5%;">
-            <div id="00_seg" class="ui segment display_seg" style="width:100%;">
-              <svg id="svg_00" class="00_svg display_svg" height="500"></svg>
+      <div class="row" style="height:500px;">
+        <div class="three wide column">
+          <div class="ui icon message">
+            <i class="material-icons">attach_money</i>
+            <div class="content">
+              <div class="header">
+                Currency Title
+              </div>
+              <p>symbol</p>
+              <p>current price</p>
             </div>
           </div>
         </div>
-        <div class="three wide column"></div>
+
+        <div class="ten wide column">
+          <div  class="ui center aligned container" style="width:100%;padding:5%;">
+            <div id="00_seg" class="ui segment display_seg" style="width:100%;"></div>
+          </div>
+        </div>
+
+        <div class="three wide column">
+          <div class="ui icon message">
+            <div class="content">
+              <i class="material-icons">assessment</i>
+              <p>rank</p>
+              <p>current price usd</p>
+              <p>current price btc</p>
+              <p>24hr volume</p>
+              <p>total supply</p>
+              <p>% change 1hr</p>
+              <p>% change 24hr</p>
+              <p>% change 7d</p>
+              <p>last updated</p>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
-
-    <script type="text/javascript">
-      let funx = {
-        price : function(symbol) {
-          console.log('price called')
-          socket.emit('req price n periods', {currency : symbol, periods : initial_time_periods})
-        },
-        ema : function(symbol) {
-          console.log('ema called')
-          socket.emit('req ema n periods', {currency : symbol, periods : initial_time_periods})
-        },
-        sma : function(symbol) {
-          console.log('sma called')
-          socket.emit('req sma n periods', {currency : symbol, periods : initial_time_periods})
-        }
-      }
-
-      var  create_markup_structure = function(data) {
-        // make svgs for each currency
-        var svg_root = document.getElementById('svg_root')
-        for (let i  = 0; i <  data.currencies.length; i++) {
-          let row = document.createElement('div')
-          row.classList.add("row")
-          row.setAttribute("currency", data.currencies[i])
-
-          let three_wide_col = document.createElement('div')
-          three_wide_col.classList = ['three wide column']
-
-          let ten_wide_col = document.createElement('div')
-          ten_wide_col.classList = ['ten wide column']
-
-          let ui_align_container = document.createElement('div')
-          ui_align_container.classList =  ['ui center aligned container']
-          ui_align_container.setAttribute("style", "padding:5%; width:100%;")
-
-          let ui_segment_display = document.createElement('div')
-          ui_segment_display.classList = ['ui segment display_seg']
-          ui_segment_display.setAttribute("style", "width:100%;")
-          ui_segment_display.setAttribute("currency", data.currencies[i])
-
-          let ui_four_top_attached_buttons = document.createElement('div')
-          ui_four_top_attached_buttons.classList = ['ui four top attached buttons ctrl_buttons']
-          ui_four_top_attached_buttons.setAttribute("currency", data.currencies[i])
-
-
-          var ui_active_button_price = document.createElement('div')
-          ui_active_button_price.classList = ['ui active button price_button ' + data.currencies[i]]
-          ui_active_button_price.setAttribute("funx", "price")
-          ui_active_button_price.appendChild(document.createTextNode("price"))
-
-          var ui_button_ema = document.createElement('div')
-          ui_button_ema.classList = ['ui button ema_button ' + data.currencies[i]]
-          ui_button_ema.setAttribute("funx", "ema")
-          ui_button_ema.appendChild(document.createTextNode("EMA"))
-
-
-          var ui_button_sma = document.createElement('div')
-          ui_button_sma.classList = ['ui button sma_button ' + data.currencies[i]]
-          ui_button_sma.setAttribute("funx", "sma")
-          ui_button_sma.appendChild(document.createTextNode("SMA"))
-
-          var ui_button_wiki = document.createElement('div')
-          ui_button_wiki.classList = ['ui button wiki_views_button ' + data.currencies[i]]
-          ui_button_wiki.setAttribute("funx", "wiki")
-          ui_button_wiki.appendChild(document.createTextNode("Wiki Views"))
-
-          ui_four_top_attached_buttons.appendChild(ui_active_button_price)
-          ui_four_top_attached_buttons.appendChild(ui_button_ema)
-          ui_four_top_attached_buttons.appendChild(ui_button_sma)
-          ui_four_top_attached_buttons.appendChild(ui_button_wiki)
-
-          ui_segment_display.appendChild(ui_four_top_attached_buttons)
-
-          // let svg = document.createElement('svg')
-          let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-
-          svg.classList = ['display_svg']
-          svg.setAttribute("height", "500")
-          // svg.setAttribute("width", "500")
-
-          // svg.setAttribute("style", "height:500px;")
-          svg.setAttribute("currency", data.currencies[i])
-          svg.setAttribute("id", data.currencies[i])
-
-          ui_segment_display.appendChild(svg)
-          ui_align_container.appendChild(ui_segment_display)
-          ten_wide_col.appendChild(ui_align_container)
-
-          let three_wide_col_second = document.createElement('div')
-          three_wide_col_second.classList = ['three wide column']
-
-          row.appendChild(three_wide_col)
-          row.appendChild(ten_wide_col)
-          row.appendChild(three_wide_col_second)
-
-          svg_root.appendChild(row)
-        }
-
-
-        // set the width of  the  svg according to the width of the pusher
-        var width_of_seg = document.getElementById('00_seg').getBoundingClientRect().width
-        let display_svgs = document.getElementsByTagName('svg')
-
-        // console.log(display_svgs)
-        for (var i = 0; i < display_svgs.length; i++) {
-          display_svgs[i].setAttribute("width", width_of_seg-20)
-          // display_svgs[i].setAttribute("width", "100%")
-        }
-
-        // let svg_elem = document.getElementById('svg_00')
-        let ctrl_buttons = document.getElementsByClassName('ctrl_buttons')
-        for (let x = 0; x < ctrl_buttons.length;x++) {
-          console.log(ctrl_buttons[x].childNodes.length)
-
-          for (let i = 0; i < ctrl_buttons[x].childNodes.length; i++) {
-            ctrl_buttons[x].childNodes[i].addEventListener('click', function() {
-              console.log('click')
-              for (let ii = 0; ii < ctrl_buttons[x].childNodes.length; ii++) {
-                ctrl_buttons[x].childNodes[ii].classList.remove('active')
-              }
-              this.classList.add('active')
-              d3.select("#"+ctrl_buttons[x].getAttribute('currency'))
-                .selectAll("*")
-                .remove()
-                console.log(ctrl_buttons[x].getAttribute('currency'))
-
-                funx[this.getAttribute("funx")](ctrl_buttons[x].getAttribute('currency'))
-
-            })
-          }
-        }
-      }
-    </script>
-
-
-    <script type="text/javascript">
-      var initial_time_periods = 200
-      var currency = 'BTC'
-      var socket = io.connect('http://localhost:8080');
-
-      socket.on('currencies', function(data) {
-        create_markup_structure(data)
-        for (let i  = 0; i <  data.currencies.length; i++) {
-          socket.emit('req price n periods', {currency : data.currencies[i], periods : initial_time_periods})
-        }
-      })
-
-    </script>
-
-
-    <script type="text/javascript">
-      // // set the width of  the  svg according to the width of the pusher
-      // var width_of_seg = document.getElementById('00_seg').getBoundingClientRect().width
-      // let display_svgs = document.getElementsByTagName('svg')
-      //
-      // console.log(display_svgs)
-      // for (var i = 0; i < display_svgs.length; i++) {
-      //   display_svgs[i].setAttribute("width", width_of_seg)
-      // }
-    </script>
-
-
-    <script type="text/javascript">
-      function price_to_percent_change(price_array) {
-        var percent_change_array = []
-        for (let i = 0; i < price_array.length-1;i++) {
-          percent_change_array.push(percent_change(price_array[i], price_array[i+1]))
-        }
-        let min = Math.abs(d3.min(percent_change_array))
-        // shift values by min
-        for (let i = 0; i < percent_change_array.length;i++) { percent_change_array[i] += min }
-        return percent_change_array;
-      }
-
-      var percent_change = function(today_price, yesterday_price) {
-        return ((today_price - yesterday_price)/yesterday_price)*100
-      }
-
-      var inverse_array = function(arr) {
-        var arr_builder = []
-        for (let i = arr.length-1; i >= 0;i--){arr_builder.push(arr[i])}
-        return arr_builder
-      }
-
-      var price_array_to_reduced_price_array = function(price_array) {
-        let min = d3.min(price_array)
-        for (let x = 0; x < price_array.length; x++) {
-          price_array[x] -= min
-        }
-        return price_array
-        // return price_array.map(x => x - min)
-      }
-    </script>
-
-
-    <script type="text/javascript">
-
-      // var time_periods = 400
-
-      var res_price_n_periods = function(price_data, time_periods) {
-        var n = 3 // number of series
-        var m = time_periods
-        // console.log('time period', time_periods)
-        // console.log('got price response from server')
-        var xz = d3.range(m)
-        xz = inverse_array(xz) // inverse
-        var yz = d3.range(n).map(function() {
-          return price_array_to_reduced_price_array(price_data.price_array);
-        })
-        // console.log(yz)
-        var y01z = d3.stack().keys(d3.range(n))(d3.transpose(yz))
-        var yMax = d3.max(yz, function(y) {
-          return d3.max(y);
-        })
-        var y1Max = d3.max(y01z, function(y) {
-          return d3.max(y, function(d) {
-            return d[1];
-          });
-        });
-
-
-        // console.log(price_data.symbol)
-        console.log(price_data.symbol)
-        var svg = d3.select("#"+price_data.symbol)
-        // var svg = d3.select("#BTC")
-            margin = {top: 5, right: 5, bottom: 5, left: 5},
-            width = +svg.attr("width") - margin.left - margin.right,
-            height = +svg.attr("height") - margin.top - margin.bottom,
-            g = svg.append("g").attr("transform", "translate(" + 0 + "," + margin.top + ")");
-
-        var x = d3.scaleBand()
-            .domain(xz)
-            .rangeRound([0, width])
-            .padding(0.08);
-
-        var y = d3.scaleLinear()
-            .domain([0, y1Max])
-            .range([height, 0]);
-
-        var color = d3.scaleOrdinal()
-            .domain(d3.range(n))
-            .range(color_arr);
-
-        var series = g.selectAll(".series")
-          .data(y01z)
-          .enter().append("g")
-            .attr("fill", function(d, i) { return color(i); });
-
-        var rect = series.selectAll("rect")
-          .data(function(d) { return d; })
-          .enter().append("rect")
-            .attr("x", function(d, i) { return x(i); })
-            .attr("y", height)
-            .attr("width", x.bandwidth())
-            .attr("height", 0);
-
-        rect.transition()
-            .delay(function(d, i) { return i ; })
-            .attr("y", function(d) { return y(d[1]); })
-            .attr("height", function(d) { return y(d[0]) - y(d[1]); });
-      }
-    </script>
-
-    <script>
-      var color_arr = [d3.schemeCategory20b[8], d3.schemeCategory20b[9], d3.schemeCategory20b[10], d3.schemeCategory20b[11]]
-
-      socket.on('res price n periods', function(price_data){
-        // console.log(price_data)
-        res_price_n_periods(price_data, price_data.price_array.length)
-      })
-
-      socket.on('res ema n periods', function(price_data) {
-        res_price_n_periods(price_data, price_data.price_array.length)
-      })
-
-      socket.on('res sma n periods', function(price_data) {
-        // console.log(price_data)
-        res_price_n_periods(price_data, price_data.price_array.length)
-      })
-    </script>
   </body>
 </html>
+
+<script type="text/javascript">
+  let funx = {
+    price : function(symbol) {
+      console.log('price called')
+      socket.emit('req price n periods', {currency : symbol, periods : initial_time_periods})
+    },
+    ema : function(symbol) {
+      console.log('ema called')
+      socket.emit('req ema n periods', {currency : symbol, periods : initial_time_periods})
+    },
+    sma : function(symbol) {
+      console.log('sma called')
+      socket.emit('req sma n periods', {currency : symbol, periods : initial_time_periods})
+    }
+  }
+
+  var  create_markup_structure = function(data) {
+    // make svgs for each currency
+    var svg_root = document.getElementById('svg_root')
+    for (let i  = 0; i <  data.currencies.length; i++) {
+      let row = document.createElement('div')
+      row.classList.add("row")
+      row.setAttribute("currency", data.currencies[i])
+
+      let three_wide_col = document.createElement('div')
+      three_wide_col.classList = ['three wide column']
+
+      let ten_wide_col = document.createElement('div')
+      ten_wide_col.classList = ['ten wide column']
+
+      let ui_align_container = document.createElement('div')
+      ui_align_container.classList =  ['ui center aligned container']
+      ui_align_container.setAttribute("style", "padding:0% 1% 1% 1%; width:100%;")
+
+      let ui_segment_display = document.createElement('div')
+      ui_segment_display.classList = ['ui segment display_seg']
+      ui_segment_display.setAttribute("style", "width:100%;")
+      ui_segment_display.setAttribute("currency", data.currencies[i])
+
+      let ui_four_top_attached_buttons = document.createElement('div')
+      ui_four_top_attached_buttons.classList = ['ui four top attached buttons ctrl_buttons']
+      ui_four_top_attached_buttons.setAttribute("currency", data.currencies[i])
+
+      var ui_active_button_price = document.createElement('div')
+      ui_active_button_price.classList = ['ui active button price_button ' + data.currencies[i]]
+      ui_active_button_price.setAttribute("funx", "price")
+      ui_active_button_price.appendChild(document.createTextNode("price"))
+
+      var ui_button_ema = document.createElement('div')
+      ui_button_ema.classList = ['ui button ema_button ' + data.currencies[i]]
+      ui_button_ema.setAttribute("funx", "ema")
+      ui_button_ema.appendChild(document.createTextNode("EMA"))
+
+
+      var ui_button_sma = document.createElement('div')
+      ui_button_sma.classList = ['ui button sma_button ' + data.currencies[i]]
+      ui_button_sma.setAttribute("funx", "sma")
+      ui_button_sma.appendChild(document.createTextNode("SMA"))
+
+      var ui_button_wiki = document.createElement('div')
+      ui_button_wiki.classList = ['ui button wiki_views_button ' + data.currencies[i]]
+      ui_button_wiki.setAttribute("funx", "wiki")
+      ui_button_wiki.appendChild(document.createTextNode("Wiki Views"))
+
+      ui_four_top_attached_buttons.appendChild(ui_active_button_price)
+      ui_four_top_attached_buttons.appendChild(ui_button_ema)
+      ui_four_top_attached_buttons.appendChild(ui_button_sma)
+      ui_four_top_attached_buttons.appendChild(ui_button_wiki)
+
+      ui_segment_display.appendChild(ui_four_top_attached_buttons)
+
+      let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+      svg.classList = ['display_svg']
+      svg.setAttribute("height", "500")
+      svg.setAttribute("currency", data.currencies[i])
+      svg.setAttribute("id", data.currencies[i])
+
+      ui_segment_display.appendChild(svg)
+      ui_align_container.appendChild(ui_segment_display)
+      ten_wide_col.appendChild(ui_align_container)
+
+      let three_wide_col_second = document.createElement('div')
+      three_wide_col_second.classList = ['three wide column']
+
+      //
+      // <div class="three wide column">
+      //   <div class="ui icon message">
+      //     <div class="content">
+      //       <i class="material-icons">assessment</i>
+      //       <p>rank</p>
+      //       <p>current price usd</p>
+      //       <p>current price btc</p>
+      //       <p>24hr volume</p>
+      //       <p>total supply</p>
+      //       <p>% change 1hr</p>
+      //       <p>% change 24hr</p>
+      //       <p>% change 7d</p>
+      //       <p>last updated</p>
+      //     </div>
+      //   </div>
+      // </div>
+      //
+
+      var ui_icon_message = document.createElement('div')
+      ui_icon_message.classList = ['ui icon message']
+
+      var ui_icon_message_content = document.createElement('div')
+      ui_icon_message_content.classList = ['content']
+
+      var ui_icon_message_content_icon = document.createElement('i')
+      ui_icon_message_content_icon.classList = ['material-icons']
+      var ui_icon_message_content_icon_text_node =  document.createTextNode("assessment")
+      ui_icon_message_content_icon.appendChild(ui_icon_message_content_icon_text_node)
+
+
+
+      // TEXT NODE START
+      var rank = document.createElement('p')
+      rank.setAttribute("currency", data.currencies[i])
+      rank.classList = ["rank_root " + data.currencies[i]]
+      rank.setAttribute("id", "rank_root_"+data.currencies[i])
+
+      var current_price_usd = document.createElement('p')
+      current_price_usd.setAttribute("currency", data.currencies[i])
+      current_price_usd.classList = ["current_price_usd_root " + data.currencies[i]]
+      current_price_usd.setAttribute("id", "current_price_usd_root_"+data.currencies[i])
+
+
+
+      var current_price_btc = document.createElement('p')
+      current_price_btc.setAttribute("currency", data.currencies[i])
+      current_price_btc.classList = ["current_price_btc_root " + data.currencies[i]]
+      current_price_btc.setAttribute("id", "current_price_btc_root_"+data.currencies[i])
+
+
+      var twenty_four_hr_volume = document.createElement('p')
+      twenty_four_hr_volume.setAttribute("currency", data.currencies[i])
+      twenty_four_hr_volume.classList = ["twenty_four_hr_volume_root " + data.currencies[i]]
+      twenty_four_hr_volume.setAttribute("id", "twenty_four_hr_volume_root_"+data.currencies[i])
+
+
+      var total_supply = document.createElement('p')
+      total_supply.setAttribute("currency", data.currencies[i])
+      total_supply.classList = ["total_supply_root " + data.currencies[i]]
+      total_supply.setAttribute("id", "total_supply_root_"+data.currencies[i])
+
+
+      var percent_change_1_hr = document.createElement('p')
+      percent_change_1_hr.setAttribute("currency", data.currencies[i])
+      percent_change_1_hr.classList = ["percent_change_1_hr_root " + data.currencies[i]]
+      percent_change_1_hr.setAttribute("id", "percent_change_1_hr_root_"+data.currencies[i])
+
+
+      var percent_change_24_hr = document.createElement('p')
+      percent_change_24_hr.setAttribute("currency", data.currencies[i])
+      percent_change_24_hr.classList = ["percent_change_24_hr_root " + data.currencies[i]]
+      percent_change_24_hr.setAttribute("id", "percent_change_24_hr_root_"+data.currencies[i])
+
+
+      var percent_change_7_days = document.createElement('p')
+      percent_change_7_days.setAttribute("currency", data.currencies[i])
+      percent_change_7_days.classList = ["percent_change_7_days_root " + data.currencies[i]]
+      percent_change_7_days.setAttribute("id", "percent_change_7_days_root_"+data.currencies[i])
+
+
+      var last_updated = document.createElement('p')
+      last_updated.setAttribute("currency", data.currencies[i])
+      last_updated.classList = ["last_updated_root " + data.currencies[i]]
+      last_updated.setAttribute("id", "last_updated_root_"+data.currencies[i])
+
+      // TEXT NODE END
+
+
+      ui_icon_message_content.appendChild(ui_icon_message_content_icon)
+      ui_icon_message_content.appendChild(rank)
+      ui_icon_message_content.appendChild(current_price_usd)
+      ui_icon_message_content.appendChild(current_price_btc)
+      ui_icon_message_content.appendChild(twenty_four_hr_volume)
+      ui_icon_message_content.appendChild(total_supply)
+      ui_icon_message_content.appendChild(percent_change_1_hr)
+      ui_icon_message_content.appendChild(percent_change_24_hr)
+      ui_icon_message_content.appendChild(percent_change_7_days)
+      ui_icon_message_content.appendChild(last_updated)
+
+      ui_icon_message.appendChild(ui_icon_message_content)
+      three_wide_col_second.appendChild(ui_icon_message)
+
+
+      row.appendChild(three_wide_col)
+      row.appendChild(ten_wide_col)
+      row.appendChild(three_wide_col_second)
+
+      svg_root.appendChild(row)
+    }
+
+
+    // set the width of  the  svg according to the width of the pusher
+    var width_of_seg = document.getElementById('00_seg').getBoundingClientRect().width
+    let display_svgs = document.getElementsByTagName('svg')
+
+    // set the width of the svgs
+    for (var i = 0; i < display_svgs.length; i++) { display_svgs[i].setAttribute("width", width_of_seg-20) }
+
+    // select control buttons
+    let ctrl_buttons = document.getElementsByClassName('ctrl_buttons')
+    // for each set of buttons...
+    for (let x = 0; x < ctrl_buttons.length;x++) {
+      // for each button ...
+      for (let i = 0; i < ctrl_buttons[x].childNodes.length; i++) {
+        // add event listener to each button
+        ctrl_buttons[x].childNodes[i].addEventListener('click', function() {
+          for (let ii = 0; ii < ctrl_buttons[x].childNodes.length; ii++) { /* deactivate other  buttons */ ctrl_buttons[x].childNodes[ii].classList.remove('active') }
+          this.classList.add('active') // activate this one
+          // remove svg contents
+          d3.select("#"+ctrl_buttons[x].getAttribute('currency'))
+            .selectAll("*")
+            .remove()
+          // call function to emit request to  server for more data
+          funx[this.getAttribute("funx")](ctrl_buttons[x].getAttribute('currency'))
+
+        })
+      }
+    }
+  }
+</script>
+
+
+<script type="text/javascript">
+  var initial_time_periods = 200
+  var currency = 'BTC'
+  var socket = io.connect('http://localhost:8080');
+
+  socket.on('currencies', function(data) {
+    create_markup_structure(data)
+    for (let i  = 0; i <  data.currencies.length; i++) {
+      socket.emit('req price n periods', {currency : data.currencies[i], periods : initial_time_periods})
+
+      socket.emit('req assessment', {currency : data.currencies[i]})
+
+    }
+  })
+
+</script>
+
+<script type="text/javascript">
+  function price_to_percent_change(price_array) {
+    var percent_change_array = []
+    for (let i = 0; i < price_array.length-1;i++) {
+      percent_change_array.push(percent_change(price_array[i], price_array[i+1]))
+    }
+    let min = Math.abs(d3.min(percent_change_array))
+    // shift values by min
+    for (let i = 0; i < percent_change_array.length;i++) { percent_change_array[i] += min }
+    return percent_change_array;
+  }
+
+  var percent_change = function(today_price, yesterday_price) {
+    return ((today_price - yesterday_price)/yesterday_price)*100
+  }
+
+  var inverse_array = function(arr) {
+    var arr_builder = []
+    for (let i = arr.length-1; i >= 0;i--){arr_builder.push(arr[i])}
+    return arr_builder
+  }
+
+  var price_array_to_reduced_price_array = function(price_array) {
+    let min = d3.min(price_array)
+    for (let x = 0; x < price_array.length; x++) {
+      price_array[x] -= min
+    }
+    return price_array
+  }
+</script>
+
+
+<script type="text/javascript">
+
+  var res_price_n_periods = function(price_data, time_periods) {
+    var n = 3 // number of series
+    var m = time_periods
+    var xz = d3.range(m)
+    xz = inverse_array(xz) // inverse
+    var yz = d3.range(n).map(function() {
+      return price_array_to_reduced_price_array(price_data.price_array);
+    })
+    var y01z = d3.stack().keys(d3.range(n))(d3.transpose(yz))
+    var yMax = d3.max(yz, function(y) {
+      return d3.max(y);
+    })
+    var y1Max = d3.max(y01z, function(y) {
+      return d3.max(y, function(d) {
+        return d[1];
+      });
+    });
+
+    var svg = d3.select("#"+price_data.symbol)
+        margin = {top: 5, right: 5, bottom: 5, left: 5},
+        width = +svg.attr("width") - margin.left - margin.right,
+        height = +svg.attr("height") - margin.top - margin.bottom,
+        g = svg.append("g").attr("transform", "translate(" + 0 + "," + margin.top + ")");
+
+    var x = d3.scaleBand()
+        .domain(xz)
+        .rangeRound([0, width])
+        .padding(0.08);
+
+    var y = d3.scaleLinear()
+        .domain([0, y1Max])
+        .range([height, 0]);
+
+    var color = d3.scaleOrdinal()
+        .domain(d3.range(n))
+        .range(color_arr);
+
+    var series = g.selectAll(".series")
+      .data(y01z)
+      .enter().append("g")
+        .attr("fill", function(d, i) { return color(i); });
+
+    var rect = series.selectAll("rect")
+      .data(function(d) { return d; })
+      .enter().append("rect")
+        .attr("x", function(d, i) { return x(i); })
+        .attr("y", height)
+        .attr("width", x.bandwidth())
+        .attr("height", 0);
+
+    rect.transition()
+        .delay(function(d, i) { return i ; })
+        .attr("y", function(d) { return y(d[1]); })
+        .attr("height", function(d) { return y(d[0]) - y(d[1]); });
+  }
+</script>
+
+<script>
+  var color_arr = [d3.schemeCategory20b[8], d3.schemeCategory20b[9], d3.schemeCategory20b[10], d3.schemeCategory20b[11]]
+
+  socket.on('res price n periods', function(price_data){
+    res_price_n_periods(price_data, price_data.price_array.length)
+  })
+
+  socket.on('res ema n periods', function(price_data) {
+    res_price_n_periods(price_data, price_data.price_array.length)
+  })
+
+  socket.on('res sma n periods', function(price_data) {
+    res_price_n_periods(price_data, price_data.price_array.length)
+  })
+
+  socket.on('res assessment', function(data) {
+    console.log(data.price_assessment)
+
+
+    // var list_of_roots = ['rank_root_',
+    // 'current_price_usd_root_',
+    // 'current_price_btc_root_',
+    // 'twenty_four_hr_volume_root_',
+    // 'total_supply_root_',
+    // 'percent_change_1_hr_root_',
+    // 'percent_change_24_hr_root_',
+    // 'percent_change_7_days_root_',
+    // 'last_updated_root_']
+
+    document.getElementById('rank_root_'+data.price_assessment.symbol).innerHTML = data.price_assessment.rank
+
+    document.getElementById('current_price_usd_root_'+data.price_assessment.symbol).innerHTML = data.price_assessment.price_usd
+
+    document.getElementById('current_price_btc_root_'+data.price_assessment.symbol).innerHTML = data.price_assessment.price_btc
+
+    document.getElementById('twenty_four_hr_volume_root_'+data.price_assessment.symbol).innerHTML = data.price_assessment['24h_volume_usd']
+
+    document.getElementById('total_supply_root_'+data.price_assessment.symbol).innerHTML = data.price_assessment.total_supply
+
+    document.getElementById('percent_change_1_hr_root_'+data.price_assessment.symbol).innerHTML = data.price_assessment.percent_change_1h
+
+    document.getElementById('percent_change_24_hr_root_'+data.price_assessment.symbol).innerHTML = data.price_assessment.percent_change_24h
+
+    document.getElementById('percent_change_7_days_root_'+data.price_assessment.symbol).innerHTML = data.price_assessment.percent_change_7d
+
+    document.getElementById('last_updated_root_'+data.price_assessment.symbol).innerHTML = data.price_assessment.last_updated
+  })
+</script>

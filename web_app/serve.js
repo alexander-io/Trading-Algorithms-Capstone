@@ -38,6 +38,14 @@ io.on('connection', function(socket) {
       socket.emit('res sma n periods', {price_array : resolution, symbol:data.currency})
     })
   })
+
+  socket.on('req assessment', function(data) {
+    console.log('got request for assessment')
+    funx.get_most_recent_coinmarketcap_data_entry_where_currency_title(data.currency).then((resolution, rejection) => {
+      socket.emit('res assessment', {price_assessment : resolution})
+    })
+  })
+
 })
 
 server.listen(port, function() {
@@ -67,3 +75,15 @@ app.get('/d3.v4.min.js', function(req,  res) {
 app.get('/themes/default/assets/fonts/icons.woff2', function(req, res) {
   res.sendFile(__dirname + '/node_modules/semantic-ui/src/themes/material/assets/fonts/icons.woff2')
 })
+
+app.get('/icon.css', function(req, res) {
+  res.sendFile(__dirname + '/node_modules/semantic-ui-icon/icon.css')
+})
+
+app.get('/assets/fonts/icons.woff2', function(req, res) {
+  res.sendFile(__dirname + '/node_modules/semantic-ui/src/themes/material/assets/fonts/icons.woff2')
+})
+
+// app.get('/semantic/src/themes/default/assets/fonts/icons.woff', function(req, res) {
+//   res.sendFile(__dirname + '/semantic-ui/src/themes/material/assets/fonts/icons.woff2')
+// })
