@@ -24,7 +24,14 @@ def main():
 		for x in range:
 			pass
 	'''
-	AccTest.findBestDistributions([views,volume,capital])
+	print('views')
+	print(AccTest.findBestDistribution(views))
+	print('capital')
+	print(AccTest.findBestDistribution(capital))
+	print('capital')
+	print(AccTest.findBestDistribution(volume))
+	print('price')
+	print(AccTest.findBestDistribution(price))
 	'''
 	print('robust GLM',AccTest.calculateErrorRobust(views,price,GLM.BTC_WIKI_to_BTC_Value))
 	print('simple GLM',AccTest.calculateErrorSimple(views,price,GLM.BTC_WIKI_to_BTC_Value))

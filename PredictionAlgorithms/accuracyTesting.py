@@ -1,6 +1,8 @@
 import bayesianNetwork as BN
 import generalLinearModel as GLM
-import itertools
+import itertools, decimal
+
+decimal.getcontext().prec = 7
 
 '''
 Gives a 2d list of all possible distribution combonations. 
@@ -15,7 +17,7 @@ def distributionCombos(n):
 	return list(itertools.product(dists,repeat=n))
 
 
-
+'''
 def findBestDistributions(inputVariables,outputVariable):
 	#number of iterations of tests to run to find best distributions
 	numberTests=10000
@@ -31,15 +33,51 @@ def findBestDistributions(inputVariables,outputVariable):
 			output=BN.dist[y](inputVariables[y])
 			#glmfunctions[y] is glm function for input
 			price+=GLM.GLMfunctions[y](output)
+'''
+
+def testDistribution(inputVariable,distribution):
+	totalError=decimal.Decimal(0)
+	trials=100
+	for y in range(trials):
+		progress(y,trials,distribution)
+		individualError=decimal.Decimal(0)
+		for x in range(len(inputVariable)//2,len(inputVariable)-1):
+			start=x-len(inputVariable)//2
+			testSet=inputVariable[start:x]
+			output=getattr(BN, distribution)(testSet)
+			individualError+=(decimal.Decimal(inputVariable[x+1]-output)**2)/decimal.Decimal(len(inputVariable))
+		totalError+=individualError
+	return totalError/trials
+
+
+def findBestDistribution(inputVariable):
+	distributions=BN.getDistributions()
+	errorList=[]
+	for dist in distributions:
+		#print('starting',dist)
+		error=testDistribution(inputVariable,dist)
+		errorList.append((error,dist))
+		print('\nfinished',dist,'with error',error)
+	return errorList.sort()
+
 
 		
+'''
+progress bar for longer calls
+from vladignatyev on github
+'''
+import sys
+def progress(count, total, status=''):
+    bar_len = 60
+    filled_len = int(round(bar_len * count / float(total)))
 
+    percents = round(100.0 * count / float(total), 1)
+    bar = '#' * filled_len + '*' * (bar_len - filled_len)
 
+    sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', status))
+    sys.stdout.flush()
 
-
-		
-
-
+'''
 
 #calculates error from probability function. 
 def calculateErrorSimple(inputVariable, actualValues, probabilityFunction):
@@ -78,3 +116,5 @@ def findBestNormalRange(inputVariable, actualValues, probabilityFunction):
 		errors.append((modelError,size))
 	errors.sort()
 	print(errors)
+
+'''

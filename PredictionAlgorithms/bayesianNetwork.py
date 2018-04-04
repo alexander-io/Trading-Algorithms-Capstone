@@ -47,7 +47,7 @@ def movingAverage(inputVariable):
 #										#
 #########################################
 
-distributions=['RECENTtriangular','MEANtriangular','triangularDist','betaDist','exponentialDist','lognormalDist','uniformDist','cauchyDist','geometricDist','poissonDist','binomialDist','normalDist']
+distributions=['binomialDist','lognormalDist','RECENTtriangularDist','MEANtriangularDist','triangularDist','betaDist','exponentialDist','uniformDist','cauchyDist','geometricDist','poissonDist','normalDist']
 
 def getDistributions():
 	return distributions
@@ -59,7 +59,7 @@ def normalDist(inputVariable):
 
 def binomialDist(inputVariable): 
 	recentValue=inputVariable[len(inputVariable)-1]
-	highValue=max(inputVariable[0:len(inputVariable)-1])
+	highValue=max(inputVariable[0:len(inputVariable)])
 	return numpy.random.binomial(highValue,recentValue/highValue)
 
 def poissonDist(inputVariable):
@@ -121,8 +121,8 @@ def MEANtriangularDist(inputVariable):
 
 def RECENTtriangularDist(inputVariable):
 	recentValue=inputVariable[len(inputVariable)-1]
-	highValue=max(inputVariable[0:len(inputVariable)-1])
-	lowValue=min(inputVariable[0:len(inputVariable)-1])
+	highValue=max(inputVariable[0:len(inputVariable)])
+	lowValue=min(inputVariable[0:len(inputVariable)])
 	return numpy.random.triangular(lowValue,recentValue,highValue)
 
 #####################################################
