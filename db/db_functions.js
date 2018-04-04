@@ -92,7 +92,7 @@
      * @resolve json obj, most-recent entry
      */
     get_most_recent_coinmarketcap_data_entry_where_currency_title : function(currency_title) {
-      let query = {"id" : currency_title}
+      let query = {"symbol" : currency_title}
       return  new Promise((resolve, reject) => {
         mongo.connect(url, (err,  client) => {
           if (err) {console.log(err); reject(err)}
