@@ -35,7 +35,7 @@ var format_date_request = function(date) {
  * pagetitle, title of the wiki page (case sensitive)
  */
 
-var x = function(pagetitle, date) {
+var x = function(pagetitle, date, symbol) {
 
   var startingyear, startingmonth, startingday
   var endingyear, endingmonth, endingday
@@ -77,6 +77,7 @@ var x = function(pagetitle, date) {
         var collection_title = 'wiki_views'
         var insert_object =  {
           'pagetitle' : pagetitle,
+          'symbol' : symbol,
           'timestamp' : info.items[x].timestamp.substring(0, info.items[x].timestamp.length -2),
           'year' : info.items[x].timestamp.substring(0,4),
           'month' : info.items[x].timestamp.substring(4,6),
@@ -104,7 +105,7 @@ x('Bitcoin', {
   'endingyear' : date.getFullYear(),
   'endingmonth' : date.getMonth(),
   'endingday' : date.getDate()
-})
+}, 'BTC')
 x('Ethereum', {
   'startingyear' : date.getFullYear(),
   'startingmonth' : date.getMonth(),
@@ -112,7 +113,7 @@ x('Ethereum', {
   'endingyear' : date.getFullYear(),
   'endingmonth' : date.getMonth(),
   'endingday' : date.getDate()
-})
+}, 'ETH')
 x('Bitcoin_Cash', {
   'startingyear' : date.getFullYear(),
   'startingmonth' : date.getMonth(),
@@ -120,7 +121,7 @@ x('Bitcoin_Cash', {
   'endingyear' : date.getFullYear(),
   'endingmonth' : date.getMonth(),
   'endingday' : date.getDate()
-})
+}, 'BCH')
 x('Litecoin', {
   'startingyear' : date.getFullYear(),
   'startingmonth' : date.getMonth(),
@@ -128,7 +129,7 @@ x('Litecoin', {
   'endingyear' : date.getFullYear(),
   'endingmonth' : date.getMonth(),
   'endingday' : date.getDate()
-})
+}, 'LTC')
 x('Dogecoin', {
   'startingyear' : date.getFullYear(),
   'startingmonth' : date.getMonth(),
@@ -136,7 +137,7 @@ x('Dogecoin', {
   'endingyear' : date.getFullYear(),
   'endingmonth' : date.getMonth(),
   'endingday' : date.getDate()
-})
+}, 'DOGE')
 x('Ripple_(payment_protocol)', {
   'startingyear' : date.getFullYear(),
   'startingmonth' : date.getMonth(),
@@ -144,4 +145,54 @@ x('Ripple_(payment_protocol)', {
   'endingyear' : date.getFullYear(),
   'endingmonth' : date.getMonth(),
   'endingday' : date.getDate()
-})
+}, 'XRP')
+
+x('EOS.IO', {
+  'startingyear' : date.getFullYear(),
+  'startingmonth' : date.getMonth(),
+  'startingday' : date.getDate(),
+  'endingyear' : date.getFullYear(),
+  'endingmonth' : date.getMonth(),
+  'endingday' : date.getDate()
+}, 'EOS')
+
+x('Cardano_(platform)', {
+  'startingyear' : date.getFullYear(),
+  'startingmonth' : date.getMonth(),
+  'startingday' : date.getDate(),
+  'endingyear' : date.getFullYear(),
+  'endingmonth' : date.getMonth(),
+  'endingday' : date.getDate()
+}, 'ADA')
+
+x('Stellar_(payment_network)', {
+  'startingyear' : date.getFullYear(),
+  'startingmonth' : date.getMonth(),
+  'startingday' : date.getDate(),
+  'endingyear' : date.getFullYear(),
+  'endingmonth' : date.getMonth(),
+  'endingday' : date.getDate()
+}, 'XLM')
+
+x('NEO_(cryptocurrency)', {
+  'startingyear' : date.getFullYear(),
+  'startingmonth' : date.getMonth(),
+  'startingday' : date.getDate(),
+  'endingyear' : date.getFullYear(),
+  'endingmonth' : date.getMonth(),
+  'endingday' : date.getDate()
+}, 'NEO')
+
+x('IOTA_(cryptocurrency)', {
+  'startingyear' : date.getFullYear(),
+  'startingmonth' : date.getMonth(),
+  'startingday' : date.getDate(),
+  'endingyear' : date.getFullYear(),
+  'endingmonth' : date.getMonth(),
+  'endingday' : date.getDate()
+}, 'MIOTA')
+
+
+
+// https://en.wikipedia.org/wiki/Cardano_(platform)
+// https://en.wikipedia.org/wiki/

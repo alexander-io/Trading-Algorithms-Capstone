@@ -364,15 +364,15 @@
     }
 
 
-    setInterval(function() {
-      for (let i  = 0; i <  data.currencies.length; i++) {
-        d3.select("#"+data.currencies[i])
-          .selectAll("*")
-          .remove()
-        socket.emit('req price n periods', {currency : data.currencies[i], periods : initial_time_periods})
-        socket.emit('req assessment', {currency : data.currencies[i]})
-      }
-    }, 5000)
+    // setInterval(function() {
+    //   for (let i  = 0; i <  data.currencies.length; i++) {
+    //     d3.select("#"+data.currencies[i])
+    //       .selectAll("*")
+    //       .remove()
+    //     socket.emit('req price n periods', {currency : data.currencies[i], periods : initial_time_periods})
+    //     socket.emit('req assessment', {currency : data.currencies[i]})
+    //   }
+    // }, 5000)
 
   })
 
