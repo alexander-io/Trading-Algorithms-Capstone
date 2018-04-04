@@ -1,7 +1,8 @@
 (function() {
 
+  // https://github.com/errcw/gaussian
   let gaussian = require(__dirname + '/gaussian.js')
-
+  
   var db_funx = require(__dirname + '/../db/db_functions.js')
 
   module.exports = {

@@ -16,6 +16,7 @@
           const db = client.db(dbName)
           var collection = db.collection(collection_title)
           // insert entry into db collection
+          console.log('inserting :', entry)
           collection.insert(entry, function(err, result) {
             if (err) {
               console.log('error', err)
@@ -91,7 +92,7 @@
      * @resolve json obj, most-recent entry
      */
     get_most_recent_coinmarketcap_data_entry_where_currency_title : function(currency_title) {
-      let query = {"id" : currency_title}
+      let query = {"symbol" : currency_title}
       return  new Promise((resolve, reject) => {
         mongo.connect(url, (err,  client) => {
           if (err) {console.log(err); reject(err)}
@@ -277,7 +278,7 @@
      * @resolve json object, corresponding with highest price value
      */
     get_cmarketcap_highest_price_usd : function(currency_title) {
-      let query = {"id" : currency_title}
+      let query = {"symbol" : currency_title}
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
           if (err) {console.log(err); reject(err)}
@@ -302,7 +303,7 @@
     * @resolve json object, corresponding with lowest price value
      */
     get_cmarketcap_lowest_price_usd : function(currency_title) {
-      let query = {"id" : currency_title}
+      let query = {"symbol" : currency_title}
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
           if (err) {console.log(err); reject(err)}
@@ -326,7 +327,7 @@
      * @resolve array of json entries corresponding to currency_title
      */
     get_cm_array_where_currency_title : function(currency_title) {
-      let query = {"id" : currency_title}
+      let query = {"symbol" : currency_title}
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
           if (err) {console.log.close()
@@ -344,7 +345,7 @@
      * @resolve average  cmarket cap price by currency
      */
     get_average_cm_price_where_currency_title : function(currency_title) {
-      let query = {"id" : currency_title}
+      let query = {"symbol" : currency_title}
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
           if (err) {console.log(err); reject(err)}
@@ -367,10 +368,9 @@
      * @ resolve simple moving average of n time periods
      */
     get_sma_for_n_recent_periods_cmarketcap_price_where_currency_title : function(currency_title, time_periods) {
-      let query = {"id" : currency_title}
+      let query = {"symbol" : currency_title}
       return new Promise((resolve, reject) => {
         this.get_num_entries_where_collection_AND_query('coinmarketcap_ticker', query).then((resolution, rejection) => {
-          console.log('num entries', resolution)
           if (time_periods > resolution) {
             time_periods = resolution
             console.log('only', resolution, 'available time periods')
@@ -396,6 +396,39 @@
         })
       })
     },
+    get_sma_array_for_n_recent_periods_cmarketcap_price_where_currency_title : function(currency_title, time_periods) {
+      let query = {"symbol" : currency_title}
+      return new Promise((resolve, reject) => {
+        this.get_num_entries_where_collection_AND_query('coinmarketcap_ticker', query).then((resolution, rejection) => {
+          if (time_periods > resolution) {
+            time_periods = resolution
+            console.log('only', resolution, 'available time periods')
+          }
+          mongo.connect(url, (err, client) => {
+            if (err) {console.log(err); reject(err)}
+            let x = client.db(dbName).collection('coinmarketcap_ticker').find(query).sort({unix_time : -1}).limit(time_periods).toArray((err, docs) => {
+              if (err) {console.log(err); reject(err)}
+              client.close()
+              let period = 10
+              let sma_array = []
+              let init_running_total = 0
+              for (let i = docs.length-1; i >= 0; i--) {
+                init_running_total+=parseFloat(docs[i].price_usd)
+                if (i < docs.length - period) {
+                  // console.log(docs[i+period].price_usd)
+                  init_running_total -= parseFloat(docs[i+period].price_usd)
+                  // console.log(init_running_total)
+
+                  sma_array[i] = init_running_total/period
+                }
+              }
+              // console.log(sma_array.length)
+              resolve(sma_array)
+            })
+          })
+        })
+      })
+    },
     /*
      * get exponential  moving average for n time  periods by currency currency_title
      * @param currency_title, ex: 'litecoin', 'bitcoin', 'ripple'
@@ -405,7 +438,7 @@
      *  index[time_periods] -> east-recent
      */
     get_ema_cmarketcap_for_n_time_period_by_currency_title : function(currency_title, time_periods) {
-      let query = {"id" : currency_title}
+      let query = {"symbol" : currency_title}
       return new Promise((resolve, reject) => {
         this.get_array_n_most_recent_entries_cmarketcap_by_currency_title(currency_title, time_periods).then((resolution, rejection) => {
           this.get_sma_for_n_recent_periods_cmarketcap_price_where_currency_title(currency_title, time_periods).then((sma_resolution, sma_rejection) => {
@@ -457,7 +490,7 @@
      * @resolve array of most recent cmarketcap entries
      */
     get_array_n_most_recent_entries_cmarketcap_by_currency_title : function(currency_title, time_periods) {
-      let query = {"id" : currency_title}
+      let query = {"symbol" : currency_title}
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
           if (err) {console.log(err); reject(err)}
@@ -473,7 +506,7 @@
       })
     },
     get_array_n_most_recent_prices_cmarketcap_by_currency_title : function(currency_title, time_periods) {
-      let query = {"id" : currency_title}
+      let query = {"symbol" : currency_title}
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
           if (err) {console.log(err); reject(err)}
