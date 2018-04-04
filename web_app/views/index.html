@@ -255,6 +255,11 @@
       current_price_btc.classList = ["current_price_btc_root " + data.currencies[i]]
       current_price_btc.setAttribute("id", "current_price_btc_root_"+data.currencies[i])
 
+      var market_cap_usd = document.createElement('p')
+      market_cap_usd.setAttribute("currency", data.currencies[i])
+      market_cap_usd.classList = ["market_cap_usd_root " + data.currencies[i]]
+      market_cap_usd.setAttribute("id", "market_cap_usd_root_"+data.currencies[i])
+
 
       var twenty_four_hr_volume = document.createElement('p')
       twenty_four_hr_volume.setAttribute("currency", data.currencies[i])
@@ -298,6 +303,7 @@
       ui_icon_message_content.appendChild(rank)
       ui_icon_message_content.appendChild(current_price_usd)
       ui_icon_message_content.appendChild(current_price_btc)
+      ui_icon_message_content.appendChild(market_cap_usd)
       ui_icon_message_content.appendChild(twenty_four_hr_volume)
       ui_icon_message_content.appendChild(total_supply)
       ui_icon_message_content.appendChild(percent_change_1_hr)
@@ -349,7 +355,7 @@
 
 
 <script type="text/javascript">
-  var initial_time_periods = 100
+  var initial_time_periods = 10
   var currency = 'BTC'
   var socket = io.connect('http://localhost:8080');
 
@@ -508,6 +514,9 @@
     document.getElementById('current_price_usd_root_'+data.price_assessment.symbol).innerHTML = "<b>$/usd : </b>" + data.price_assessment.price_usd
 
     document.getElementById('current_price_btc_root_'+data.price_assessment.symbol).innerHTML = "<b>$/btc : </b>" + data.price_assessment.price_btc
+
+    document.getElementById('market_cap_usd_root_'+data.price_assessment.symbol).innerHTML = "<b>marketcap usd : </b>" + data.price_assessment.market_cap_usd
+
 
     document.getElementById('twenty_four_hr_volume_root_'+data.price_assessment.symbol).innerHTML = "<b>24hr vol. : </b>" + data.price_assessment['24h_volume_usd']
 
