@@ -93,7 +93,30 @@
   </body>
 </html>
 
+
+
 <script type="text/javascript">
+
+  class Q {
+    constructor(arr) {
+      this.supporting_array = arr
+    }
+
+
+    enqueue(x) {
+      this.supporting_array.push(x)
+    }
+    dequeue() {
+      return this.supporting_array.shift()
+    }
+    empty() {
+      return this.supporting_array.length == 0
+    }
+  }
+
+  var state_of_buttons = {}
+
+
   let funx = {
     price : function(symbol) {
       console.log('price called')
@@ -149,12 +172,12 @@
 
 
 
-      var currency_id = document.createElement('p')
+      var currency_id = document.createElement('h2')
       currency_id.setAttribute("currency", data.currencies[i])
       currency_id.classList = ["currency_id_root " + data.currencies[i]]
       currency_id.setAttribute("id", "currency_id_root_"+data.currencies[i])
 
-      var currency_symbol = document.createElement('p')
+      var currency_symbol = document.createElement('h2')
       currency_symbol.setAttribute("currency", data.currencies[i])
       currency_symbol.classList = ["currency_symbol_root " + data.currencies[i]]
       currency_symbol.setAttribute("id", "currency_symbol_root_"+data.currencies[i])
@@ -333,6 +356,19 @@
     // set the width of the svgs
     for (var i = 0; i < display_svgs.length; i++) { display_svgs[i].setAttribute("width", width_of_seg-20) }
 
+
+    // var state_of_buttons = {}
+    for (var i = 0; i < data.currencies.length; i++) {
+      state_of_buttons[data.currencies[i]] = {
+        'price' : true,
+        'ema' : false,
+        'sma' : false,
+        'wiki' : false
+      }
+    }
+    // console.log(state)
+
+
     // select control buttons
     let ctrl_buttons = document.getElementsByClassName('ctrl_buttons')
     // for each set of buttons...
@@ -341,6 +377,14 @@
       for (let i = 0; i < ctrl_buttons[x].childNodes.length; i++) {
         // add event listener to each button
         ctrl_buttons[x].childNodes[i].addEventListener('click', function() {
+
+          var key = ctrl_buttons[x].getAttribute('currency')
+          for (xxx in state_of_buttons[key]) { state_of_buttons[key][xxx] = false }
+          state_of_buttons[key][this.getAttribute("funx")] = true
+          // console.log(state_of_buttons)
+
+          // console.log(state_of_buttons[key][this.getAttribute("funx")])
+
           for (let ii = 0; ii < ctrl_buttons[x].childNodes.length; ii++) { /* deactivate other  buttons */ ctrl_buttons[x].childNodes[ii].classList.remove('active') }
           this.classList.add('active') // activate this one
           // remove svg contents
@@ -358,7 +402,7 @@
 
 
 <script type="text/javascript">
-  var initial_time_periods = 100
+  var initial_time_periods = 200
   var currency = 'BTC'
   var socket = io.connect('http://localhost:8080');
 
@@ -372,17 +416,36 @@
 
     }
 
+    var inner_interval = null
 
-    // setInterval(function() {
-    //   for (let i  = 0; i <  data.currencies.length; i++) {
-    //     d3.select("#"+data.currencies[i])
-    //       .selectAll("*")
-    //       .remove()
-    //     socket.emit('req price n periods', {currency : data.currencies[i], periods : initial_time_periods})
-    //     socket.emit('req assessment', {currency : data.currencies[i]})
-    //   }
-    // }, 5000)
+    var refresh_queue = new  Q(data.currencies)
+    setInterval(function() {
+      clearInterval(inner_interval)
+      refresh_queue.supporting_array = data.currencies.slice()
+      console.log(refresh_queue)
 
+      inner_interval = setInterval(function() {
+        if (refresh_queue.empty()) {
+          clearInterval(inner_interval)
+        } else {
+          let curr_elem = refresh_queue.dequeue()
+
+          d3.select("#"+curr_elem)
+              .selectAll("*")
+              .remove()
+          socket.emit('req assessment', {currency : curr_elem})
+          if (state_of_buttons[curr_elem].price) {
+            socket.emit('req price n periods', {currency : curr_elem, periods : initial_time_periods})
+          } else if (state_of_buttons[curr_elem].ema) {
+            socket.emit('req ema n periods', {currency : curr_elem, periods : initial_time_periods})
+          } else if (state_of_buttons[curr_elem].sma) {
+            socket.emit('req sma n periods', {currency : curr_elem, periods : initial_time_periods})
+          } else if (state_of_buttons[curr_elem].wiki) {
+            socket.emit('req wiki n periods', {currency : curr_elem, periods : initial_time_periods})
+          }
+        }
+      }, 200)
+    }, 15000)
   })
 
 </script>
@@ -425,7 +488,7 @@
 
   var res_price_n_periods = function(price_data, time_periods) {
 
-    console.log(price_data.price_array)
+    // console.log(price_data.price_array)
 
     var n = 3 // number of series
     var m = time_periods
@@ -499,7 +562,7 @@
   })
 
   socket.on('res assessment', function(data) {
-    console.log(data.price_assessment)
+    // console.log(data.price_assessment)
 
     document.getElementById('currency_id_root_'+data.price_assessment.symbol).innerHTML = "<b>name : </b>" + data.price_assessment.id
 
