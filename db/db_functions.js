@@ -45,6 +45,23 @@
         })
       })
     },
+    get_array_n_recent_wiki_views_where_pagetitle :  function(pagetitle, time_periods) {
+      let query = {"symbol" : pagetitle}
+      return new Promise(function(resolve, reject) {
+        mongo.connect(url, function(err, client) {
+          if (err) {console.log(err);reject(err)}
+          var collection = client.db(dbName).collection('wiki_views')
+          var x = collection.find(query).sort({unix_time : -1}).limit(time_periods).toArray((err, docs) => {
+            client.close()
+            let arr_builder = []
+            for (let i = 0; i < docs.length; i++) {
+              arr_builder.push(docs[i].views)
+            }
+            resolve(arr_builder)
+          })
+        })
+      })
+    },
     /*
      *  get_array_coinmarketcap_data_where_currency_title
      * @param currency_title, select from db.coinmarketcap_ticker by currency_title

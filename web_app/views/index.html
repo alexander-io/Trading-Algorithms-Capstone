@@ -88,7 +88,6 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </body>
@@ -107,6 +106,10 @@
     sma : function(symbol) {
       console.log('sma called')
       socket.emit('req sma n periods', {currency : symbol, periods : initial_time_periods})
+    },
+    wiki : function(symbol) {
+      console.log('wiki called')
+      socket.emit('req wiki n periods', {currency : symbol, periods : initial_time_periods})
     }
   }
 
@@ -355,7 +358,7 @@
 
 
 <script type="text/javascript">
-  var initial_time_periods = 10
+  var initial_time_periods = 100
   var currency = 'BTC'
   var socket = io.connect('http://localhost:8080');
 
@@ -408,6 +411,8 @@
 
   var price_array_to_reduced_price_array = function(price_array) {
     let min = d3.min(price_array)
+    let max = d3.max(price_array)
+    if (min == max) return price_array
     for (let x = 0; x < price_array.length; x++) {
       price_array[x] -= min
     }
@@ -419,6 +424,9 @@
 <script type="text/javascript">
 
   var res_price_n_periods = function(price_data, time_periods) {
+
+    console.log(price_data.price_array)
+
     var n = 3 // number of series
     var m = time_periods
     var xz = d3.range(m)
@@ -493,17 +501,6 @@
   socket.on('res assessment', function(data) {
     console.log(data.price_assessment)
 
-
-    // var list_of_roots = ['rank_root_',
-    // 'current_price_usd_root_',
-    // 'current_price_btc_root_',
-    // 'twenty_four_hr_volume_root_',
-    // 'total_supply_root_',
-    // 'percent_change_1_hr_root_',
-    // 'percent_change_24_hr_root_',
-    // 'percent_change_7_days_root_',
-    // 'last_updated_root_']
-
     document.getElementById('currency_id_root_'+data.price_assessment.symbol).innerHTML = "<b>name : </b>" + data.price_assessment.id
 
     document.getElementById('currency_symbol_root_'+data.price_assessment.symbol).innerHTML = "<b>symbol : </b>" + data.price_assessment.symbol
@@ -529,5 +526,12 @@
     document.getElementById('percent_change_7_days_root_'+data.price_assessment.symbol).innerHTML = "<b>%change 7d : </b>" + data.price_assessment.percent_change_7d
 
     document.getElementById('last_updated_root_'+data.price_assessment.symbol).innerHTML = "<b>updated : </b>" + unix_ms_to_date_string(data.price_assessment.unix_time)
+  })
+
+
+  socket.on('res wiki n periods', function(data) {
+    console.log('got response from server', data)
+    res_price_n_periods(data, data.price_array.length)
+
   })
 </script>
