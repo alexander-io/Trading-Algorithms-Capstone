@@ -538,6 +538,22 @@
         })
       })
     },
+    get_array_n_most_recent_prices_cmarketcap_by_currency_title_skip_k_periods : function(currency_title, time_periods, k_periods) {
+      let query = {"symbol" : currency_title}
+      return new Promise((resolve, reject) => {
+        mongo.connect(url, (err, client) => {
+          if (err) {console.log(err); reject(err)}
+          let x = client.db(dbName).collection('coinmarketcap_ticker').find(query).sort({unix_time : -1}).toArray((err, docs) => {
+            client.close()
+            let array_of_n_periods = []
+            for (let i = 0; i < docs.length; i+= k_periods) {
+              array_of_n_periods.push(parseFloat(docs[i].price_usd))
+            }
+            resolve(array_of_n_periods)
+          })
+        })
+      })
+    },
     seconds_to_hours : function(seconds) {
       return seconds/3600
     },
