@@ -42,6 +42,14 @@
           </div>
         </div>
 
+        <div class="two column centered row">
+          <div class="ui toggle checkbox" data-position="bottom left">
+            <input id="update_toggle" name="public" type="checkbox">
+            <label>Toggle Live Update</label>
+          </div>
+        </div>
+
+
       </div>
     </div>
 
@@ -264,60 +272,60 @@
 
 
       // TEXT NODE START
-      var rank = document.createElement('p')
+      var rank = document.createElement('h6')
       rank.setAttribute("currency", data.currencies[i])
       rank.classList = ["rank_root " + data.currencies[i]]
       rank.setAttribute("id", "rank_root_"+data.currencies[i])
 
-      var current_price_usd = document.createElement('p')
+      var current_price_usd = document.createElement('h6')
       current_price_usd.setAttribute("currency", data.currencies[i])
       current_price_usd.classList = ["current_price_usd_root " + data.currencies[i]]
       current_price_usd.setAttribute("id", "current_price_usd_root_"+data.currencies[i])
 
 
 
-      var current_price_btc = document.createElement('p')
+      var current_price_btc = document.createElement('h6')
       current_price_btc.setAttribute("currency", data.currencies[i])
       current_price_btc.classList = ["current_price_btc_root " + data.currencies[i]]
       current_price_btc.setAttribute("id", "current_price_btc_root_"+data.currencies[i])
 
-      var market_cap_usd = document.createElement('p')
+      var market_cap_usd = document.createElement('h6')
       market_cap_usd.setAttribute("currency", data.currencies[i])
       market_cap_usd.classList = ["market_cap_usd_root " + data.currencies[i]]
       market_cap_usd.setAttribute("id", "market_cap_usd_root_"+data.currencies[i])
 
 
-      var twenty_four_hr_volume = document.createElement('p')
+      var twenty_four_hr_volume = document.createElement('h6')
       twenty_four_hr_volume.setAttribute("currency", data.currencies[i])
       twenty_four_hr_volume.classList = ["twenty_four_hr_volume_root " + data.currencies[i]]
       twenty_four_hr_volume.setAttribute("id", "twenty_four_hr_volume_root_"+data.currencies[i])
 
 
-      var total_supply = document.createElement('p')
+      var total_supply = document.createElement('h6')
       total_supply.setAttribute("currency", data.currencies[i])
       total_supply.classList = ["total_supply_root " + data.currencies[i]]
       total_supply.setAttribute("id", "total_supply_root_"+data.currencies[i])
 
 
-      var percent_change_1_hr = document.createElement('p')
+      var percent_change_1_hr = document.createElement('h6')
       percent_change_1_hr.setAttribute("currency", data.currencies[i])
       percent_change_1_hr.classList = ["percent_change_1_hr_root " + data.currencies[i]]
       percent_change_1_hr.setAttribute("id", "percent_change_1_hr_root_"+data.currencies[i])
 
 
-      var percent_change_24_hr = document.createElement('p')
+      var percent_change_24_hr = document.createElement('h6')
       percent_change_24_hr.setAttribute("currency", data.currencies[i])
       percent_change_24_hr.classList = ["percent_change_24_hr_root " + data.currencies[i]]
       percent_change_24_hr.setAttribute("id", "percent_change_24_hr_root_"+data.currencies[i])
 
 
-      var percent_change_7_days = document.createElement('p')
+      var percent_change_7_days = document.createElement('h6')
       percent_change_7_days.setAttribute("currency", data.currencies[i])
       percent_change_7_days.classList = ["percent_change_7_days_root " + data.currencies[i]]
       percent_change_7_days.setAttribute("id", "percent_change_7_days_root_"+data.currencies[i])
 
 
-      var last_updated = document.createElement('p')
+      var last_updated = document.createElement('h6')
       last_updated.setAttribute("currency", data.currencies[i])
       last_updated.classList = ["last_updated_root " + data.currencies[i]]
       last_updated.setAttribute("id", "last_updated_root_"+data.currencies[i])
@@ -406,22 +414,31 @@
   var currency = 'BTC'
   var socket = io.connect('http://localhost:8080');
 
+  var list_of_currencies = null
+
   socket.on('currencies', function(data) {
     create_markup_structure(data)
 
+    list_of_currencies = data.currencies.slice()
+
     for (let i  = 0; i <  data.currencies.length; i++) {
       socket.emit('req price n periods', {currency : data.currencies[i], periods : initial_time_periods})
-
       socket.emit('req assessment', {currency : data.currencies[i]})
-
     }
+  })
 
-    var inner_interval = null
+</script>
 
-    var refresh_queue = new  Q(data.currencies)
-    setInterval(function() {
+
+<script type="text/javascript">
+
+
+  var start_interval = function() {
+
+    var refresh_queue = new  Q(list_of_currencies)
+    outer_interval = setInterval(function() {
       clearInterval(inner_interval)
-      refresh_queue.supporting_array = data.currencies.slice()
+      refresh_queue.supporting_array = list_of_currencies.slice()
       console.log(refresh_queue)
 
       inner_interval = setInterval(function() {
@@ -445,8 +462,42 @@
           }
         }
       }, 200)
-    }, 15000)
-  })
+    }, 5000)
+
+  }
+</script>
+
+<script type="text/javascript">
+
+  // set live update interval for toggle button click
+  var inner_interval = null
+  var outer_interval = null
+
+  if ($('.ui.toggle').checkbox('is checked')) {
+    start_interval()
+  }
+
+  $('.ui.toggle').checkbox({
+    onChecked: function () {
+      console.log('checked')
+
+      $('.ui.toggle').popup({
+        title : 'off',
+        on : 'click'
+      })
+      start_interval()
+    },
+    onUnchecked: function () {
+      console.log('unchecked')
+      $('.ui.toggle').popup({
+        title : 'on',
+        content : 'updates every 15s',
+        on : 'click'
+      })
+      clearInterval(inner_interval)
+      clearInterval(outer_interval)
+    }
+  });
 
 </script>
 
@@ -488,15 +539,20 @@
 
   var res_price_n_periods = function(price_data, time_periods) {
 
-    // console.log(price_data.price_array)
+
+    var minimum_val = d3.min(price_data.price_array)
+    price_data.price_array.push(minimum_val*.999)
+
 
     var n = 3 // number of series
-    var m = time_periods
-    var xz = d3.range(m)
+    var m = time_periods+1
+    var xz = d3.range(m+1)
     xz = inverse_array(xz) // inverse
+
     var yz = d3.range(n).map(function() {
       return price_array_to_reduced_price_array(price_data.price_array);
     })
+
     var y01z = d3.stack().keys(d3.range(n))(d3.transpose(yz))
     var yMax = d3.max(yz, function(y) {
       return d3.max(y);
@@ -509,9 +565,9 @@
 
     var svg = d3.select("#"+price_data.symbol)
         margin = {top: 5, right: 5, bottom: 5, left: 5},
-        width = +svg.attr("width") - margin.left - margin.right,
+        width = +svg.attr("width") /*- margin.left - margin.right*/,
         height = +svg.attr("height") - margin.top - margin.bottom,
-        g = svg.append("g").attr("transform", "translate(" + 0 + "," + margin.top + ")");
+        g = svg.append("g").attr("transform", "translate(" + 0 + "," + 0 + ")");
 
     var x = d3.scaleBand()
         .domain(xz)
@@ -539,9 +595,31 @@
         .attr("width", x.bandwidth())
         .attr("height", 0);
 
+        console.log(height)
+
+    svg.append("rect")
+      .attr("height", 2)
+      .attr("width", width)
+      .attr("x", 0)
+      .attr("y", height )
+      .attr("fill", "#000000")
+
+    svg.append("rect")
+      .attr("height", height)
+      .attr("width", 2)
+      .attr("x", 0)
+      .attr("y", 0 )
+      .attr("fill", "#000000")
+
+    // svg.append("text")
+
+
     rect.transition()
         .delay(function(d, i) { return i ; })
-        .attr("y", function(d) { return y(d[1]); })
+        .attr("y", function(d) {
+          // console.log(y(d[1]))
+          return y(d[1]);
+        })
         .attr("height", function(d) { return y(d[0]) - y(d[1]); });
   }
 </script>
