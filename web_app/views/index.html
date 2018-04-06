@@ -75,7 +75,7 @@
         </div>
 
         <div class="ten wide column">
-          <div  class="ui center aligned container" style="width:100%;padding:5%;">
+          <div  class="ui center aligned container" style="width:100%;padding:0% 5% 5% 5%;">
             <div id="00_seg" class="ui segment display_seg" style="width:100%;"></div>
           </div>
         </div>
@@ -121,6 +121,20 @@
       return this.supporting_array.length == 0
     }
   }
+
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round
+  function round(number, precision) {
+    var shift = function (number, precision, reverseShift) {
+      if (reverseShift) {
+        precision = -precision;
+      }
+      numArray = ("" + number).split("e");
+      return +(numArray[0] + "e" + (numArray[1] ? (+numArray[1] + precision) : precision));
+    };
+    return shift(Math.round(shift(number, precision, false)), precision, true);
+  }
+
+
 
   var state_of_buttons = {}
 
@@ -169,6 +183,8 @@
 
       var left_ui_icon_message = document.createElement('div')
       left_ui_icon_message.classList = ['ui icon message']
+      left_ui_icon_message.setAttribute("style", "background-color : " + color_arr[0])
+
 
       var left_ui_icon_message_content = document.createElement('div')
       left_ui_icon_message_content.classList = ['content']
@@ -176,6 +192,7 @@
       var left_ui_icon_message_content_icon = document.createElement('i')
       left_ui_icon_message_content_icon.classList = ['material-icons']
       var left_ui_icon_message_content_icon_text_node =  document.createTextNode("fingerprint")
+      left_ui_icon_message_content_icon.setAttribute("style", "color : white;display:inline;")
       left_ui_icon_message_content_icon.appendChild(left_ui_icon_message_content_icon_text_node)
 
 
@@ -184,11 +201,14 @@
       currency_id.setAttribute("currency", data.currencies[i])
       currency_id.classList = ["currency_id_root " + data.currencies[i]]
       currency_id.setAttribute("id", "currency_id_root_"+data.currencies[i])
+      currency_id.setAttribute("style", "color:white;display:inline")
 
       var currency_symbol = document.createElement('h2')
       currency_symbol.setAttribute("currency", data.currencies[i])
       currency_symbol.classList = ["currency_symbol_root " + data.currencies[i]]
       currency_symbol.setAttribute("id", "currency_symbol_root_"+data.currencies[i])
+      currency_symbol.setAttribute("style", "color:white;c")
+
 
       left_ui_icon_message_content.appendChild(left_ui_icon_message_content_icon)
       left_ui_icon_message_content.appendChild(currency_id)
@@ -247,6 +267,8 @@
       let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
       svg.classList = ['display_svg']
       svg.setAttribute("height", "500")
+      svg.setAttribute("style", "margin-top : 5px;")
+
       svg.setAttribute("currency", data.currencies[i])
       svg.setAttribute("id", data.currencies[i])
 
@@ -256,10 +278,14 @@
 
       let three_wide_col_second = document.createElement('div')
       three_wide_col_second.classList = ['three wide column']
+      // three_wide_col_second.setAttribute("style", "background-color : " + color_arr[1])
+
 
 
       var ui_icon_message = document.createElement('div')
       ui_icon_message.classList = ['ui icon message']
+      // ui_icon_message.setAttribute("style", "background-color : " + color_arr[3])
+
 
       var ui_icon_message_content = document.createElement('div')
       ui_icon_message_content.classList = ['content']
@@ -371,10 +397,10 @@
         'price' : true,
         'ema' : false,
         'sma' : false,
-        'wiki' : false
+        'wiki' : false,
+        'time_periods' : 200
       }
     }
-    // console.log(state)
 
 
     // select control buttons
@@ -462,7 +488,7 @@
           }
         }
       }, 200)
-    }, 5000)
+    }, 15000)
 
   }
 </script>
@@ -541,12 +567,14 @@
 
 
     var minimum_val = d3.min(price_data.price_array)
+    var maximum_val = d3.max(price_data.price_array)
     price_data.price_array.push(minimum_val*.999)
+    // price_data.price_array.push(maximum_val*1.001)
 
 
     var n = 3 // number of series
     var m = time_periods+1
-    var xz = d3.range(m+1)
+    var xz = d3.range(m)
     xz = inverse_array(xz) // inverse
 
     var yz = d3.range(n).map(function() {
@@ -567,7 +595,7 @@
         margin = {top: 5, right: 5, bottom: 5, left: 5},
         width = +svg.attr("width") /*- margin.left - margin.right*/,
         height = +svg.attr("height") - margin.top - margin.bottom,
-        g = svg.append("g").attr("transform", "translate(" + 0 + "," + 0 + ")");
+        g = svg.append("g").attr("transform", "translate(" + 25 + "," + -10 + ")");
 
     var x = d3.scaleBand()
         .domain(xz)
@@ -595,23 +623,49 @@
         .attr("width", x.bandwidth())
         .attr("height", 0);
 
-        console.log(height)
+        // console.log(height)
 
     svg.append("rect")
       .attr("height", 2)
       .attr("width", width)
       .attr("x", 0)
-      .attr("y", height )
+      .attr("y", height -10)
       .attr("fill", "#000000")
 
     svg.append("rect")
       .attr("height", height)
       .attr("width", 2)
-      .attr("x", 0)
-      .attr("y", 0 )
+      .attr("x", 45)
+      .attr("y", 10 )
       .attr("fill", "#000000")
 
-    // svg.append("text")
+    svg.append("text")
+      .attr("x", 0)
+      .attr("y", 25)
+      .attr("font-family", "sans-serif")
+      .attr("font-size", "10px")
+      .text(round(maximum_val,3))
+
+    svg.append("text")
+      .attr("x", 0)
+      .attr("y", height -13)
+      .attr("font-family", "sans-serif")
+      .attr("font-size", "10px")
+      .text(round(minimum_val, 3))
+
+    svg.append("text")
+      .attr("x", 50)
+      .attr("y", height + 1)
+      .attr("font-family", "sans-serif")
+      .attr("font-size", "10px")
+      .text('past')
+
+    svg.append("text")
+      .attr("x", width*.925)
+      .attr("y", height + 1)
+      .attr("font-family", "sans-serif")
+      .attr("font-size", "10px")
+      .text('present')
 
 
     rect.transition()
@@ -642,7 +696,7 @@
   socket.on('res assessment', function(data) {
     // console.log(data.price_assessment)
 
-    document.getElementById('currency_id_root_'+data.price_assessment.symbol).innerHTML = "<b>name : </b>" + data.price_assessment.id
+    document.getElementById('currency_id_root_'+data.price_assessment.symbol).innerHTML = "<b> </b>" + data.price_assessment.id
 
     document.getElementById('currency_symbol_root_'+data.price_assessment.symbol).innerHTML = "<b>symbol : </b>" + data.price_assessment.symbol
 
