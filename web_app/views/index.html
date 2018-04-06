@@ -2,17 +2,22 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>crypto</title>
+    <title>Forecasting Algorithms</title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="jquery.min.js"></script>
     <script src="d3.v4.min.js"></script>
     <script src="semantic.min.js"></script>
     <link rel="stylesheet" href="semantic.min.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+     <link href="https://fonts.googleapis.com/css?family=Comfortaa" rel="stylesheet">
 
   </head>
-
+  <style media="screen">
+    h2 {
+      font-family: 'Comfortaa', cursive;
+      font-size: 20px;
+    }
+  </style>
   <body>
     <div class="row" style="margin:5%;">
       <div class="ui two column centered grid">
@@ -66,10 +71,9 @@
             <i class="material-icons">attach_money</i>
             <div class="content">
               <div class="header">
-                Currency Title
               </div>
-              <p>symbol</p>
-              <p>current price</p>
+              <p></p>
+              <p></p>
             </div>
           </div>
         </div>
@@ -189,11 +193,11 @@
       var left_ui_icon_message_content = document.createElement('div')
       left_ui_icon_message_content.classList = ['content']
 
-      var left_ui_icon_message_content_icon = document.createElement('i')
-      left_ui_icon_message_content_icon.classList = ['material-icons']
-      var left_ui_icon_message_content_icon_text_node =  document.createTextNode("fingerprint")
-      left_ui_icon_message_content_icon.setAttribute("style", "color : white;display:inline;")
-      left_ui_icon_message_content_icon.appendChild(left_ui_icon_message_content_icon_text_node)
+      // var left_ui_icon_message_content_icon = document.createElement('i')
+      // left_ui_icon_message_content_icon.classList = ['material-icons']
+      // var left_ui_icon_message_content_icon_text_node =  document.createTextNode("fingerprint")
+      // left_ui_icon_message_content_icon.setAttribute("style", "color : white;display:inline;")
+      // left_ui_icon_message_content_icon.appendChild(left_ui_icon_message_content_icon_text_node)
 
 
 
@@ -210,7 +214,7 @@
       currency_symbol.setAttribute("style", "color:white;c")
 
 
-      left_ui_icon_message_content.appendChild(left_ui_icon_message_content_icon)
+      // left_ui_icon_message_content.appendChild(left_ui_icon_message_content_icon)
       left_ui_icon_message_content.appendChild(currency_id)
       left_ui_icon_message_content.appendChild(currency_symbol)
 
@@ -465,7 +469,7 @@
     outer_interval = setInterval(function() {
       clearInterval(inner_interval)
       refresh_queue.supporting_array = list_of_currencies.slice()
-      console.log(refresh_queue)
+      // console.log(refresh_queue)
 
       inner_interval = setInterval(function() {
         if (refresh_queue.empty()) {
@@ -698,7 +702,7 @@
 
     document.getElementById('currency_id_root_'+data.price_assessment.symbol).innerHTML = "<b> </b>" + data.price_assessment.id
 
-    document.getElementById('currency_symbol_root_'+data.price_assessment.symbol).innerHTML = "<b>symbol : </b>" + data.price_assessment.symbol
+    document.getElementById('currency_symbol_root_'+data.price_assessment.symbol).innerHTML = "<b> </b>" + data.price_assessment.symbol
 
 
     document.getElementById('rank_root_'+data.price_assessment.symbol).innerHTML = "<b>rank : </b>" + data.price_assessment.rank
