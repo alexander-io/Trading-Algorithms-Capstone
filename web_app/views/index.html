@@ -193,14 +193,6 @@
       var left_ui_icon_message_content = document.createElement('div')
       left_ui_icon_message_content.classList = ['content']
 
-      // var left_ui_icon_message_content_icon = document.createElement('i')
-      // left_ui_icon_message_content_icon.classList = ['material-icons']
-      // var left_ui_icon_message_content_icon_text_node =  document.createTextNode("fingerprint")
-      // left_ui_icon_message_content_icon.setAttribute("style", "color : white;display:inline;")
-      // left_ui_icon_message_content_icon.appendChild(left_ui_icon_message_content_icon_text_node)
-
-
-
       var currency_id = document.createElement('h2')
       currency_id.setAttribute("currency", data.currencies[i])
       currency_id.classList = ["currency_id_root " + data.currencies[i]]
@@ -213,16 +205,11 @@
       currency_symbol.setAttribute("id", "currency_symbol_root_"+data.currencies[i])
       currency_symbol.setAttribute("style", "color:white;c")
 
-
-      // left_ui_icon_message_content.appendChild(left_ui_icon_message_content_icon)
       left_ui_icon_message_content.appendChild(currency_id)
       left_ui_icon_message_content.appendChild(currency_symbol)
 
-
-
       left_ui_icon_message.appendChild(left_ui_icon_message_content)
       three_wide_col.appendChild(left_ui_icon_message)
-
 
       let ten_wide_col = document.createElement('div')
       ten_wide_col.classList = ['ten wide column']
@@ -249,7 +236,6 @@
       ui_button_ema.classList = ['ui button ema_button ' + data.currencies[i]]
       ui_button_ema.setAttribute("funx", "ema")
       ui_button_ema.appendChild(document.createTextNode("EMA"))
-
 
       var ui_button_sma = document.createElement('div')
       ui_button_sma.classList = ['ui button sma_button ' + data.currencies[i]]
@@ -282,14 +268,9 @@
 
       let three_wide_col_second = document.createElement('div')
       three_wide_col_second.classList = ['three wide column']
-      // three_wide_col_second.setAttribute("style", "background-color : " + color_arr[1])
-
-
 
       var ui_icon_message = document.createElement('div')
       ui_icon_message.classList = ['ui icon message']
-      // ui_icon_message.setAttribute("style", "background-color : " + color_arr[3])
-
 
       var ui_icon_message_content = document.createElement('div')
       ui_icon_message_content.classList = ['content']
@@ -312,8 +293,6 @@
       current_price_usd.classList = ["current_price_usd_root " + data.currencies[i]]
       current_price_usd.setAttribute("id", "current_price_usd_root_"+data.currencies[i])
 
-
-
       var current_price_btc = document.createElement('h6')
       current_price_btc.setAttribute("currency", data.currencies[i])
       current_price_btc.classList = ["current_price_btc_root " + data.currencies[i]]
@@ -324,36 +303,30 @@
       market_cap_usd.classList = ["market_cap_usd_root " + data.currencies[i]]
       market_cap_usd.setAttribute("id", "market_cap_usd_root_"+data.currencies[i])
 
-
       var twenty_four_hr_volume = document.createElement('h6')
       twenty_four_hr_volume.setAttribute("currency", data.currencies[i])
       twenty_four_hr_volume.classList = ["twenty_four_hr_volume_root " + data.currencies[i]]
       twenty_four_hr_volume.setAttribute("id", "twenty_four_hr_volume_root_"+data.currencies[i])
-
 
       var total_supply = document.createElement('h6')
       total_supply.setAttribute("currency", data.currencies[i])
       total_supply.classList = ["total_supply_root " + data.currencies[i]]
       total_supply.setAttribute("id", "total_supply_root_"+data.currencies[i])
 
-
       var percent_change_1_hr = document.createElement('h6')
       percent_change_1_hr.setAttribute("currency", data.currencies[i])
       percent_change_1_hr.classList = ["percent_change_1_hr_root " + data.currencies[i]]
       percent_change_1_hr.setAttribute("id", "percent_change_1_hr_root_"+data.currencies[i])
-
 
       var percent_change_24_hr = document.createElement('h6')
       percent_change_24_hr.setAttribute("currency", data.currencies[i])
       percent_change_24_hr.classList = ["percent_change_24_hr_root " + data.currencies[i]]
       percent_change_24_hr.setAttribute("id", "percent_change_24_hr_root_"+data.currencies[i])
 
-
       var percent_change_7_days = document.createElement('h6')
       percent_change_7_days.setAttribute("currency", data.currencies[i])
       percent_change_7_days.classList = ["percent_change_7_days_root " + data.currencies[i]]
       percent_change_7_days.setAttribute("id", "percent_change_7_days_root_"+data.currencies[i])
-
 
       var last_updated = document.createElement('h6')
       last_updated.setAttribute("currency", data.currencies[i])
@@ -378,7 +351,6 @@
       ui_icon_message.appendChild(ui_icon_message_content)
       three_wide_col_second.appendChild(ui_icon_message)
 
-
       row.appendChild(three_wide_col)
       row.appendChild(ten_wide_col)
       row.appendChild(three_wide_col_second)
@@ -394,8 +366,6 @@
     // set the width of the svgs
     for (var i = 0; i < display_svgs.length; i++) { display_svgs[i].setAttribute("width", width_of_seg-20) }
 
-
-    // var state_of_buttons = {}
     for (var i = 0; i < data.currencies.length; i++) {
       state_of_buttons[data.currencies[i]] = {
         'price' : true,
@@ -441,9 +411,7 @@
 
 <script type="text/javascript">
   var initial_time_periods = 200
-  var currency = 'BTC'
   var socket = io.connect('http://localhost:8080');
-
   var list_of_currencies = null
 
   socket.on('currencies', function(data) {
@@ -451,6 +419,7 @@
 
     list_of_currencies = data.currencies.slice()
 
+    // for all currencies, send initial request to server for price and assessment
     for (let i  = 0; i <  data.currencies.length; i++) {
       socket.emit('req price n periods', {currency : data.currencies[i], periods : initial_time_periods})
       socket.emit('req assessment', {currency : data.currencies[i]})
@@ -462,14 +431,12 @@
 
 <script type="text/javascript">
 
-
+  // define a function to start the  interval refresh cycle
   var start_interval = function() {
-
     var refresh_queue = new  Q(list_of_currencies)
     outer_interval = setInterval(function() {
       clearInterval(inner_interval)
       refresh_queue.supporting_array = list_of_currencies.slice()
-      // console.log(refresh_queue)
 
       inner_interval = setInterval(function() {
         if (refresh_queue.empty()) {
@@ -493,7 +460,6 @@
         }
       }, 200)
     }, 15000)
-
   }
 </script>
 
@@ -567,14 +533,13 @@
 
 <script type="text/javascript">
 
-  var res_price_n_periods = function(price_data, time_periods) {
 
+  // handle response from server with data, draw data  elements to svg
+  var res_price_n_periods = function(price_data, time_periods) {
 
     var minimum_val = d3.min(price_data.price_array)
     var maximum_val = d3.max(price_data.price_array)
     price_data.price_array.push(minimum_val*.999)
-    // price_data.price_array.push(maximum_val*1.001)
-
 
     var n = 3 // number of series
     var m = time_periods+1
@@ -627,8 +592,6 @@
         .attr("width", x.bandwidth())
         .attr("height", 0);
 
-        // console.log(height)
-
     svg.append("rect")
       .attr("height", 2)
       .attr("width", width)
@@ -675,7 +638,6 @@
     rect.transition()
         .delay(function(d, i) { return i ; })
         .attr("y", function(d) {
-          // console.log(y(d[1]))
           return y(d[1]);
         })
         .attr("height", function(d) { return y(d[0]) - y(d[1]); });
@@ -697,8 +659,8 @@
     res_price_n_periods(price_data, price_data.price_array.length)
   })
 
+  // handle assesement response from server, select elements and bind data from server to them
   socket.on('res assessment', function(data) {
-    // console.log(data.price_assessment)
 
     document.getElementById('currency_id_root_'+data.price_assessment.symbol).innerHTML = "<b> </b>" + data.price_assessment.id
 
@@ -713,7 +675,6 @@
 
     document.getElementById('market_cap_usd_root_'+data.price_assessment.symbol).innerHTML = "<b>marketcap usd : </b>" + data.price_assessment.market_cap_usd
 
-
     document.getElementById('twenty_four_hr_volume_root_'+data.price_assessment.symbol).innerHTML = "<b>24hr vol. : </b>" + data.price_assessment['24h_volume_usd']
 
     document.getElementById('total_supply_root_'+data.price_assessment.symbol).innerHTML = "<b>total supply : </b>" + data.price_assessment.total_supply
@@ -727,10 +688,9 @@
     document.getElementById('last_updated_root_'+data.price_assessment.symbol).innerHTML = "<b>updated : </b>" + unix_ms_to_date_string(data.price_assessment.unix_time)
   })
 
-
+  
   socket.on('res wiki n periods', function(data) {
     console.log('got response from server', data)
     res_price_n_periods(data, data.price_array.length)
-
   })
 </script>
