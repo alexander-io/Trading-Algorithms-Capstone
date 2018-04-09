@@ -10,8 +10,6 @@ var funx = require(__dirname + '/../../db/db_functions.js')
 var request = require('request') // include request npm package
 var date = new Date()
 
-/* this is a comment */
-// this works for one line
 
 // format  the date object to a string that fits the request api format
 var format_date_request = function(date) {
@@ -34,7 +32,6 @@ var format_date_request = function(date) {
  * provide as parameters :
  * pagetitle, title of the wiki page (case sensitive)
  */
-
 var x = function(pagetitle, date, symbol) {
 
   var startingyear, startingmonth, startingday

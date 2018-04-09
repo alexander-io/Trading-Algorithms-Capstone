@@ -19,9 +19,9 @@ var start_interval = function() {
         if (state_of_buttons[curr_elem].price) {
           socket.emit('req price n periods k density', {currency : curr_elem, time_periods : state_of_time_periods.time_periods, minute_density : state_of_time_periods.minute_interval})
         } else if (state_of_buttons[curr_elem].ema) {
-          socket.emit('req ema n periods', {currency : curr_elem, periods : initial_time_periods})
+          socket.emit('req ema n periods', {currency : curr_elem, periods : initial_time_periods, minute_density : state_of_time_periods.minute_interval})
         } else if (state_of_buttons[curr_elem].sma) {
-          socket.emit('req sma n periods', {currency : curr_elem, periods : initial_time_periods})
+          socket.emit('req sma n periods', {currency : curr_elem, periods : initial_time_periods, minute_density : state_of_time_periods.minute_interval})
         } else if (state_of_buttons[curr_elem].wiki) {
           socket.emit('req wiki n periods', {currency : curr_elem, periods : initial_time_periods})
         }

@@ -30,7 +30,8 @@ io.on('connection', function(socket) {
   })
 
   socket.on('req sma n periods', function(data) {
-    funx.get_sma_array_for_n_recent_periods_cmarketcap_price_where_currency_title(data.currency, data.periods).then((resolution, rejection) => {
+    console.log(data)
+    funx.get_sma_array_for_n_recent_periods_cmarketcap_price_where_currency_title_minute_density(data.currency, data.periods, data.minute_density).then((resolution, rejection) => {
       socket.emit('res sma n periods', {price_array : resolution, symbol:data.currency})
     })
   })
