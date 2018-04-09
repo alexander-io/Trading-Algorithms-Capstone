@@ -19,50 +19,127 @@
     }
   </style>
   <body>
-    <div class="row" style="margin:5%;">
-      <div class="ui two column centered grid">
+
+
+
+    <div class="ui two column centered grid" style="margin-bottom:5%;">
+      <div class="row" style="margin-top:5%;margin-bottom:1%;">
+        <div class="ui toggle checkbox" data-position="bottom left">
+          <label>Toggle Live Update</label>
+          <input id="update_toggle" name="public" type="checkbox">
+        </div>
+      </div>
+      <div class="row">
         <div class="column">
-          <h1 style="text-align:center;">Analysis of Crypto Currency Financial Forecasting Algorithms</h1>
-        </div>
-        <div class="four column centered row">
-          <div class="column">
-            <select class="ui selection dropdown" style="width:100%">
-              <option value="">1 minute</option>
-              <option value="">5 minutes</option>
-              <option value="">15 minutes</option>
-              <option value="">30 minutes</option>
-              <option value="">1 hour</option>
-              <option value="">6 hour</option>
-              <option value="">12 hour</option>
-              <option value="">24 hour</option>
-            </select>
-          </div>
-          <div class="column">
-            <select class="ui selection dropdown" style="width:100%">
-              <option value="">10 periods</option>
-              <option value="">50 periods</option>
-              <option value="">100 periods</option>
-              <option value="">200 periods</option>
-            </select>
+          <div class="nine ui buttons">
+            <button class="period-option ui basic button" value="2">2</button>
+            <button class="period-option ui basic button" value="4">4</button>
+            <button class="period-option ui basic button" value="8">8</button>
+            <button class="period-option ui basic button" value="16">16</button>
+            <button class="period-option ui basic button" value="32">32</button>
+            <button class="period-option ui basic button" value="64">64</button>
+            <button class="period-option ui basic button" value="128">128</button>
+            <button class="period-option active ui basic button" value="256">256</button>
           </div>
         </div>
-
-        <div class="two column centered row">
-          <div class="ui toggle checkbox" data-position="bottom left">
-            <input id="update_toggle" name="public" type="checkbox">
-            <label>Toggle Live Update</label>
+      </div>
+      <div class="row">
+        <div class="column">
+          <div class="nine ui buttons">
+            <button class="minute_option active ui basic button" value="1">1</button>
+            <button class="minute_option ui basic button" value="2">2</button>
+            <button class="minute_option ui basic button" value="4">4</button>
+            <button class="minute_option ui basic button" value="8">8</button>
+            <button class="minute_option ui basic button" value="16">16</button>
+            <button class="minute_option ui basic button" value="32">32</button>
+            <button class="minute_option ui basic button" value="64">64</button>
+            <button class="minute_option ui basic button" value="128">128</button>
+            <button class="minute_option ui basic button" value="256">256</button>
           </div>
         </div>
-
-
       </div>
     </div>
 
 
+    <script type="text/javascript">
+
+      var state_of_time_periods = {
+        minute_interval : 1,
+        time_periods : 256
+      }
+
+      var minute_options = document.getElementsByClassName('minute_option')
+      var period_options = document.getElementsByClassName('period-option')
+      for (var i = 0; i < minute_options.length; i++) {
+        minute_options[i].addEventListener('mouseover', function() {
+          this.setAttribute("style", "background:#bd9e39!important;")
+        })
+        minute_options[i].addEventListener('mouseout', function() {
+          if (!this.classList.contains('active')) {
+            this.setAttribute("style", "background:white!important;")
+          }
+        })
+        minute_options[i].addEventListener('click', function() {
+          remove_all_svgs_elms()
+          for (var ii = 0; ii < minute_options.length; ii++) {
+            minute_options[ii].classList.remove('active')
+            minute_options[ii].setAttribute("style", "background:white!important;")
+          }
+          this.classList.add('active')
+          this.setAttribute("style", "background:#bd9e39!important;")
+          state_of_time_periods.minute_interval = parseInt(this.getAttribute("value"))
+
+          for (var ii = 0; ii < list_of_currencies.length; ii++) {
+            // console.log({currency_title : list_of_currencies[ii], time_periods : state_of_time_periods.time_periods, minute_density : state_of_time_periods.minute_interval})
+            console.log(list_of_currencies[ii])
+            socket.emit('req price n periods k density', {currency : list_of_currencies[ii], time_periods : state_of_time_periods.time_periods, minute_density : state_of_time_periods.minute_interval})
+          }
+
+
+
+          console.log(list_of_currencies)
+          console.log(state_of_time_periods)
+        })
+      }
+
+      for (var i = 0; i < period_options.length; i++) {
+        period_options[i].addEventListener('mouseover', function() {
+          this.setAttribute("style", "background:#bd9e39!important;")
+        })
+
+        period_options[i].addEventListener('mouseout', function() {
+          if (!this.classList.contains('active')) {
+            this.setAttribute("style", "background:white!important;")
+          }
+        })
+
+        period_options[i].addEventListener('click', function() {
+          remove_all_svgs_elms()
+          for (var ii = 0; ii < period_options.length; ii++) {
+            period_options[ii].classList.remove('active')
+            period_options[ii].setAttribute("style", "background:white!important;")
+          }
+          this.classList.add('active')
+          this.setAttribute("style", "background:#bd9e39!important;")
+          state_of_time_periods.time_periods = parseInt(this.getAttribute("value"))
+          // console.log(list_of_currencies)
+          for (var ii = 0; ii < list_of_currencies.length; ii++) {
+            // console.log({currency_title : list_of_currencies[ii], time_periods : state_of_time_periods.time_periods, minute_density : state_of_time_periods.minute_interval})
+            console.log(list_of_currencies[ii])
+            socket.emit('req price n periods k density', {currency : list_of_currencies[ii], time_periods : state_of_time_periods.time_periods, minute_density : state_of_time_periods.minute_interval})
+          }
+          // console.log(state_of_time_periods)
+        })
+      }
+    </script>
+
+
+
+
+
+
 
     <div class="ui internally celled grid" id="svg_root">
-
-
 
       <div class="row" style="height:0px;">
 
@@ -106,15 +183,12 @@
 </html>
 
 
-
 <script type="text/javascript">
 
   class Q {
     constructor(arr) {
       this.supporting_array = arr
     }
-
-
     enqueue(x) {
       this.supporting_array.push(x)
     }
@@ -137,8 +211,6 @@
     };
     return shift(Math.round(shift(number, precision, false)), precision, true);
   }
-
-
 
   var state_of_buttons = {}
 
@@ -428,6 +500,15 @@
 
 </script>
 
+<script type="text/javascript">
+  var remove_all_svgs_elms = function() {
+    for (var i = 0; i < list_of_currencies.length; i++) {
+      d3.select("#"+list_of_currencies[i])
+        .selectAll("*")
+        .remove()
+    }
+  }
+</script>
 
 <script type="text/javascript">
 
@@ -449,7 +530,9 @@
               .remove()
           socket.emit('req assessment', {currency : curr_elem})
           if (state_of_buttons[curr_elem].price) {
-            socket.emit('req price n periods', {currency : curr_elem, periods : initial_time_periods})
+            socket.emit('req price n periods k density', {currency : curr_elem, time_periods : state_of_time_periods.time_periods, minute_density : state_of_time_periods.minute_interval})
+
+            // socket.emit('req price n periods', {currency : curr_elem, periods : initial_time_periods})
           } else if (state_of_buttons[curr_elem].ema) {
             socket.emit('req ema n periods', {currency : curr_elem, periods : initial_time_periods})
           } else if (state_of_buttons[curr_elem].sma) {
@@ -646,6 +729,7 @@
 
 <script>
   var color_arr = [d3.schemeCategory20b[8], d3.schemeCategory20b[9], d3.schemeCategory20b[10], d3.schemeCategory20b[11]]
+  console.log(color_arr)
 
   socket.on('res price n periods', function(price_data){
     res_price_n_periods(price_data, price_data.price_array.length)
@@ -688,9 +772,26 @@
     document.getElementById('last_updated_root_'+data.price_assessment.symbol).innerHTML = "<b>updated : </b>" + unix_ms_to_date_string(data.price_assessment.unix_time)
   })
 
-  
+
   socket.on('res wiki n periods', function(data) {
     console.log('got response from server', data)
     res_price_n_periods(data, data.price_array.length)
   })
+
+  socket.on('res price n periods k density', function(data) {
+    console.log('got response from server', data)
+    // new Promise((resolve, reject) {
+    //   try {
+    //     remove_all_svgs_elms()
+    //     resolve()
+    //   } catch (e) {
+    //     reject(e)
+    //   }
+    // })
+    // .then((resolution, rejection) => {
+    //
+    // })
+      res_price_n_periods(data, data.price_array.length)
+  })
+
 </script>

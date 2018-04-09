@@ -554,6 +554,25 @@
         })
       })
     },
+    get_array_n_most_recent_prices_cmarketcap_by_currency_title_minute_density : function(currency_title, time_periods, minute_density) {
+      let query = {"symbol" : currency_title}
+      return new Promise((resolve, reject) => {
+        mongo.connect(url, (err, client) => {
+          if (err) {console.log(err); reject(err)}
+          let x = client.db(dbName).collection('coinmarketcap_ticker').find(query).sort({unix_time : -1}).limit(minute_density * time_periods).toArray((err, docs) => {
+            client.close()
+
+            // console.log(docs)
+
+            let array_builder = []
+            for (let i = 0; i < docs.length && i < minute_density * time_periods; i+= minute_density) {
+              array_builder.push(parseFloat(docs[i].price_usd))
+            }
+            resolve(array_builder)
+          })
+        })
+      })
+    },
     seconds_to_hours : function(seconds) {
       return seconds/3600
     },
@@ -596,6 +615,22 @@
   let unix_to_num_days = function(unix_time_ms) {
     return unix_time_ms/86400000.00007714
   }
+
+  // module.exports.get_array_n_most_recent_prices_cmarketcap_by_currency_title_minute_density('BTC', 10, 1).then((resolution, rejection) => {
+  //
+  //   console.log('1  minute :', resolution)
+  // })
+  //
+  // module.exports.get_array_n_most_recent_prices_cmarketcap_by_currency_title_minute_density('BTC', 10, 5).then((resolution, rejection) => {
+  //   console.log('5  minute :', resolution)
+  //   // console.log(resolution)
+  // })
+  //
+  // module.exports.get_array_n_most_recent_prices_cmarketcap_by_currency_title_minute_density('BTC', 10, 10).then((resolution, rejection) => {
+  //   console.log('5  minute :', resolution)
+  //   // console.log(resolution)
+  // })
+
 
 
   // module.exports.get_ema_cmarketcap_for_n_time_period_by_currency_title('bitcoin', 40).then((resolution, rejection) => {

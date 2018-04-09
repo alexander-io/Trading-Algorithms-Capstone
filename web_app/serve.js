@@ -17,42 +17,52 @@ app.get('/', function(req,  res) {
 io.on('connection', function(socket) {
   socket.emit('currencies', currencies)
 
-
   socket.on('req ema n periods', function(data) {
-    console.log('received request for ema,', data.currency + ', ', data.periods)
+    // console.log('received request for ema,', data.currency + ', ', data.periods)
     funx.get_ema_cmarketcap_for_n_time_period_by_currency_title(data.currency, data.periods).then((resolution, rejection) => {
       socket.emit('res ema n periods', {price_array: resolution, symbol:data.currency})
     })
   })
 
   socket.on('req price n periods', function(data) {
-    console.log('received request for price,', data.currency + ', ', data.periods)
+    // console.log('received request for price,', data.currency + ', ', data.periods)
     funx.get_array_n_most_recent_prices_cmarketcap_by_currency_title(data.currency, data.periods).then((resolution, rejection) => {
       socket.emit('res price n periods', {price_array: resolution, symbol:data.currency})
     })
   })
 
   socket.on('req sma n periods', function(data) {
-    console.log('received request for  sma')
+    // console.log('received request for  sma')
     funx.get_sma_array_for_n_recent_periods_cmarketcap_price_where_currency_title(data.currency, data.periods).then((resolution, rejection) => {
       socket.emit('res sma n periods', {price_array : resolution, symbol:data.currency})
     })
   })
 
   socket.on('req assessment', function(data) {
-    console.log('got request for assessment')
+    // console.log('got request for assessment')
     funx.get_most_recent_coinmarketcap_data_entry_where_currency_title(data.currency).then((resolution, rejection) => {
       socket.emit('res assessment', {price_assessment : resolution})
     })
   })
 
   socket.on('req wiki n periods', function(data) {
-    console.log('got request for wiki views')
+    // console.log('got request for wiki views')
     funx.get_array_n_recent_wiki_views_where_pagetitle(data.currency, data.periods).then((resolution, rejection) => {
-      console.log(resolution)
+      // console.log(resolution)
       socket.emit('res wiki n periods', {price_array : resolution, symbol : data.currency})
     })
   })
+
+  socket.on('req price n periods k density', function(data) {
+    // console.log(data)
+    funx.get_array_n_most_recent_prices_cmarketcap_by_currency_title_minute_density(data.currency, data.time_periods, data.minute_density).then((resolution,  rejection) => {
+      console.log(resolution)
+      // console.log({price_array : resolution, symbol : data.currency})
+
+      socket.emit('res price n periods k density', {price_array : resolution, symbol : data.currency})
+    })
+  })
+
 
 })
 

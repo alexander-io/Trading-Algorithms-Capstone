@@ -154,8 +154,14 @@ var predict_price_for_next_time_period = function(currency, minutes_analyzed, ti
 
 var main = () => {
   for (let i = 0; i < currencies.currencies.length; i++) {
-    predict_price_for_next_time_period(currencies.currencies[i], 30000, 10).then((resolution, rejection) => {
+    predict_price_for_next_time_period(currencies.currencies[i], 30000, 5).then((resolution, rejection) => {
       console.log(resolution)
+      // console.log(resolution.most_recent_price_fluctuation)
+      // console.log(resolution.predicted_price_change)
+      // console.log(resolution.periods_analyzed)
+      // console.log(resolution.total_minutes_analyzed)
+      // console.log("\n")
+      // console.log(resolution.)
     })
   }
 }
