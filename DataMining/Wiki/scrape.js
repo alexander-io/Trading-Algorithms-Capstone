@@ -191,8 +191,3 @@ x('IOTA_(cryptocurrency)', {
   'endingmonth' : date.getMonth(),
   'endingday' : date.getDate()
 }, 'MIOTA')
-
-
-
-// https://en.wikipedia.org/wiki/Cardano_(platform)
-// https://en.wikipedia.org/wiki/
