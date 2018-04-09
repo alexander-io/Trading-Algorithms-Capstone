@@ -32,17 +32,17 @@ class Q {
       socket.emit('req price n periods k density', {currency : symbol, time_periods : state_of_time_periods.time_periods, minute_density : state_of_time_periods.minute_interval})
     },
     ema : function(symbol) {
-      socket.emit('req ema n periods', {currency : symbol, periods : state_of_time_periods.time_periods, minute_density : state_of_time_periods.minute_interval})
+      socket.emit('req ema n periods', {currency : symbol, time_periods : state_of_time_periods.time_periods, minute_density : state_of_time_periods.minute_interval})
     },
     sma : function(symbol) {
       console.log(state_of_time_periods)
         socket.emit('req sma n periods', {
           currency : symbol,
-          periods : state_of_time_periods.time_periods,
+          time_periods : state_of_time_periods.time_periods,
           minute_density : state_of_time_periods.minute_interval})
     },
     wiki : function(symbol) {
-      socket.emit('req wiki n periods', {currency : symbol, periods : initial_time_periods})
+      socket.emit('req wiki n periods', {currency : symbol, time_periods : initial_time_periods})
     }
   }
 

@@ -9,7 +9,7 @@ var initial_time_periods = 256
 
     // for all currencies, send initial request to server for price and assessment
     for (let i  = 0; i <  data.currencies.length; i++) {
-      socket.emit('req price n periods', {currency : data.currencies[i], periods : initial_time_periods})
+      socket.emit('req price n periods', {currency : data.currencies[i], time_periods : initial_time_periods})
       socket.emit('req assessment', {currency : data.currencies[i]})
     }
   })
