@@ -1,167 +1,206 @@
 var funx = require(__dirname + '/../../db/db_functions.js')
 var currencies = require(__dirname + '/../../DataMining/scheduler/currencies.json')
 
-/*
- * take a percent value and return it's range
- * where 1 -> 1/10th of a percent -> 0.001
- * where 10 -> 10/10th of a percent -> 0.01
- * @param decimal represented percentage, i.e., 0.03 -> 3%, pass in 0.03 as param
- * @return return the range of the percent, i -> 0.03; o -> '3 - 4'
- */
-var calc_percent_change_range = function(percent_change) {
-  let arr_of_percent_changes = []
-  for (let i = 0; i <= 100; i++) {
-    arr_of_percent_changes.push(i/1000)
-  }
-  percent_change = Math.abs(percent_change)
-  if (percent_change == 0) return "0 - 0"
-  for (let i = 1; i < arr_of_percent_changes.length; i++) {
-    if (percent_change < arr_of_percent_changes[i]) {
-      return i-1 + " - " + i
+module.exports = {
+  /*
+   * take a percent value and return it's range
+   * where 1 -> 1/10th of a percent -> 0.001
+   * where 10 -> 10/10th of a percent -> 0.01
+   * @param decimal represented percentage, i.e., 0.03 -> 3%, pass in 0.03 as param
+   * @return return the range of the percent, i -> 0.03; o -> '3 - 4'
+   */
+  calc_percent_change_range_bin : function(percent_change) {
+    let arr_of_percent_changes = []
+    for (let i = 0; i <= 100; i++) {
+      arr_of_percent_changes.push(i/1000)
     }
-  }
-}
 
-/*
- * calculate the percent change between two time periods
- * @param t0, the current or most recent time period
- * @param t1, the previous time period
- * @return percent change, decimal format : 0.03 -> 3%
- */
-var calc_percent_change = function(t0, t1) {
-  var increase = t0 - t1
-  var percent_increase = increase/t1
-  return percent_increase
-}
-
-/*
- * take in an array of sequential values, interpolate their percent change values
- * i.e., [12.1, 11, 10] -> [.1, .1] -> [10%, 10%]
- * where index 0 is most recent time period
- * where index n is time period furthest in past
- */
-var make_percent_change_arr = function(arr) {
-  var percent_change_arr = []
-  for (let i = arr.length; i > 0; i--) {
-    percent_change_arr[i-1] = calc_percent_change(arr[i-1], arr[i])
-  }
-  return percent_change_arr
-}
-
-/*
- * take list of state keys
- * i.e., state key -> i, 0 - 1
- * ex. i, 0 - 1
- * ex. i, 3 - 4
- * ex. d, 0 - 1
- * ex. d, 3 - 4
- * make a map of their coorelated frequencies in the list and return
- */
-var make_state_frequency_map = function(list_of_state_keys) {
-  var map_of_state_key_freq = {}
-  for (let i = 0; i < list_of_state_keys.length;i++) {
-    if (map_of_state_key_freq[list_of_state_keys[i]]) {
-      map_of_state_key_freq[list_of_state_keys[i]] += 1
-    } else {
-      map_of_state_key_freq[list_of_state_keys[i]] = 1
+    percent_change = Math.abs(percent_change)
+    if (percent_change == 0) return "0 - 0"
+    for (let i = 1; i < arr_of_percent_changes.length; i++) {
+      if (percent_change < arr_of_percent_changes[i]) {
+        return i-1 + " - " + i
+      }
     }
-  }
-  return map_of_state_key_freq
-}
+  },
+  calc_percent_change_range : function(percent_change) {
+    let positive = percent_change > 0
+    let arr_of_percent_changes = []
+    for (let i = 0; i <= 100; i++) {
+      arr_of_percent_changes.push(i/1000)
+    }
 
-
-/*
- * take list of state keys
- * make a map of the states in the list mapped to the frequencies of the next sequential state
- * where i, 0 - 1 : { i, 0 - 2 : 5, i, 2 - 3 : 3} ...
- * ...suggests that in the list there were 5 occurences of 'i, 0 - 2' after 'i, 0 - 1' ...
- * ... AND 3 occurences of 'i, 2 - 3' also following 'i, 0 - 1'
- */
-var make_state_next_state_occurance_frequency_map = function(list_of_state_keys) {
-  var map_of_state_key_freq = {}
-  for (let i = list_of_state_keys.length-1; i > 0;i--) {
-    if (map_of_state_key_freq[list_of_state_keys[i]]) {
-      if (map_of_state_key_freq[list_of_state_keys[i]][list_of_state_keys[i-1]]) {
-        map_of_state_key_freq[list_of_state_keys[i]][list_of_state_keys[i-1]] += 1
+    percent_change = Math.abs(percent_change)
+    if (percent_change == 0) return "0 - 0"
+    for (let i = 1; i < arr_of_percent_changes.length; i++) {
+      if (percent_change < arr_of_percent_changes[i]) {
+        // return i-1 + " - " + i
+        if (positive) return i/1000
+        else return (i/1000 )*-1
+      }
+    }
+  },
+  /*
+   * calculate the percent change between two time periods
+   * @param t0, the current or most recent time period
+   * @param t1, the previous time period
+   * @return percent change, decimal format : 0.03 -> 3%
+   */
+  calc_percent_change : function(t0, t1) {
+    var increase = t0 - t1
+    var percent_increase = increase/t1
+    return percent_increase
+  },
+  /*
+   * take in an array of sequential values, interpolate their percent change values
+   * i.e., [12.1, 11, 10] -> [.1, .1] -> [10%, 10%]
+   * where index 0 is most recent time period
+   * where index n is time period furthest in past
+   */
+  make_percent_change_arr : function(arr) {
+    var percent_change_arr = []
+    for (let i = arr.length; i > 0; i--) {
+      percent_change_arr[i-1] = this.calc_percent_change(arr[i-1], arr[i])
+    }
+    return percent_change_arr
+  },
+  /*
+   * take list of state keys
+   * i.e., state key -> i, 0 - 1
+   * ex. i, 0 - 1
+   * ex. i, 3 - 4
+   * ex. d, 0 - 1
+   * ex. d, 3 - 4
+   * make a map of their coorelated frequencies in the list and return
+   */
+  make_state_frequency_map : function(list_of_state_keys) {
+    var map_of_state_key_freq = {}
+    for (let i = 0; i < list_of_state_keys.length;i++) {
+      if (map_of_state_key_freq[list_of_state_keys[i]]) {
+        map_of_state_key_freq[list_of_state_keys[i]] += 1
       } else {
+        map_of_state_key_freq[list_of_state_keys[i]] = 1
+      }
+    }
+    return map_of_state_key_freq
+  },
+  /*
+   * take list of state keys
+   * make a map of the states in the list mapped to the frequencies of the next sequential state
+   * where i, 0 - 1 : { i, 0 - 2 : 5, i, 2 - 3 : 3} ...
+   * ...suggests that in the list there were 5 occurences of 'i, 0 - 2' after 'i, 0 - 1' ...
+   * ... AND 3 occurences of 'i, 2 - 3' also following 'i, 0 - 1'
+   */
+  make_state_next_state_occurance_frequency_map : function(list_of_state_keys) {
+    var map_of_state_key_freq = {}
+    for (let i = list_of_state_keys.length-1; i > 0;i--) {
+      if (map_of_state_key_freq[list_of_state_keys[i]]) {
+        if (map_of_state_key_freq[list_of_state_keys[i]][list_of_state_keys[i-1]]) {
+          map_of_state_key_freq[list_of_state_keys[i]][list_of_state_keys[i-1]] += 1
+        } else {
+          map_of_state_key_freq[list_of_state_keys[i]][list_of_state_keys[i-1]] = 1
+        }
+      } else {
+        map_of_state_key_freq[list_of_state_keys[i]] = {}
         map_of_state_key_freq[list_of_state_keys[i]][list_of_state_keys[i-1]] = 1
       }
-    } else {
-      map_of_state_key_freq[list_of_state_keys[i]] = {}
-      map_of_state_key_freq[list_of_state_keys[i]][list_of_state_keys[i-1]] = 1
     }
-  }
-  delete map_of_state_key_freq.undefined
-  return map_of_state_key_freq
-}
+    delete map_of_state_key_freq.undefined
+    return map_of_state_key_freq
+  },
+  get_most_recent_price_change_range : function(array_of_price_fluctuation_ranges) {
+    let most_recent_range = array_of_price_fluctuation_ranges.slice(0,1)
+    return most_recent_range[0]
+  },
+  /*
+   * make a list of state keys based on the percent  changes
+   * i.e., percent_changes = [0.01, -0.02, 0.03]
+   *... then  list_of_state_keys = ['i, 0 - 1', 'd, 1 - 2', 'i, 1 - 3']
+   */
+  make_list_of_state_keys : function(percent_change_arr) {
 
-var get_most_recent_price_change_range = function(array_of_price_fluctuation_ranges) {
-  let most_recent_range = array_of_price_fluctuation_ranges.slice(0,1)
-  return most_recent_range[0]
-}
+    let list_of_state_keys = []
+    for (let i = 0; i < percent_change_arr.length; i++) {
+      // console.log(percent_change_arr[i])
+      let appendage = "-"
+      if (percent_change_arr[i] < 0) appendage = "bear"
+      if (percent_change_arr[i] > 0) appendage = "bull"
 
-var predict_price_for_next_time_period = function(currency, minutes_analyzed, time_interval) {
-  return new Promise((resolve, reject) => {
-    funx.get_array_n_most_recent_prices_cmarketcap_by_currency_title_skip_k_periods(currency, minutes_analyzed, time_interval).then((resolution, rejection) => {
-      var percent_change_arr = make_percent_change_arr(resolution)
-      var periods_analyzed = resolution.length
-      percent_change_arr.pop()
+      let state_key = appendage + ", " + this.calc_percent_change_range(percent_change_arr[i])
+      list_of_state_keys.push(state_key)
+    }
+    // console.log('::::::::::::::::::::::::::::::::::::')
+    return list_of_state_keys
+  },
+  predict_price_for_next_time_period : function(currency, minutes_analyzed, time_interval) {
+    return new Promise((resolve, reject) => {
+      funx.get_array_n_most_recent_prices_cmarketcap_by_currency_title_skip_k_periods(currency, minutes_analyzed, time_interval).then((resolution, rejection) => {
+        // generate array of price percent changes_
+        var percent_change_arr = this.make_percent_change_arr(resolution)
+        var periods_analyzed = resolution.length
+        // console.log(percent_change_arr)
+        // let n = array of prices length
+        // length of percent_change_arr is n-1 because percent change is determined via interpolation between two time periods
+        percent_change_arr.pop()
+        // console.log(percent_change_arr)
 
-      let list_of_state_keys = []
-      for (let i = 0; i < percent_change_arr.length; i++) {
 
-        let appendage = "-"
-        if (percent_change_arr[i] < 0) appendage = "d"
-        if (percent_change_arr[i] > 0) appendage = "i"
-
-        let state_key = appendage + ", " + calc_percent_change_range(percent_change_arr[i])
-        list_of_state_keys.push(state_key)
-      }
-      var most_recent_price_fluctuation = get_most_recent_price_change_range(list_of_state_keys)
-      var next_state_occurance_frequency = make_state_next_state_occurance_frequency_map(list_of_state_keys)
-
-      var max_val = 0
-      var max = null
-      var init_flag = true
-
-      for (x in next_state_occurance_frequency[most_recent_price_fluctuation]) {
-        max_val = next_state_occurance_frequency[most_recent_price_fluctuation][x]
-        max = x
-        break
-      }
-
-      for (x in next_state_occurance_frequency[most_recent_price_fluctuation]) {
-        if (next_state_occurance_frequency[most_recent_price_fluctuation][x] > max_val) {
+        let list_of_state_keys = this.make_list_of_state_keys(percent_change_arr)
+        var most_recent_price_fluctuation = this.get_most_recent_price_change_range(list_of_state_keys)
+        var next_state_occurance_frequency = this.make_state_next_state_occurance_frequency_map(list_of_state_keys)
+        // console.log(next_state_occurance_frequency)
+        var max_val = 0
+        var max = null
+        // initialize the max value to be any object in map
+        for (x in next_state_occurance_frequency[most_recent_price_fluctuation]) {
           max_val = next_state_occurance_frequency[most_recent_price_fluctuation][x]
           max = x
+          break
         }
-      }
 
-      // console.log(next_state_occurance_frequency)
+        var running_total = 0
+        var num_elems = 0
+        // iterate through entire map, update max value if necessary
+        for (x in next_state_occurance_frequency[most_recent_price_fluctuation]) {
+          // console.log(next_state_occurance_frequency[most_recent_price_fluctuation][x])
+          // console.log(x, x.includes('bear'))
 
-      resolve ({
-        currency : currency,
-        most_recent_price_fluctuation : most_recent_price_fluctuation,
-        predicted_price_change : max,
-        periods_analyzed : periods_analyzed,
-        time_intervals_minutes : time_interval,
-        total_minutes_analyzed : periods_analyzed * time_interval,
-        frequency_graph : next_state_occurance_frequency
+          num_elems++
+          // console.log(x)
+          // console.log(next_state_occurance_frequency[most_recent_price_fluctuation][x])
+          // x.includes('bull') ? running_total += next_state_occurance_frequency[most_recent_price_fluctuation][x] : running_total -= next_state_occurance_frequency[most_recent_price_fluctuation][x]
+
+          if (next_state_occurance_frequency[most_recent_price_fluctuation][x] > max_val) {
+            max_val = next_state_occurance_frequency[most_recent_price_fluctuation][x]
+            max = x
+          }
+        }
+        // console.log(':::::::::::::::::::::::::::::::::::::::::::::')
+
+        // var average_expected_price_fluctuation = (running_total/num_elems)/100
+
+
+
+
+        resolve ({
+          currency : currency,
+          most_recent_price_fluctuation : most_recent_price_fluctuation,
+          predicted_price_change : max,
+          periods_analyzed : periods_analyzed,
+          time_intervals_minutes : time_interval,
+          total_minutes_analyzed : periods_analyzed * time_interval,
+          // average_expected_price_fluctuation : average_expected_price_fluctuation,
+          frequency_graph : next_state_occurance_frequency
+        })
       })
     })
-  })
+  }
 }
 
 var main = () => {
   for (let i = 0; i < currencies.currencies.length; i++) {
-    predict_price_for_next_time_period(currencies.currencies[i], 30000, 5).then((resolution, rejection) => {
+    module.exports.predict_price_for_next_time_period(currencies.currencies[i], 10, 5).then((resolution, rejection) => {
       console.log(resolution)
-      // console.log(resolution.most_recent_price_fluctuation)
-      // console.log(resolution.predicted_price_change)
-      // console.log(resolution.periods_analyzed)
-      // console.log(resolution.total_minutes_analyzed)
-      // console.log("\n")
-      // console.log(resolution.)
     })
   }
 }

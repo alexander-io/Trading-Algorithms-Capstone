@@ -1,4 +1,6 @@
 var funx = require(__dirname + '/../db/db_functions.js')
+var markov_funx = require(__dirname + '/../PredictionAlgorithms/markov/markov.js')
+
 let app = require('express')()
 let server = require('http').createServer(app)
 let io = require('socket.io')(server)
@@ -53,6 +55,10 @@ io.on('connection', function(socket) {
     funx.get_array_n_most_recent_prices_cmarketcap_by_currency_title_minute_density(data.currency, data.time_periods, data.minute_density).then((resolution,  rejection) => {
       socket.emit('res price n periods k density', {price_array : resolution, symbol : data.currency})
     })
+  })
+
+  socket.on('req markov n periods', function(data) {
+    console.log('got markov req', data)
   })
 })
 

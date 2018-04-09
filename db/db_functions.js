@@ -573,10 +573,10 @@
       return new Promise((resolve, reject) => {
         mongo.connect(url, (err, client) => {
           if (err) {console.log(err); reject(err)}
-          let x = client.db(dbName).collection('coinmarketcap_ticker').find(query).sort({unix_time : -1}).toArray((err, docs) => {
+          let x = client.db(dbName).collection('coinmarketcap_ticker').find(query).sort({unix_time : -1}).limit(time_periods*k_periods).toArray((err, docs) => {
             client.close()
             let array_of_n_periods = []
-            for (let i = 0; i < docs.length; i+= k_periods) {
+            for (let i = 0; i < docs.length && i < time_periods*k_periods; i+= k_periods) {
               array_of_n_periods.push(parseFloat(docs[i].price_usd))
             }
             resolve(array_of_n_periods)

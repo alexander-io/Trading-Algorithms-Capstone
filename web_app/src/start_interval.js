@@ -28,7 +28,7 @@ var start_interval = function() {
         document.getElementById("dimmer_"+curr_elem).setAttribute("style", "visibility:visible;")
       }
     }, 200)
-  }, 15000)
+  }, 10000)
 }
 // set live update interval for toggle button click
   var inner_interval = null

@@ -75,8 +75,6 @@ for (var i = 0; i < period_options.length; i++) {
     this.setAttribute("style", "background:#bd9e39!important;")
     state_of_time_periods.time_periods = parseInt(this.getAttribute("value"))
     for (var ii = 0; ii < list_of_currencies.length; ii++) {
-      console.log(list_of_currencies[ii])
-      // socket.emit('req price n periods k density', {currency : list_of_currencies[ii], time_periods : state_of_time_periods.time_periods, minute_density : state_of_time_periods.minute_interval})
 
       if (state_of_buttons[list_of_currencies[ii]].price) {
         socket.emit('req price n periods k density', {currency : list_of_currencies[ii], time_periods : state_of_time_periods.time_periods, minute_density : state_of_time_periods.minute_interval})

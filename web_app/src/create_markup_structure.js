@@ -43,6 +43,12 @@ class Q {
     },
     wiki : function(symbol) {
       socket.emit('req wiki n periods', {currency : symbol, time_periods : initial_time_periods})
+    },
+    markov : function(symbol) {
+      socket.emit('req markov n periods', {
+        currency : symbol,
+        time_periods : state_of_time_periods.time_periods,
+        minute_density : state_of_time_periods.minute_interval})
     }
   }
 
@@ -128,7 +134,7 @@ class Q {
       // </div>
 
       let ui_four_top_attached_buttons = document.createElement('div')
-      ui_four_top_attached_buttons.classList = ['ui four top attached buttons ctrl_buttons']
+      ui_four_top_attached_buttons.classList = ['ui five top attached buttons ctrl_buttons']
       ui_four_top_attached_buttons.setAttribute("currency", data.currencies[i])
 
       var ui_active_button_price = document.createElement('div')
@@ -151,10 +157,16 @@ class Q {
       ui_button_wiki.setAttribute("funx", "wiki")
       ui_button_wiki.appendChild(document.createTextNode("Wiki Views"))
 
+      var ui_active_button_markov = document.createElement('div')
+      ui_active_button_markov.classList = ['ui button markov_button ' + data.currencies[i]]
+      ui_active_button_markov.setAttribute("funx", "markov")
+      ui_active_button_markov.appendChild(document.createTextNode("markov"))
+
       ui_four_top_attached_buttons.appendChild(ui_active_button_price)
       ui_four_top_attached_buttons.appendChild(ui_button_ema)
       ui_four_top_attached_buttons.appendChild(ui_button_sma)
       ui_four_top_attached_buttons.appendChild(ui_button_wiki)
+      ui_four_top_attached_buttons.appendChild(ui_active_button_markov)
 
       ui_segment_display.appendChild(ui_four_top_attached_buttons)
 
