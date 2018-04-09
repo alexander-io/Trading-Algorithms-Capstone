@@ -31,7 +31,7 @@ module.exports = {
     }
 
     percent_change = Math.abs(percent_change)
-    if (percent_change == 0) return "0 - 0"
+    if (percent_change == 0) return 0
     for (let i = 1; i < arr_of_percent_changes.length; i++) {
       if (percent_change < arr_of_percent_changes[i]) {
         // return i-1 + " - " + i
@@ -121,15 +121,15 @@ module.exports = {
 
     let list_of_state_keys = []
     for (let i = 0; i < percent_change_arr.length; i++) {
-      // console.log(percent_change_arr[i])
       let appendage = "-"
       if (percent_change_arr[i] < 0) appendage = "bear"
       if (percent_change_arr[i] > 0) appendage = "bull"
 
-      let state_key = appendage + ", " + this.calc_percent_change_range(percent_change_arr[i])
+      // let state_key = appendage + ", " + this.calc_percent_change_range(percent_change_arr[i])
+      let state_key = this.calc_percent_change_range(percent_change_arr[i])
       list_of_state_keys.push(state_key)
     }
-    // console.log('::::::::::::::::::::::::::::::::::::')
+    // console.log(list_of_state_keys)
     return list_of_state_keys
   },
   predict_price_for_next_time_period : function(currency, minutes_analyzed, time_interval) {
@@ -142,54 +142,60 @@ module.exports = {
         // let n = array of prices length
         // length of percent_change_arr is n-1 because percent change is determined via interpolation between two time periods
         percent_change_arr.pop()
-        // console.log(percent_change_arr)
 
 
         let list_of_state_keys = this.make_list_of_state_keys(percent_change_arr)
+        // console.log(list_of_state_keys)
         var most_recent_price_fluctuation = this.get_most_recent_price_change_range(list_of_state_keys)
+        // console.log('recent', most_recent_price_fluctuation)
         var next_state_occurance_frequency = this.make_state_next_state_occurance_frequency_map(list_of_state_keys)
-        // console.log(next_state_occurance_frequency)
+        // console.log('freq', next_state_occurance_frequency)
+        // console.log('freq[recent]', next_state_occurance_frequency[most_recent_price_fluctuation])
+        // console.log('::::::::::::::::::::::::::::::::::::::::::::::::::::::')
+
         var max_val = 0
         var max = null
+        var max_arr = []
         // initialize the max value to be any object in map
         for (x in next_state_occurance_frequency[most_recent_price_fluctuation]) {
           max_val = next_state_occurance_frequency[most_recent_price_fluctuation][x]
           max = x
           break
         }
+        // console.log('init max', max)
+
+        // console.log(next_state_occurance_frequency[most_recent_price_fluctuation])
 
         var running_total = 0
         var num_elems = 0
         // iterate through entire map, update max value if necessary
         for (x in next_state_occurance_frequency[most_recent_price_fluctuation]) {
-          // console.log(next_state_occurance_frequency[most_recent_price_fluctuation][x])
-          // console.log(x, x.includes('bear'))
-
-          num_elems++
-          // console.log(x)
-          // console.log(next_state_occurance_frequency[most_recent_price_fluctuation][x])
-          // x.includes('bull') ? running_total += next_state_occurance_frequency[most_recent_price_fluctuation][x] : running_total -= next_state_occurance_frequency[most_recent_price_fluctuation][x]
-
+          let frequency = next_state_occurance_frequency[most_recent_price_fluctuation][x]
+          num_elems += frequency
+          running_total += x*frequency
+          // console.log('eh')
           if (next_state_occurance_frequency[most_recent_price_fluctuation][x] > max_val) {
+            max_arr = []
             max_val = next_state_occurance_frequency[most_recent_price_fluctuation][x]
             max = x
+            max_arr.push(max)
+            // console.log(max)
+          } else if (next_state_occurance_frequency[most_recent_price_fluctuation][x] === max_val) {
+            max_arr.push(x)
           }
         }
-        // console.log(':::::::::::::::::::::::::::::::::::::::::::::')
+        // console.log(max_arr)
 
-        // var average_expected_price_fluctuation = (running_total/num_elems)/100
-
-
-
+        var average_expected_price_fluctuation = (running_total/num_elems)
 
         resolve ({
           currency : currency,
           most_recent_price_fluctuation : most_recent_price_fluctuation,
-          predicted_price_change : max,
+          most_likely_price_fluctuations_next_period : max_arr,
           periods_analyzed : periods_analyzed,
           time_intervals_minutes : time_interval,
           total_minutes_analyzed : periods_analyzed * time_interval,
-          // average_expected_price_fluctuation : average_expected_price_fluctuation,
+          average_expected_price_fluctuation : average_expected_price_fluctuation,
           frequency_graph : next_state_occurance_frequency
         })
       })
@@ -198,9 +204,41 @@ module.exports = {
 }
 
 var main = () => {
+
+  var sem = 0
+
+  let max_val = 0
+  let max = 0
   for (let i = 0; i < currencies.currencies.length; i++) {
-    module.exports.predict_price_for_next_time_period(currencies.currencies[i], 10, 5).then((resolution, rejection) => {
-      console.log(resolution)
+    module.exports.predict_price_for_next_time_period(currencies.currencies[i], 3000, 60).then((resolution, rejection) => {
+
+      // spin lock
+      while(sem < 0) {
+        if (sem >= 0) break
+      }
+
+      // START critical  section
+      if (resolution.average_expected_price_fluctuation > max_val) {
+        // console.log('\t\t\tcompare : ' + resolution.average_expected_price_fluctuation + ' > ' + max_val + ' -> true')
+        max_val = resolution.average_expected_price_fluctuation
+        max = resolution
+      }
+
+      // console.log(resolution.currency, ':',resolution.average_expected_price_fluctuation) // test print curr : expected change for testing
+      // END critical  section
+
+      sem++
+      if (sem===10) {
+        console.log(
+          'currency', max.currency,
+          '\nmost recent price flux : ', max.most_recent_price_fluctuation,
+          '\nmost likely price flux : ', max.most_likely_price_fluctuations_next_period,
+          '\nperiods analyzed : ', max.periods_analyzed,
+          '\ntime interval minutes : ', max.time_intervals_minutes,
+          '\ntotal minutes analyzed : ', max.total_minutes_analyzed,
+          '\naverage expected price flux : ', max.average_expected_price_fluctuation
+        )
+      }
     })
   }
 }

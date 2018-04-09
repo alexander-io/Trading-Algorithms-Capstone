@@ -168,7 +168,7 @@ class Q {
       ui_four_top_attached_buttons.appendChild(ui_button_wiki)
       ui_four_top_attached_buttons.appendChild(ui_active_button_markov)
 
-      ui_segment_display.appendChild(ui_four_top_attached_buttons)
+      ui_align_container.appendChild(ui_four_top_attached_buttons)
 
       let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
       svg.classList = ['display_svg']
