@@ -162,12 +162,9 @@ module.exports = {
         max_arr.push(x)
       }
     }
-
-    var average_expected_price_fluctuation = (running_total/num_elems)
-
     return {
       max_arr : max_arr,
-      average_expected_price_fluctuation : average_expected_price_fluctuation
+      average_expected_price_fluctuation : running_total/num_elems
     }
   },
   predict_price_for_next_time_period : function(currency, minutes_analyzed, time_interval) {
