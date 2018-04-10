@@ -167,9 +167,9 @@ module.exports = {
       average_expected_price_fluctuation : running_total/num_elems
     }
   },
-  predict_price_for_next_time_period : function(currency, minutes_analyzed, time_interval) {
+  predict_price_for_next_time_period : function(currency, time_periods, minute_interval) {
     return new Promise((resolve, reject) => {
-      funx.get_array_n_most_recent_prices_cmarketcap_by_currency_title_skip_k_periods(currency, minutes_analyzed, time_interval).then((resolution, rejection) => {
+      funx.get_array_n_most_recent_prices_cmarketcap_by_currency_title_skip_k_periods(currency, time_periods, minute_interval).then((resolution, rejection) => {
         // generate array of price percent changes_
         var percent_change_arr = this.make_percent_change_arr(resolution)
         var periods_analyzed = resolution.length
@@ -190,56 +190,105 @@ module.exports = {
           most_recent_price_fluctuation : most_recent_price_fluctuation,
           most_likely_price_fluctuations_next_period : max_arr_AND_average_expected_price_flux.max_arr,
           periods_analyzed : periods_analyzed,
-          time_intervals_minutes : time_interval,
-          total_minutes_analyzed : periods_analyzed * time_interval,
+          time_intervals_minutes : minute_interval,
+          total_minutes_analyzed : periods_analyzed * minute_interval,
           average_expected_price_fluctuation : max_arr_AND_average_expected_price_flux.average_expected_price_fluctuation,
           frequency_graph : next_state_occurance_frequency
         })
       })
+    })
+  },
+  determine_currency_with_highest_expected_average_price_change : function(list_of_currencies, time_periods, minute_interval) {
+    return new Promise((resolve, reject) => {
+      var semaphore = 0
+      let max_val = 0
+      let max = 0
+
+      for (let i = 0; i < list_of_currencies.length; i++) {
+        module.exports.predict_price_for_next_time_period(list_of_currencies[i], time_periods, minute_interval).then((resolution, rejection) => {
+          // spin lock
+          while(semaphore < 0) {
+            if (semaphore >= 0) break
+          }
+
+          // START critical  section
+          if (resolution.average_expected_price_fluctuation > max_val) {
+            // console.log('\t\t\tcompare : ' + resolution.average_expected_price_fluctuation + ' > ' + max_val + ' -> true')
+            max_val = resolution.average_expected_price_fluctuation
+            max = resolution
+          }
+
+          // console.log(resolution.currency, ':',resolution.average_expected_price_fluctuation) // test print curr : expected change for testing
+          // END critical  section
+
+          semaphore++
+          if (semaphore===10) {
+            resolve ({
+              'currency' : max.currency,
+              'most_recent_price_fluctuation' : max.most_recent_price_fluctuation,
+              'most_likely_price_fluctuations_next_period' : max.most_likely_price_fluctuations_next_period,
+              'periods_analyzed' : max.periods_analyzed,
+              'time_intervals_minutes' : max.time_intervals_minutes,
+              'total minutes analyzed' : max.total_minutes_analyzed,
+              'average expected price flux' : max.average_expected_price_fluctuation,
+              'freq_graph' : max.frequency_graph
+            })
+          }
+        })
+      }
     })
   }
 }
 
 var main = () => {
 
-  var semaphore = 0
-  let max_val = 0
-  let max = 0
+  module.exports.determine_currency_with_highest_expected_average_price_change(currencies.currencies, 5000, 5).then((resolution, rejection) => {
+    console.log(resolution)
+  })
 
-  for (let i = 0; i < currencies.currencies.length; i++) {
-    module.exports.predict_price_for_next_time_period(currencies.currencies[i], 3000, 30).then((resolution, rejection) => {
-      // console.log(resolution)
-      // spin lock
-      while(semaphore < 0) {
-        if (semaphore >= 0) break
-      }
+  // for (let i = 0; i < currencies.currencies.length; i++) {
+  //   module.exports.predict_price_for_next_time_period(currencies.currencies[i], 10, 5).then((resolution, rejection) => {
+  //     console.log(resolution)
+  //   })
+  // }
 
-      // START critical  section
-      if (resolution.average_expected_price_fluctuation > max_val) {
-        // console.log('\t\t\tcompare : ' + resolution.average_expected_price_fluctuation + ' > ' + max_val + ' -> true')
-        max_val = resolution.average_expected_price_fluctuation
-        max = resolution
-      }
-
-      // console.log(resolution.currency, ':',resolution.average_expected_price_fluctuation) // test print curr : expected change for testing
-      // END critical  section
-
-      semaphore++
-      if (semaphore===10) {
-        console.log(
-          'currency', max.currency,
-          '\nmost recent price flux : ', max.most_recent_price_fluctuation,
-          '\nmost likely price flux : ', max.most_likely_price_fluctuations_next_period,
-          '\nperiods analyzed : ', max.periods_analyzed,
-          '\ntime interval minutes : ', max.time_intervals_minutes,
-          '\ntotal minutes analyzed : ', max.total_minutes_analyzed,
-          '\naverage expected price flux : ', max.average_expected_price_fluctuation,
-          '\nfreq graph: ', max.frequency_graph
-
-        )
-      }
-    })
-  }
+  // var semaphore = 0
+  // let max_val = 0
+  // let max = 0
+  //
+  // for (let i = 0; i < currencies.currencies.length; i++) {
+  //   module.exports.predict_price_for_next_time_period(currencies.currencies[i], 3000, 30).then((resolution, rejection) => {
+  //     // spin lock
+  //     while(semaphore < 0) {
+  //       if (semaphore >= 0) break
+  //     }
+  //
+  //     // START critical  section
+  //     if (resolution.average_expected_price_fluctuation > max_val) {
+  //       // console.log('\t\t\tcompare : ' + resolution.average_expected_price_fluctuation + ' > ' + max_val + ' -> true')
+  //       max_val = resolution.average_expected_price_fluctuation
+  //       max = resolution
+  //     }
+  //
+  //     // console.log(resolution.currency, ':',resolution.average_expected_price_fluctuation) // test print curr : expected change for testing
+  //     // END critical  section
+  //
+  //     semaphore++
+  //     if (semaphore===10) {
+  //       console.log(
+  //         'currency', max.currency,
+  //         '\nmost recent price flux : ', max.most_recent_price_fluctuation,
+  //         '\nmost likely price flux : ', max.most_likely_price_fluctuations_next_period,
+  //         '\nperiods analyzed : ', max.periods_analyzed,
+  //         '\ntime interval minutes : ', max.time_intervals_minutes,
+  //         '\ntotal minutes analyzed : ', max.total_minutes_analyzed,
+  //         '\naverage expected price flux : ', max.average_expected_price_fluctuation,
+  //         '\nfreq graph: ', max.frequency_graph
+  //
+  //       )
+  //     }
+  //   })
+  // }
 }
 
 main()
