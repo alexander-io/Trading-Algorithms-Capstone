@@ -5,7 +5,7 @@ import generalLinearModel as GLM
 import importlib.util, os, inspect
 
 path=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-path=path[0:len(path)-20]
+path=path[0:len(path)-36]
 path+='db/query.py'
 
 spec = importlib.util.spec_from_file_location("query.py", path)
