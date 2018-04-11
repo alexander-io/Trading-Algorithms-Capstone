@@ -22,7 +22,7 @@ var x = function() {
           info[x].unix_time = Date.now()
           info[x].post_created_time_hour = d.getHours()
           info[x].post_created_time_minute = d.getMinutes()
-          info[x].price_usd_int = parseInt(info[x].price_usd)
+          info[x].price_usd_int = parseFloat(info[x].price_usd)
           funx.insert(info[x], 'coinmarketcap_ticker' /* collection title */)
         }
       }

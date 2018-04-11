@@ -1,5 +1,7 @@
 var funx = require(__dirname + '/../../db/db_functions.js')
 var currencies = require(__dirname + '/../../DataMining/scheduler/currencies.json')
+var request = require('request')
+// var request = require(__dirname + '/../../DataMining/blockchain/node_modules/request/request.js')
 
 module.exports = {
   /*
@@ -206,6 +208,7 @@ module.exports = {
 
       for (let i = 0; i < list_of_currencies.length; i++) {
         module.exports.predict_price_for_next_time_period(list_of_currencies[i], time_periods, minute_interval).then((resolution, rejection) => {
+          if (rejection) reject(rejection)
           // spin lock
           while(semaphore < 0) {
             if (semaphore >= 0) break
@@ -213,15 +216,12 @@ module.exports = {
 
           // START critical  section
           if (resolution.average_expected_price_fluctuation > max_val) {
-            // console.log('\t\t\tcompare : ' + resolution.average_expected_price_fluctuation + ' > ' + max_val + ' -> true')
             max_val = resolution.average_expected_price_fluctuation
             max = resolution
           }
-
-          // console.log(resolution.currency, ':',resolution.average_expected_price_fluctuation) // test print curr : expected change for testing
           // END critical  section
-
           semaphore++
+
           if (semaphore===10) {
             resolve ({
               'currency' : max.currency,
@@ -229,66 +229,73 @@ module.exports = {
               'most_likely_price_fluctuations_next_period' : max.most_likely_price_fluctuations_next_period,
               'periods_analyzed' : max.periods_analyzed,
               'time_intervals_minutes' : max.time_intervals_minutes,
-              'total minutes analyzed' : max.total_minutes_analyzed,
-              'average expected price flux' : max.average_expected_price_fluctuation,
+              'total_minutes_analyzed' : max.total_minutes_analyzed,
+              'average_expected_price_flux' : max.average_expected_price_fluctuation,
               'freq_graph' : max.frequency_graph
             })
           }
         })
       }
     })
+  },
+  check_accuracy_of_prediction : function(currency, minute_interval, average_expected_price_fluctuation) {
+    var req_url = 'https://api.coinmarketcap.com/v1/ticker/'
+
+    var options =  {
+      url : req_url,
+      headers : {
+        'User-Agent' : 'request'
+      }
+    }
+
+    var price_now = null
+    var price_next_time_period = null
+
+    return new Promise((resolve, reject) => {
+      var callback = function(error, response, body) {
+        if (!error && response.statusCode == 200) {
+          var info = JSON.parse(body)
+          // console.log(info)
+          for (var x = 0; x < info.length;x++) {
+            if (info[x].symbol === currency) {
+              if (!price_now) {
+                price_now = parseFloat(info[x].price_usd)
+                console.log('set price now :', price_now)
+              } else {
+                price_next_time_period =  parseFloat(info[x].price_usd)
+                console.log('set price next :', price_next_time_period)
+
+                console.log({
+                  price_now : price_now,
+                  price_next_time_period : price_next_time_period
+                })
+                resolve ({
+                  price_now : price_now,
+                  price_next_time_period : price_next_time_period
+                })
+              }
+            }
+          }
+        }
+      }
+      try {
+        request(options, callback)
+        setTimeout(function() {
+          console.log('calling timeout')
+          request(options, callback)
+        }, (minute_interval*1000)*60)
+      } catch (e) {
+        console.log(e)
+      }
+    })
   }
 }
 
 var main = () => {
-
-  module.exports.determine_currency_with_highest_expected_average_price_change(currencies.currencies, 5000, 5).then((resolution, rejection) => {
+  module.exports.determine_currency_with_highest_expected_average_price_change(currencies.currencies, 1000, 1).then((resolution, rejection) => {
     console.log(resolution)
+    module.exports.check_accuracy_of_prediction(resolution.currency, resolution.time_intervals_minutes, resolution.average_expected_price_flux)
   })
-
-  // for (let i = 0; i < currencies.currencies.length; i++) {
-  //   module.exports.predict_price_for_next_time_period(currencies.currencies[i], 10, 5).then((resolution, rejection) => {
-  //     console.log(resolution)
-  //   })
-  // }
-
-  // var semaphore = 0
-  // let max_val = 0
-  // let max = 0
-  //
-  // for (let i = 0; i < currencies.currencies.length; i++) {
-  //   module.exports.predict_price_for_next_time_period(currencies.currencies[i], 3000, 30).then((resolution, rejection) => {
-  //     // spin lock
-  //     while(semaphore < 0) {
-  //       if (semaphore >= 0) break
-  //     }
-  //
-  //     // START critical  section
-  //     if (resolution.average_expected_price_fluctuation > max_val) {
-  //       // console.log('\t\t\tcompare : ' + resolution.average_expected_price_fluctuation + ' > ' + max_val + ' -> true')
-  //       max_val = resolution.average_expected_price_fluctuation
-  //       max = resolution
-  //     }
-  //
-  //     // console.log(resolution.currency, ':',resolution.average_expected_price_fluctuation) // test print curr : expected change for testing
-  //     // END critical  section
-  //
-  //     semaphore++
-  //     if (semaphore===10) {
-  //       console.log(
-  //         'currency', max.currency,
-  //         '\nmost recent price flux : ', max.most_recent_price_fluctuation,
-  //         '\nmost likely price flux : ', max.most_likely_price_fluctuations_next_period,
-  //         '\nperiods analyzed : ', max.periods_analyzed,
-  //         '\ntime interval minutes : ', max.time_intervals_minutes,
-  //         '\ntotal minutes analyzed : ', max.total_minutes_analyzed,
-  //         '\naverage expected price flux : ', max.average_expected_price_fluctuation,
-  //         '\nfreq graph: ', max.frequency_graph
-  //
-  //       )
-  //     }
-  //   })
-  // }
 }
 
 main()
