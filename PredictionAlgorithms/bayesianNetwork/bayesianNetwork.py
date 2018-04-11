@@ -13,7 +13,10 @@ query = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(query)
 #end of module importation
 
-collections=[{'collectionTitle':'coinmarketcap_ticker','projection':{'_id':0,'id':0,'name':0,'rank':0,'last_updated':0}},{'collectionTitle':'wiki_views','projection':{'pagetitle':1,'views':1,'_id':0}}]
+collections=[
+	{'collectionTitle':'coinmarketcap_ticker','projection':{'_id':0,'id':0,'name':0,'rank':0,'last_updated':0,'post_created_time_hour':0,'post_created_time_minute':0,'price_usd_int':0}},
+	{'collectionTitle':'wiki_views','projection':{'pagetitle':1,'views':1}}
+	]
 wikiTranslation={'Bitcoin':'BTC','Litecoin':'LTC','Ripple_(payment_protocol)':'XRP','Dogecoin':'DOGE','Bitcoin_Cash':'BCH','Ethereum':'ETH'}
 
 def getData():
