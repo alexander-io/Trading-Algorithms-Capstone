@@ -1,158 +1,41 @@
-'''
-ideas:
+import statistics as STAT
+import generalLinearModel as GLM
 
-	1)
-	currently, normal function looks at x datum before and after data point y.
-	It would be more realistic if it just looked at the past x datum in refferance to y
-	this makes it less accurate however. Instead use past x, but assign lower weights to 
-	data farther from y. IDK how the stats would work for this. 
+#importing mongo query module
+import importlib.util, os, inspect
 
-	Maybe keep going back until the weight sums to one or the integral of the curve is 
-	equal to one. Im not sure
+path=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+path=path[0:len(path)-20]
+path+='db/query.py'
 
-	2) 
-	y=current index of pageviews, x=amount of data, z=number of normal curves
+spec = importlib.util.spec_from_file_location("query.py", path)
+query = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(query)
+#end of module importation
 
-	include x of the past datum, starting from y into a normal curve. Then use a weighted average of the past
-	z normal curves drawn in this fashion while decreasing y iterativly.
+collections=[{'collectionTitle':'coinmarketcap_ticker','projection':{'_id':0,'id':0,'name':0,'rank':0,'last_updated':0}},{'collectionTitle':'wiki_views','projection':{'pagetitle':1,'views':1,'_id':0}}]
+wikiTranslation={'Bitcoin':'BTC','Litecoin':'LTC','Ripple_(payment_protocol)':'XRP','Dogecoin':'DOGE','Bitcoin_Cash':'BCH','Ethereum':'ETH'}
 
-'''
-import numpy,random, scipy.stats, math
-
-
-#########################################
-#										#
-#				Averages 				#
-#										#
-#########################################
-
-def simpleAverage(inputVariable):
-	return numpy.mean(inputVariable)
-
-def calWeights(n):
-	triangleNumber=(n*(n+1))/2
-	weights=[]
-	for x in range(1,n+1):
-		weights.append(x/triangleNumber)
-	return weights
-
-def movingAverage(inputVariable):
-	weight=calWeights(len(inputVariable))
-	return numpy.ma.average(inputVariable,weights=weight)
-
-
-#########################################
-#										#
-#		Probability Distributions		#
-#										#
-#########################################
-
-distributions=['binomialDist','lognormalDist','RECENTtriangularDist','MEANtriangularDist','triangularDist','betaDist','exponentialDist','uniformDist','cauchyDist','geometricDist','poissonDist','normalDist']
-
-def getDistributions():
-	return distributions
-
-def normalDist(inputVariable):
-	mean=movingAverage(inputVariable)
-	standardDeviation=numpy.std(inputVariable) 
-	return numpy.random.normal(mean,standardDeviation)
-
-def binomialDist(inputVariable): 
-	recentValue=inputVariable[len(inputVariable)-1]
-	highValue=max(inputVariable[0:len(inputVariable)])
-	return numpy.random.binomial(highValue,recentValue/highValue)
-
-def poissonDist(inputVariable):
-	mean=movingAverage(inputVariable)
-	return numpy.random.poisson(mean)
-
-def geometricDist(inputVariable):
-	mean=movingAverage(inputVariable)
-	return numpy.random.geometric(1/mean)
-
-def cauchyDist(inputVariable):
-	mean=movingAverage(inputVariable[0:len(inputVariable)-1])
-	recentValue=inputVariable[len(inputVariable)-1]
-	standardDeviation=numpy.std(inputVariable[0:len(inputVariable)-1])
-	return -scipy.stats.cauchy.logpdf(recentValue,mean,standardDeviation)
-
-def uniformDist(inputVariable):
-	highValue=max(inputVariable)
-	lowValue=min(inputVariable)
-	return numpy.random.uniform(lowValue,highValue)
-
-def lognormalDist(inputVariable):
-	mean=movingAverage(inputVariable)
-	standardDeviation=numpy.std(inputVariable) 
-	return numpy.random.lognormal(mean,standardDeviation)
-
-def exponentialDist(inputVariable):
-	mean=movingAverage(inputVariable)
-	return numpy.random.exponential(mean)
-
-def betaDist(inputVariable):
-	mean=movingAverage(inputVariable)
-	standardDeviation=numpy.std(inputVariable)
-	modifiedMean=1/math.log(mean,math.e)
-	modifiedSTD=1/math.log(standardDeviation,math.e)
-	#print('mean',modifiedMean)
-	#print('std',modifiedSTD)
-	alpha=(((1-modifiedMean)/modifiedSTD)-(1/modifiedMean))*modifiedMean**2
-	#print('alpha',alpha)
-	beta=alpha*((1/modifiedMean)-1)
-	if beta <=0 or alpha <=0: return 0
-	#print('beta',beta)
-	output= numpy.random.beta(alpha,beta)
-	return 1/(output**e)
-
-def triangularDist(inputVariable):
-	mode=(scipy.stats.mode(inputVariable))[0][0]
-	highValue=max(inputVariable)
-	lowValue=min(inputVariable)
-	return numpy.random.triangular(lowValue,mode,highValue)
-
-#the next 2 methods are in testing phase still
-
-def MEANtriangularDist(inputVariable):
-	mean=movingAverage(inputVariable)
-	highValue=max(inputVariable)
-	lowValue=min(inputVariable)
-	return numpy.random.triangular(lowValue,mean,highValue)
-
-def RECENTtriangularDist(inputVariable):
-	recentValue=inputVariable[len(inputVariable)-1]
-	highValue=max(inputVariable[0:len(inputVariable)])
-	lowValue=min(inputVariable[0:len(inputVariable)])
-	return numpy.random.triangular(lowValue,recentValue,highValue)
-
-#####################################################
-#													#
-#													#
-#					TESTING							#
-#													#
-#													#
-#####################################################
+def getData():
+	dataSets={}
+	cursor=query.queryDistinct(collectionTitle='coinmarketcap_ticker',field='symbol')
+	for symbol in cursor:
+		dataSets[symbol]={}
+	for collection in collections:
+		cursor=query.queryWithParameters(projection=collection['projection'],collectionTitle=collection['collectionTitle'])
+		for doc in cursor:
+			if collection['collectionTitle']=='wiki_views':
+				if wikiTranslation[doc['pagetitle']] in dataSets.keys(): data=dataSets[wikiTranslation[doc['pagetitle']]]
+				else: continue
+			else:data=dataSets[doc['symbol']]
+			for key in doc.keys():
+				if key=='symbol' or key=='pagetitle': continue
+				if key in data.keys(): data[key].append(doc[key])
+				else: data[key]=[doc[key]]
+	return dataSets
 
 def main():
-	a=[1,2,3,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6,7,8,9,10]
-	print('array',a)
-	random.shuffle(a)
-	print('shuffled',a)
-	print('MA',movingAverage(a))
-	print('SA',simpleAverage(a))
-	print('normal',normalDist(a))
-	print('poisson',poissonDist(a))
-	print('geometric',geometricDist(a))
-	print('binomial',binomialDist(a))
-	print('cauchy',cauchyDist(a))
-	print('uniform',uniformDist(a))
-	print('beta',betaDist(a))
-	print('triangular',triangularDist(a))
-	print('MEANtriangular',MEANtriangularDist(a))
-	print('RECENTtriangularDist',RECENTtriangularDist(a))
-
+	print(getData())
 
 if __name__ == '__main__':
 	main()
-
-			

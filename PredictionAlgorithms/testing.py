@@ -1,6 +1,5 @@
-import bayesianNetwork as BN
+import statistics as STAT
 import generalLinearModel as GLM
-import accuracyTesting as AccTest
 
 
 def main():
@@ -25,21 +24,26 @@ def main():
 			pass
 	'''
 	print('views')
-	print(AccTest.findBestDistribution(views))
+	#print('\n',STAT.findBestMovingAverageLimit(views))
+	print('\n',STAT.findBestDistribution(views))
 	print('capital')
-	print(AccTest.findBestDistribution(capital))
-	print('capital')
-	print(AccTest.findBestDistribution(volume))
+	#print('\n',STAT.findBestMovingAverageLimit(capital))
+	print('\n',STAT.findBestDistribution(views))
+	print('volume')
+	#print('\n',STAT.findBestMovingAverageLimit(volume))
+	print('\n',STAT.findBestDistribution(volume))
 	print('price')
-	print(AccTest.findBestDistribution(price))
+	#print('\n',STAT.findBestMovingAverageLimit(price))
+	print('\n',STAT.findBestDistribution(price))
+
 	'''
 	print('robust GLM',AccTest.calculateErrorRobust(views,price,GLM.BTC_WIKI_to_BTC_Value))
 	print('simple GLM',AccTest.calculateErrorSimple(views,price,GLM.BTC_WIKI_to_BTC_Value))
-	print('robust NORMAL',AccTest.calculateErrorRobust(views,price,BN.normalized_model_WIKI_to_BTC_value))
-	print('simple NORMAL',AccTest.calculateErrorSimple(views,price,BN.normalized_model_WIKI_to_BTC_value))
+	print('robust NORMAL',AccTest.calculateErrorRobust(views,price,STAT.normalized_model_WIKI_to_BTC_value))
+	print('simple NORMAL',AccTest.calculateErrorSimple(views,price,STAT.normalized_model_WIKI_to_BTC_value))
 	print('\n\n\n\n\n')
 	print('normalized model')
-	AccTest.findBestNormalRange(views,price,BN.normalized_model_WIKI_to_BTC_value)
+	AccTest.findBestNormalRange(views,price,STAT.normalized_model_WIKI_to_BTC_value)
 	print('\n\n\n\n\n')
 	print('glm model')
 	AccTest.findBestNormalRange(views,price,GLM.BTC_WIKI_to_BTC_Value)
