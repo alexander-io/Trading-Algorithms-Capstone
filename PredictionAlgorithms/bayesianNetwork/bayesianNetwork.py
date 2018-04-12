@@ -1,6 +1,6 @@
 import statistics as STAT
 import generalLinearModel as GLM
-import pprint
+import pprint,copy
 
 #importing mongo query module
 import importlib.util, os, inspect
@@ -48,45 +48,40 @@ def getData(timePeriod):
 		for doc in cursor:
 
 			#get translated symbol
-			symbol=translationTable[doc[collection['id']]]
+			try:symbol=translationTable[doc[collection['id']]]
+			except KeyError: continue
 			if symbol not in dataSets.keys(): continue
 			#get correct dataset
 			data=dataSets[symbol]
 
 			#check how many time periods have gone by since previous time period
 			if previousDoc == None: previousDoc=doc
-			try:
-				#time difference
-				dTimePeriods=((int(doc[collection['time']])-int(previousDoc[collection['time']]))//60)//timePeriod
-			except:
-				print('doc',doc)
-				print('doc[collection[\'time\']]',doc[collection['time']])
-				print('\n')
-				print('previousDoc',previousDoc)
-				print('previousDoc[collection[\'time\']]',previousDoc[collection['time']])
-				break
-			#interpolate missing data
-			if dTimePeriods>1:doc=interpolate(previousDoc,doc,dTimePeriods)
+			#time difference
+			dTimePeriods=((int(doc[collection['time']])-int(previousDoc[collection['time']]))//60)//timePeriod
 			#skip datapoint if not enough time has passed
 			elif dTimePeriods<1 and dTimePeriods!=0:continue
 			previousDoc=doc
 
-			#for each field..
-			for key in doc.keys():
-				#filter further unwanted fields
-				if key=='symbol' or key=='pagetitle': continue
-				#create or add to list of data
-				if key in data.keys():
-					if type(doc[key])==list: data[key+symbol]=data[key+symbol]+doc[key]
-					else: data[key+symbol].append(doc[key])
-				else: 
-					if type(doc[key])!=list:value=[doc[key]]
-					else: value=doc[key]
-					data[key+symbol]=value
+			#interpolate missing data and create list for each new datapoint
+			docList=interpolate(previousDoc,doc,dTimePeriods)
+			for entry in docList:
+				#for each field..
+				for key in entry.keys():
+					#filter further unwanted fields
+					if key=='symbol' or key=='pagetitle': continue
+					#create or add to list of data
+					if key in data.keys():
+						if type(entry[key])==list: data[key+symbol]=data[key+symbol]+entry[key]
+						else: data[key+symbol].append(entry[key])
+					else: 
+						if type(entry[key])!=list:value=[entry[key]]
+						else: value=entry[key]
+						data[key+symbol]=value
 	return dataSets
 
-
+'''
 def interpolate(previousDatum,currentDatum,dTimePeriod):
+	if dTimePeriod==1:return [currentDatum]
 	for field in previousDatum:
 		try:
 			previous=float(previousDatum[field])
@@ -98,6 +93,22 @@ def interpolate(previousDatum,currentDatum,dTimePeriod):
 		except:
 			currentDatum[field]=[currentDatum[field]*dTimePeriod]
 	return currentDatum
+'''
+
+def interpolate(previousDatum,currentDatum,dTimePeriod):
+	if dTimePeriod==1:return [currentDatum]
+	data=[]
+	for x in range(1,dTimePeriod-1):
+		newDatum=copy.deepcopy(previousDatum)
+		for key in previousDatum:
+			try:
+				newValue=(float(currentDatum[key])-float(previousDatum[key]))/dTimePeriod
+				newDatum[key]=newValue*x
+			except:
+				continue
+		data.append(newDatum)
+	data.append(currentDatum)
+	return data
 
 
 def makePrediction(dataSet,coinSymbol):
