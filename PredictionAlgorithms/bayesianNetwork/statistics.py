@@ -51,36 +51,43 @@ def movingAverage(inputVariable,limit=None):
 	return numpy.ma.average(inputVariable,weights=weight)
 
 def MA7(inputVariable):
+	if len(inputVariable)<7:return -1
 	weight=calWeights(7)
 	limitedInput=inputVariable[len(inputVariable)-7:]
 	return numpy.ma.average(limitedInput,weights=weight)
 
 def MA14(inputVariable):
+	if len(inputVariable)<14:return -1
 	weight=calWeights(14)
 	limitedInput=inputVariable[len(inputVariable)-14:]
 	return numpy.ma.average(limitedInput,weights=weight)
 
 def MA21(inputVariable):
+	if len(inputVariable)<21:return -1
 	weight=calWeights(21)
 	limitedInput=inputVariable[len(inputVariable)-21:]
 	return numpy.ma.average(limitedInput,weights=weight)
 
 def MA28(inputVariable):
+	if len(inputVariable)<28:return -1
 	weight=calWeights(28)
 	limitedInput=inputVariable[len(inputVariable)-28:]
 	return numpy.ma.average(limitedInput,weights=weight)
 
 def MA35(inputVariable):
+	if len(inputVariable)<35:return -1
 	weight=calWeights(35)
 	limitedInput=inputVariable[len(inputVariable)-35:]
 	return numpy.ma.average(limitedInput,weights=weight)
 
 def MA42(inputVariable):
+	if len(inputVariable)<42:return -1
 	weight=calWeights(42)
 	limitedInput=inputVariable[len(inputVariable)-42:]
 	return numpy.ma.average(limitedInput,weights=weight)
 
 def MA49(inputVariable):
+	if len(inputVariable)<49:return -1
 	weight=calWeights(49)
 	limitedInput=inputVariable[len(inputVariable)-49:]
 	return numpy.ma.average(limitedInput,weights=weight)
@@ -219,7 +226,7 @@ def findBestDistribution(inputVariable):
 
 def testDistribution(inputVariable,distribution):
 	totalError=decimal.Decimal(0)
-	trials=2
+	trials=100
 	#stuff for calling function from a string name
 	possibles = globals().copy()
 	possibles.update(locals())
@@ -227,7 +234,7 @@ def testDistribution(inputVariable,distribution):
 	#if its in another module use instead
 	#output=getattr(bayesianNetwork, distribution)(testSet)
 	for y in range(trials):
-		progress(y,trials,'Now testing '+distribution)
+		#progress(y,trials,'Now testing '+distribution)
 		individualError=decimal.Decimal(0)
 		for x in range(len(inputVariable)//2,len(inputVariable)-1):
 			testSet=inputVariable[0:x]
