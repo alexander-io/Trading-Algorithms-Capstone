@@ -62,7 +62,7 @@ def getData(timePeriod):
 				print('doc',doc)
 				print('doc[collection[\'time\']]',doc[collection['time']])
 				print('\n')
-				prtin('previousDoc',previousDoc)
+				print('previousDoc',previousDoc)
 				print('previousDoc[collection[\'time\']]',previousDoc[collection['time']])
 				break
 			#interpolate missing data
