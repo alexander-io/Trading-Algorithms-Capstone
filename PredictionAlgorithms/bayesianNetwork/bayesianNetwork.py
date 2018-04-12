@@ -56,11 +56,13 @@ def getData(timePeriod):
 			#check how many time periods have gone by since previous time period
 			if previousDoc == None: previousDoc=doc
 			#time difference
+			print(doc[collection['time']])
+			print(previousDoc[collection['time']])
 			dTimePeriods=((int(doc[collection['time']])-int(previousDoc[collection['time']]))//60)//timePeriod
 			#interpolate missing data
 			if dTimePeriods>1:doc=interpolate(previousDoc,doc,dTimePeriods)
 			#skip datapoint if not enough time has passed
-			elif dTimePeriods<0:continue
+			elif dTimePeriods<1 and dTimePeriods!=0:continue
 			previousDoc=doc
 
 			#for each field..
