@@ -64,6 +64,12 @@ def getData(timePeriod):
 
 			#interpolate missing data and create list for each new datapoint
 			docList=interpolate(previousDoc,doc,dTimePeriods)
+			print('previousDoc')
+			print(previousDoc)
+			print('doc')
+			print(doc)
+			print('doclist')
+			print(doclist)
 			for entry in docList:
 				#for each field..
 				for key in entry.keys():
