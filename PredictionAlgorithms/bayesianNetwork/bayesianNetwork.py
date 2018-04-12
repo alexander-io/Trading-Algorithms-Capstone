@@ -46,6 +46,13 @@ def getData(timePeriod):
 		previousDoc=None
 		#for each param...
 		for doc in cursor:
+
+			#get translated symbol
+			symbol=translationTable[doc[collection['id']]]
+			if symbol not in dataSets.keys(): continue
+			#get correct dataset
+			data=dataSets[symbol]
+
 			#check how many time periods have gone by since previous time period
 			if previousDoc == None: previousDoc=doc
 			#time difference
@@ -55,20 +62,18 @@ def getData(timePeriod):
 			#skip datapoint if not enough time has passed
 			elif dTimePeriods<0:continue
 			previousDoc=doc
-			#get translated symbol
-			symbol=translationTable[doc[collection['id']]]
-			if symbol not in dataSets.keys(): continue
-			#get correct dataset
-			data=dataSets[symbol]
+
 			#for each field..
 			for key in doc.keys():
 				#filter further unwanted fields
 				if key=='symbol' or key=='pagetitle': continue
 				#create or add to list of data
 				if key in data.keys():
-
-					data[key+symbol].append(doc[key])
-				else: data[key+symbol]=[doc[key]]
+					if type(doc[key])==list: data[key+symbol]=data[key+symbol]+doc[key]
+					else: data[key+symbol].append(doc[key])
+				else: 
+					if type(doc[key])!=list:doc[key]=[doc[key]]
+					data[key+symbol]=doc[key]
 	return dataSets
 
 
