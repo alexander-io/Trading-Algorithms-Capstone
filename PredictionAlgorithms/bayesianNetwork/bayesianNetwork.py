@@ -68,8 +68,8 @@ def getData(timePeriod):
 			print(previousDoc)
 			print('doc')
 			print(doc)
-			print('doclist')
-			print(doclist)
+			print('docList')
+			print(docList)
 			for entry in docList:
 				#for each field..
 				for key in entry.keys():
