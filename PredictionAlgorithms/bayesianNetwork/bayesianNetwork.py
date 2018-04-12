@@ -59,7 +59,7 @@ def getData(timePeriod):
 			#time difference
 			dTimePeriods=((int(doc[collection['time']])-int(previousDoc[collection['time']]))//60)//timePeriod
 			#skip datapoint if not enough time has passed
-			elif dTimePeriods<1 and dTimePeriods!=0:continue
+			if dTimePeriods<1 and dTimePeriods!=0: continue
 			previousDoc=doc
 
 			#interpolate missing data and create list for each new datapoint
