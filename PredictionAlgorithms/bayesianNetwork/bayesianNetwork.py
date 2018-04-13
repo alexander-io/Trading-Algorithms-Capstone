@@ -64,7 +64,7 @@ def getData(timePeriod):
 
 
 			#check how many time periods have gone by since previous time period
-			if previousDocs[symbol] == None: previousDocs=doc
+			if previousDocs[symbol] == None: previousDocs[symbol]=doc
 			print(previousDocs[symbol])
 			print(previousDocs[symbol][collection['time']])
 			#time difference
