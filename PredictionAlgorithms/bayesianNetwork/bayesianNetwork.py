@@ -57,7 +57,7 @@ def getData(timePeriod):
 			#get correct dataset
 			data=dataSets[symbol]
 
-			print('START')
+			#print('START')
 			#print('previousDocs')
 			#print(previousDocs[symbol])
 			#print('doc')
@@ -80,7 +80,7 @@ def getData(timePeriod):
 			#print(dTimePeriods)
 			#print('docList')
 			#print(docList)
-			print('END')
+			#print('END')
 			previousDocs[symbol]=doc
 			for entry in docList:
 				#for each field..
@@ -154,8 +154,8 @@ def main():
 	#data=getData(60)
 	#print('hourly data')
 	#pp.pprint(data)	
-	data=getData(10)
-	print('10 min data')
+	data=getData(60)
+	print('60 min data')
 	pp.pprint(data)
 	print(makePrediction(data,'BTC'))
 
