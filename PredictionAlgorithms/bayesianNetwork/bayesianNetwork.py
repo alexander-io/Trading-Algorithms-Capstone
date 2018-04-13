@@ -138,14 +138,14 @@ def makePrediction(dataSet,coinSymbol):
 
 
 def main():
-	data=getData(60*24)
-	print('daily data')
-	pp.pprint(data)
+	#data=getData(60*24)
+	#print('daily data')
+	#pp.pprint(data)
 	data=getData(60)
 	print('hourly data')
 	pp.pprint(data)	
-	data=getData(1)
-	print('1 min data')
+	data=getData(10)
+	print('10 min data')
 	pp.pprint(data)
 	print(makePrediction(data,'BTC'))
 
