@@ -57,6 +57,7 @@ def getData(timePeriod):
 			#get correct dataset
 			data=dataSets[symbol]
 
+			print('START')
 			print('previousDocs')
 			print(previousDocs[symbol])
 			print('doc')
@@ -65,8 +66,8 @@ def getData(timePeriod):
 
 			#check how many time periods have gone by since previous time period
 			if previousDocs[symbol] == None: previousDocs[symbol]=doc
-			print(previousDocs[symbol])
-			print(previousDocs[symbol][collection['time']])
+			#print(previousDocs[symbol])
+			#print(previousDocs[symbol][collection['time']])
 			#time difference
 			dTimePeriods=((int(doc[collection['time']])-int(previousDocs[symbol][collection['time']]))//60)//timePeriod
 			#skip datapoint if not enough time has passed
@@ -75,8 +76,11 @@ def getData(timePeriod):
 
 			#interpolate missing data and create list for each new datapoint
 			docList=interpolate(previousDocs[symbol],doc,dTimePeriods)
+			print('dTimePeriods')
+			print(dTimePeriods)
 			print('docList')
 			print(docList)
+			print('END')
 			for entry in docList:
 				#for each field..
 				for key in entry.keys():
