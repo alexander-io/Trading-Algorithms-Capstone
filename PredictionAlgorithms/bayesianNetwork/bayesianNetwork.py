@@ -58,13 +58,15 @@ def getData(timePeriod):
 			data=dataSets[symbol]
 
 			print('previousDocs')
-			print(previousDocs)
+			print(previousDocs[symbol])
 			print('doc')
 			print(doc)
 
 
 			#check how many time periods have gone by since previous time period
 			if previousDocs[symbol] == None: previousDocs=doc
+
+			print(previousDocs[symbol][collection['time']])
 			#time difference
 			dTimePeriods=((int(doc[collection['time']])-int(previousDocs[symbol][collection['time']]))//60)//timePeriod
 			#skip datapoint if not enough time has passed
