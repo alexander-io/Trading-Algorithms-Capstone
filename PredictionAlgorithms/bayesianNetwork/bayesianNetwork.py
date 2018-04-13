@@ -43,7 +43,10 @@ def getData(timePeriod):
 	for collection in collections:
 		#get inportant params
 		cursor=query.queryWithParameters(projection=collection['projection'],collectionTitle=collection['collectionTitle'])
-		previousDoc=None
+
+		previousDocs={}
+		for symbol in dataSets:
+			previousDocs[symbol]=None
 		#for each param...
 		for doc in cursor:
 
@@ -61,15 +64,15 @@ def getData(timePeriod):
 
 
 			#check how many time periods have gone by since previous time period
-			if previousDoc == None: previousDoc=doc
+			if previousDocs[symbol] == None: previousDoc=doc
 			#time difference
-			dTimePeriods=((int(doc[collection['time']])-int(previousDoc[collection['time']]))//60)//timePeriod
+			dTimePeriods=((int(doc[collection['time']])-int(previousDoc[symbol][collection['time']]))//60)//timePeriod
 			#skip datapoint if not enough time has passed
 			if dTimePeriods<1 and dTimePeriods!=0: continue
-			previousDoc=doc
+			previousDoc[symbol]=doc
 
 			#interpolate missing data and create list for each new datapoint
-			docList=interpolate(previousDoc,doc,dTimePeriods)
+			docList=interpolate(previousDoc[symbol],doc,dTimePeriods)
 			print('docList')
 			print(docList)
 			for entry in docList:
