@@ -57,11 +57,11 @@ def getData(timePeriod):
 			#get correct dataset
 			data=dataSets[symbol]
 
-			#print('START')
-			#print('previousDocs')
-			#print(previousDocs[symbol])
-			#print('doc')
-			#print(doc)
+			print('START')
+			print('previousDocs')
+			print(previousDocs[symbol])
+			print('doc')
+			print(doc)
 
 
 			#check how many time periods have gone by since previous time period
@@ -80,7 +80,7 @@ def getData(timePeriod):
 			#print(dTimePeriods)
 			#print('docList')
 			#print(docList)
-			#print('END')
+			print('END')
 			previousDocs[symbol]=doc
 			for entry in docList:
 				#for each field..
