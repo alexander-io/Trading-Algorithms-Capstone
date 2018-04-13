@@ -87,6 +87,10 @@ def getData(timePeriod):
 				for key in entry.keys():
 					#filter further unwanted fields
 					if key=='symbol' or key=='pagetitle' or key=='timestamp' or key=='last_updated' : continue
+
+					if type(entry[key])==str:
+						try: entry[key]=float(entry[key])
+						except: pass
 					#create or add to list of data
 					if key+symbol in data.keys():
 						data[key+symbol].append(entry[key])
