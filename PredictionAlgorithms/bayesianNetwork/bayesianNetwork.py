@@ -69,15 +69,15 @@ def getData(timePeriod):
 			#print(previousDocs[symbol])
 			#print(previousDocs[symbol][collection['time']])
 			#time difference
-			dTimePeriods=((int(doc[collection['time']])-int(previousDocs[symbol][collection['time']]))//60)//timePeriod
+			dTimePeriods=((int(doc[collection['time']])-int(previousDocs[symbol][collection['time']]))//60)/timePeriod
 			#skip datapoint if not enough time has passed
-			if dTimePeriods<1:# and dTimePeriods!=0: 
+			if dTimePeriods<1 and dTimePeriods!=0: 
 				print('skipping datum')
 				continue
 			
 
 			#interpolate missing data and create list for each new datapoint
-			docList=interpolate(previousDocs[symbol],doc,dTimePeriods)
+			docList=interpolate(previousDocs[symbol],doc,int(dTimePeriods))
 			#print('dTimePeriods')
 			#print(dTimePeriods)
 			#print('docList')
@@ -161,7 +161,7 @@ def main():
 	#data=getData(60)
 	#print('hourly data')
 	#pp.pprint(data)	
-	data=getData(60*24*4)
+	data=getData(60*24)
 	print('60 min data')
 	pp.pprint(data)
 	#print(makePrediction(data,'BTC'))
