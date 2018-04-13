@@ -112,23 +112,34 @@ module.exports = {
     delete map_of_state_key_freq.undefined
     return map_of_state_key_freq
   },
-  make_double_state_next_state_occurance_frequency_map : function(list_of_state_keys) {
-    // console.log(list_of_state_keys)
+  make_n_state_next_state_occurance_frequency_map : function(list_of_state_keys, n_states) {
     var map_of_state_key_freq = {}
-    for (let i = list_of_state_keys.length-1; i > 1;i--) {
-      if (map_of_state_key_freq[list_of_state_keys[i] + '->' + list_of_state_keys[i-1]]) {
-        if (map_of_state_key_freq[list_of_state_keys[i] + '->' + list_of_state_keys[i-1]][list_of_state_keys[i-2]]) {
-          map_of_state_key_freq[list_of_state_keys[i] + '->' + list_of_state_keys[i-1]][list_of_state_keys[i-2]] += 1
+    var key_builder = ''
+
+    for (let i = list_of_state_keys.length-1; i > n_states-2;i--) {
+      key_builder = ''
+      // build key
+      for (let j = i; j > i - n_states; j--) {
+        if (key_builder.length === 0) {
+          key_builder += list_of_state_keys[j]
         } else {
-          map_of_state_key_freq[list_of_state_keys[i] + '->' + list_of_state_keys[i-1]][list_of_state_keys[i-2]] = 1
+          key_builder += '->'+list_of_state_keys[j]
+        }
+      }
+      console.log(key_builder)
+
+      if (map_of_state_key_freq[key_builder]) {
+        if (map_of_state_key_freq[key_builder][list_of_state_keys[i-n_states]]) {
+          map_of_state_key_freq[key_builder][list_of_state_keys[i-n_states]] += 1
+        } else {
+          map_of_state_key_freq[key_builder][list_of_state_keys[i-n_states]] = 1
         }
       } else {
-        map_of_state_key_freq[list_of_state_keys[i] + '->' + list_of_state_keys[i-1]] = {}
-        map_of_state_key_freq[list_of_state_keys[i] + '->' + list_of_state_keys[i-1]][list_of_state_keys[i-2]] = 1
+        map_of_state_key_freq[key_builder] = {}
+        map_of_state_key_freq[key_builder][list_of_state_keys[i-n_states]] = 1
       }
     }
     delete map_of_state_key_freq.undefined
-    // console.log(map_of_state_key_freq)
     return map_of_state_key_freq
   },
   get_most_recent_price_change_range : function(array_of_price_fluctuation_ranges) {
@@ -214,17 +225,21 @@ module.exports = {
         var list_of_state_keys = this.make_list_of_state_keys(percent_change_arr)
         // console.log(list_of_state_keys)
 
-        // var most_recent_price_fluctuation = this.get_most_recent_price_change_range(list_of_state_keys)
-        var most_recent_price_fluctuation = this.get_double_most_recent_price_change_range(list_of_state_keys)
+        var most_recent_price_fluctuation = this.get_most_recent_price_change_range(list_of_state_keys)
+        // var most_recent_price_fluctuation = this.get_double_most_recent_price_change_range(list_of_state_keys)
 
-        // var next_state_occurance_frequency = this.make_state_next_state_occurance_frequency_map(list_of_state_keys)
-        var next_state_occurance_frequency = this.make_double_state_next_state_occurance_frequency_map(list_of_state_keys)
+        var next_state_occurance_frequency = this.make_state_next_state_occurance_frequency_map(list_of_state_keys)
+        // var next_state_occurance_frequency = this.make_double_state_next_state_occurance_frequency_map(list_of_state_keys)
+        // var next_state_occurance_frequency = this.make_n_state_next_state_occurance_frequency_map(list_of_state_keys, 5)
 
-        console.log(most_recent_price_fluctuation, next_state_occurance_frequency)
+        // console.log(next_state_occurance_frequency)
+
+
+        // console.log(most_recent_price_fluctuation, next_state_occurance_frequency)
 
         var max_arr_AND_average_expected_price_flux = this.determine_array_of_likely_next_state_AND_average_expected_price_fluctuation(next_state_occurance_frequency, most_recent_price_fluctuation)
 
-        console.log(max_arr_AND_average_expected_price_flux)
+        // console.log(max_arr_AND_average_expected_price_flux)
 
         resolve ({
           currency : currency,
@@ -322,16 +337,16 @@ var main = () => {
   if (currency === 'all') {
     for (let i = 0; i < currencies.currencies.length;i++) {
       module.exports.predict_price_for_next_time_period(currencies.currencies[i], time_periods, skip_periods).then((resolution, rejection) => {
-        // console.log(resolution)
+        console.log(resolution)
       })
     }
   } else if (currency === 'top') {
     module.exports.determine_currency_with_highest_expected_average_price_change(currencies.currencies, time_periods, skip_periods).then((resolution, rejection) => {
-      // console.log(resolution)
+      console.log(resolution)
     })
   } else {
     module.exports.predict_price_for_next_time_period(currency, time_periods, skip_periods).then((resolution, rejection) => {
-      // console.log(resolution)
+      console.log(resolution)
     })
   }
 }

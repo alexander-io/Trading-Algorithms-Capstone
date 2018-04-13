@@ -1,11 +1,11 @@
 import os, subprocess, time, inspect, pymongo, datetime
 import datetime
 
-from twilio.rest import Client
-x = "AC067a5e1514f4e1592f6a8912a4f84590"
-xx = "971b883992a4bbd9d1d17f9a7e0d1960"
+# from twilio.rest import Client
+# x = "AC067a5e1514f4e1592f6a8912a4f84590"
+# xx = "971b883992a4bbd9d1d17f9a7e0d1960"
 
-client = Client(x, xx)
+# client = Client(x, xx)
 
 # test class day
 class Day:
@@ -27,16 +27,16 @@ path=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 path=path[0:len(path)-9]
 
 
-def time_update_txt_daily():
-    now = datetime.datetime.now()
-    today = str(now.year) + " " + str(now.month) + " " + str(now.day) + " " + str(now.hour) + " " + str(now.minute)
-
-    today = "daily server update " + today
-
-    client.messages.create(
-        to="+12623542930",
-        from_="+12623144555",
-        body=today)
+# def time_update_txt_daily():
+#     now = datetime.datetime.now()
+#     today = str(now.year) + " " + str(now.month) + " " + str(now.day) + " " + str(now.hour) + " " + str(now.minute)
+#
+#     today = "daily server update " + today
+#
+#     client.messages.create(
+#         to="+12623542930",
+#         from_="+12623144555",
+#         body=today)
 
 
 def once_per_1_min_scripts():
@@ -44,8 +44,9 @@ def once_per_1_min_scripts():
     pass
 
 def once_per_5_min_scripts():
-    subprocess.Popen(['nodejs'], path+cmarketcap)
-    pass
+    # subprocess.Popen(['nodejs'], path+cmarketcap)
+    subprocess.Popen(['nodejs', path+cmarketcap] )
+    # pass
 def once_per_15_min_scripts():
     # subprocess.Popen(['nodejs', path+cmarketcap])
     subprocess.Popen(['python3', path+blockchain])
@@ -56,7 +57,7 @@ def once_per_hour_scripts():
 
 def once_per_day_scripts():
     subprocess.Popen(['nodejs', path+wiki])
-    time_update_txt_daily()
+    # time_update_txt_daily()
 
 def twenty_four_hours_have_elapsed_unix(start_time, end_time):
     if (end_time - start_time >= ((60*60)*24)):
@@ -93,13 +94,14 @@ def secs_to_mins(secs): return secs/60
 
 def serve():
 
-    time_update_txt_daily()
+    # time_update_txt_daily()
 
     server_start_time = time.localtime()
     server_start_time_unix = time.time()
     print('server start time\n\t', server_start_time, server_start_time_unix)
 
     once_per_1_min_scripts()
+    once_per_5_min_scripts()
     once_per_15_min_scripts()
     once_per_day_scripts()
 
@@ -124,7 +126,7 @@ def serve():
 
         if (five_mins_have_elapsed_unix(last_5_min_call_unix, current_time_unix)):
             last_5_min_call_unix = current_time_unix
-            # once_per_5_min_scripts()
+            once_per_5_min_scripts()
 
         if (fifteen_mins_have_elapsed_unix(last_15_min_call_unix, current_time_unix)):
             last_15_min_call_unix = current_time_unix
