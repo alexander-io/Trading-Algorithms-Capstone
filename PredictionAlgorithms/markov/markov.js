@@ -143,8 +143,10 @@ module.exports = {
     for (x in next_state_occurance_frequency[most_recent_price_fluctuation]) {
       let frequency = next_state_occurance_frequency[most_recent_price_fluctuation][x]
 
-      num_elems += frequency
-      running_total += x*frequency
+      if (x !== 'undefined') {
+        num_elems += frequency
+        running_total += x*frequency
+      }
 
       /*
        * the possibility exists that a tie will occur when comparing the frequency of the next state  possibilities
@@ -164,6 +166,7 @@ module.exports = {
         max_arr.push(x)
       }
     }
+
     return {
       max_arr : max_arr,
       average_expected_price_fluctuation : running_total/num_elems
@@ -175,7 +178,6 @@ module.exports = {
         // generate array of price percent changes_
         var percent_change_arr = this.make_percent_change_arr(resolution)
         var periods_analyzed = resolution.length
-        // console.log(percent_change_arr)
         // let n = array of prices length
         // length of percent_change_arr is n-1 because percent change is determined via interpolation between two time periods
         percent_change_arr.pop()
@@ -184,8 +186,8 @@ module.exports = {
         var list_of_state_keys = this.make_list_of_state_keys(percent_change_arr)
         var most_recent_price_fluctuation = this.get_most_recent_price_change_range(list_of_state_keys)
         var next_state_occurance_frequency = this.make_state_next_state_occurance_frequency_map(list_of_state_keys)
-        var max_arr_AND_average_expected_price_flux = this.determine_array_of_likely_next_state_AND_average_expected_price_fluctuation(next_state_occurance_frequency, most_recent_price_fluctuation)
 
+        var max_arr_AND_average_expected_price_flux = this.determine_array_of_likely_next_state_AND_average_expected_price_fluctuation(next_state_occurance_frequency, most_recent_price_fluctuation)
 
         resolve ({
           currency : currency,
@@ -220,8 +222,8 @@ module.exports = {
             max = resolution
           }
           // END critical  section
-          semaphore++
 
+          semaphore++
           if (semaphore===10) {
             resolve ({
               'currency' : max.currency,
@@ -238,7 +240,7 @@ module.exports = {
       }
     })
   },
-  check_accuracy_of_prediction : function(currency, minute_interval, average_expected_price_fluctuation) {
+  get_current_price : function(currency) {
     var req_url = 'https://api.coinmarketcap.com/v1/ticker/'
 
     var options =  {
@@ -249,53 +251,52 @@ module.exports = {
     }
 
     var price_now = null
-    var price_next_time_period = null
 
     return new Promise((resolve, reject) => {
       var callback = function(error, response, body) {
         if (!error && response.statusCode == 200) {
           var info = JSON.parse(body)
-          // console.log(info)
           for (var x = 0; x < info.length;x++) {
             if (info[x].symbol === currency) {
-              if (!price_now) {
-                price_now = parseFloat(info[x].price_usd)
-                console.log('set price now :', price_now)
-              } else {
-                price_next_time_period =  parseFloat(info[x].price_usd)
-                console.log('set price next :', price_next_time_period)
+              console.log(info[x])
+              price_now = parseFloat(info[x].price_usd)
+              resolve ({price : price_now})
 
-                console.log({
-                  price_now : price_now,
-                  price_next_time_period : price_next_time_period
-                })
-                resolve ({
-                  price_now : price_now,
-                  price_next_time_period : price_next_time_period
-                })
-              }
             }
           }
         }
       }
-      try {
-        request(options, callback)
-        setTimeout(function() {
-          console.log('calling timeout')
-          request(options, callback)
-        }, (minute_interval*1000)*60)
-      } catch (e) {
-        console.log(e)
-      }
+      request(options, callback)
     })
   }
 }
 
-var main = () => {
-  module.exports.determine_currency_with_highest_expected_average_price_change(currencies.currencies, 1000, 1).then((resolution, rejection) => {
-    console.log(resolution)
-    module.exports.check_accuracy_of_prediction(resolution.currency, resolution.time_intervals_minutes, resolution.average_expected_price_flux)
-  })
-}
-
-main()
+// var main = () =>
+//   let currency, time_periods, skip_periods
+//
+//   if (process.argv[2] && currencies.currencies.includes(process.argv[2]) || process.argv[2] && process.argv[2] === 'top') {
+//     currency = process.argv[2]
+//   } else {
+//     currency = 'all'
+//   }
+//   process.argv[3] ? time_periods = parseInt(process.argv[3]) : time_periods = 100
+//   process.argv[4] ? skip_periods = parseInt(process.argv[4]) : skip_periods = 1
+//
+//   if (currency === 'all') {
+//     for (let i = 0; i < currencies.currencies.length;i++) {
+//       module.exports.predict_price_for_next_time_period(currencies.currencies[i], time_periods, skip_periods).then((resolution, rejection) => {
+//         console.log(resolution)
+//       })
+//     }
+//   } else if (currency === 'top') {
+//     module.exports.determine_currency_with_highest_expected_average_price_change(currencies.currencies, time_periods, skip_periods).then((resolution, rejection) => {
+//       console.log(resolution)
+//     })
+//   } else {
+//     module.exports.predict_price_for_next_time_period(currency, time_periods, skip_periods).then((resolution, rejection) => {
+//       console.log(resolution)
+//     })
+//   }
+// }
+//
+// main()
