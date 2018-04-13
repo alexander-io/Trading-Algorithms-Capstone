@@ -119,6 +119,7 @@ def interpolate(previousDatum,currentDatum,dTimePeriod):
 def interpolate(previousDatum,currentDatum,dTimePeriod):
 	if dTimePeriod<=1:return [currentDatum]
 	print('interpolating',dTimePeriod,'datapoints')
+	print(currentDatum)
 	data=[]
 	for x in range(1,dTimePeriod-1):
 		newDatum=copy.deepcopy(previousDatum)
