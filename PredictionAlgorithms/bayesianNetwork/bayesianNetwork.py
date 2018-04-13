@@ -115,7 +115,7 @@ def interpolate(previousDatum,currentDatum,dTimePeriod):
 '''
 
 def interpolate(previousDatum,currentDatum,dTimePeriod):
-	if dTimePeriod==1:return [currentDatum]
+	if dTimePeriod<=1:return [currentDatum]
 	data=[]
 	for x in range(1,dTimePeriod-1):
 		newDatum=copy.deepcopy(previousDatum)
@@ -161,7 +161,7 @@ def main():
 	data=getData(60*24*4)
 	print('60 min data')
 	pp.pprint(data)
-	print(makePrediction(data,'BTC'))
+	#print(makePrediction(data,'BTC'))
 
 
 if __name__ == '__main__':
