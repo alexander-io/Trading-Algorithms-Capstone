@@ -58,10 +58,10 @@ def getData(timePeriod):
 			data=dataSets[symbol]
 
 			print('START')
-			print('previousDocs')
-			print(previousDocs[symbol])
-			print('doc')
-			print(doc)
+			#print('previousDocs')
+			#print(previousDocs[symbol])
+			#print('doc')
+			#print(doc)
 
 
 			#check how many time periods have gone by since previous time period
@@ -88,7 +88,7 @@ def getData(timePeriod):
 					#filter further unwanted fields
 					if key=='symbol' or key=='pagetitle' or key=='timestamp' or key=='last_updated' : continue
 					#create or add to list of data
-					if key in data.keys():
+					if key+symbol in data.keys():
 						data[key+symbol].append(entry[key])
 					else: 
 						data[key+symbol]=[entry[key]]
