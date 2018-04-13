@@ -57,11 +57,11 @@ def getData(timePeriod):
 			#get correct dataset
 			data=dataSets[symbol]
 
-			print('START')
-			print('previousDocs')
-			print(previousDocs[symbol])
-			print('doc')
-			print(doc)
+			#print('START')
+			#print('previousDocs')
+			#print(previousDocs[symbol])
+			#print('doc')
+			#print(doc)
 
 
 			#check how many time periods have gone by since previous time period
@@ -76,11 +76,11 @@ def getData(timePeriod):
 
 			#interpolate missing data and create list for each new datapoint
 			docList=interpolate(previousDocs[symbol],doc,dTimePeriods)
-			print('dTimePeriods')
-			print(dTimePeriods)
-			print('docList')
-			print(docList)
-			print('END')
+			#print('dTimePeriods')
+			#print(dTimePeriods)
+			#print('docList')
+			#print(docList)
+			#print('END')
 			previousDocs[symbol]=doc
 			for entry in docList:
 				#for each field..
@@ -89,12 +89,9 @@ def getData(timePeriod):
 					if key=='symbol' or key=='pagetitle' or key=='timestamp' or key=='last_updated' : continue
 					#create or add to list of data
 					if key in data.keys():
-						if type(entry[key])==list: data[key+symbol]=data[key+symbol]+entry[key]
-						else: data[key+symbol].append(entry[key])
+						data[key+symbol].append(entry[key])
 					else: 
-						if type(entry[key])!=list:value=[entry[key]]
-						else: value=entry[key]
-						data[key+symbol]=value
+						data[key+symbol]=[entry[key]]
 	return dataSets
 
 '''
@@ -121,9 +118,9 @@ def interpolate(previousDatum,currentDatum,dTimePeriod):
 		for key in newDatum:
 			try:
 				newValue=(float(currentDatum[key])-float(previousDatum[key]))/dTimePeriod
-				print('current:',float(currentDatum[key]))
-				print('previous:',float(previousDatum[key]))
-				print('newValue',newValue)
+				#print('current:',float(currentDatum[key]))
+				#print('previous:',float(previousDatum[key]))
+				#print('newValue',newValue)
 				newDatum[key]=newValue*x
 			except:
 				continue
