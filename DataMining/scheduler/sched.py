@@ -40,11 +40,11 @@ def time_update_txt_daily():
 
 
 def once_per_1_min_scripts():
-    subprocess.Popen(['nodejs', path+cmarketcap])
-
+    # subprocess.Popen(['nodejs', path+cmarketcap])
+    pass
 
 def once_per_5_min_scripts():
-    # subprocess.Popen(['nodejs'], path+cmarketcap)
+    subprocess.Popen(['nodejs'], path+cmarketcap)
     pass
 def once_per_15_min_scripts():
     # subprocess.Popen(['nodejs', path+cmarketcap])
