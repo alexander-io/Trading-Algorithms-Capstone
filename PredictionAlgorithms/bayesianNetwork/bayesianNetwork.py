@@ -72,7 +72,7 @@ def getData(timePeriod):
 			dTimePeriods=((int(doc[collection['time']])-int(previousDocs[symbol][collection['time']]))//60)//timePeriod
 			#skip datapoint if not enough time has passed
 			if dTimePeriods<1 and dTimePeriods!=0: continue
-			previousDocs[symbol]=doc
+			
 
 			#interpolate missing data and create list for each new datapoint
 			docList=interpolate(previousDocs[symbol],doc,dTimePeriods)
@@ -81,6 +81,7 @@ def getData(timePeriod):
 			print('docList')
 			print(docList)
 			print('END')
+			previousDocs[symbol]=doc
 			for entry in docList:
 				#for each field..
 				for key in entry.keys():
