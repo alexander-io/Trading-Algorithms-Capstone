@@ -72,7 +72,7 @@ def getData(timePeriod):
 			dTimePeriods=((int(doc[collection['time']])-int(previousDocs[symbol][collection['time']]))//60)/timePeriod
 			#skip datapoint if not enough time has passed
 			print(dTimePeriods)
-			if dTimePeriods<1:# and dTimePeriods!=0: 
+			if dTimePeriods<1 and dTimePeriods!=0: 
 				print('skipping datum')
 				continue
 			
@@ -135,6 +135,7 @@ def interpolate(previousDatum,currentDatum,dTimePeriod):
 				continue
 		data.append(newDatum)
 	data.append(currentDatum)
+	print('added' ,len(data)-1,'additional datum')
 	return data
 
 
