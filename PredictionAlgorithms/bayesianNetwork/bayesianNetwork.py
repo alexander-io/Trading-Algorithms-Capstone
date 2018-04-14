@@ -73,7 +73,7 @@ def getData(timePeriod):
 			#skip datapoint if not enough time has passed
 			print(dTimePeriods)
 			if dTimePeriods<1:# and dTimePeriods!=0: 
-				#print('skipping datum')
+				print('skipping datum')
 				continue
 			
 
