@@ -71,7 +71,7 @@ def getData(timePeriod):
 			#time difference
 			dTimePeriods=((int(doc[collection['time']])-int(previousDocs[symbol][collection['time']]))//60)/timePeriod
 			#skip datapoint if not enough time has passed
-			if collection[collectionTitle]=='wiki_views':
+			if collection['collectionTitle']=='wiki_views':
 				pp.pprint(doc)
 			print(dTimePeriods)
 			if dTimePeriods<1 and dTimePeriods!=0: 
