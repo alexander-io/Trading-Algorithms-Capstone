@@ -125,11 +125,11 @@ def interpolate(previousDatum,currentDatum,dTimePeriod):
 		newDatum=copy.deepcopy(previousDatum)
 		for key in newDatum:
 			try:
-				newValue=(float(currentDatum[key])-float(previousDatum[key]))/dTimePeriod
+				valueChange=(float(currentDatum[key])-float(previousDatum[key]))/dTimePeriod
 				#print('current:',float(currentDatum[key]))
 				#print('previous:',float(previousDatum[key]))
 				#print('newValue',newValue)
-				newDatum[key]=newValue*x
+				newDatum[key]=float(previousDatum[key])+valueChange*x
 			except:
 				continue
 		data.append(newDatum)
