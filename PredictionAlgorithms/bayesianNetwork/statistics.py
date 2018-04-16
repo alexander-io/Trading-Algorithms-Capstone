@@ -214,7 +214,6 @@ def findBestMovingAverageLimit(inputVariable):
 def findBestDistribution(inputVariable):
 	errorList=[]
 	trials=numTrials(len(inputVariable))
-	print(trials)
 	for x in range(len(distributions)):
 		progress(x,len(distributions))
 		error=testDistribution(inputVariable,distributions[x],trials)
@@ -250,7 +249,9 @@ Therefore, with a relativly small dataset of length 20, 100 passes must be run t
 However with a dataset of 500, it would only be tested about 4 times 
 '''
 def numTrials(dataLength):
-	return int((1/dataLength)*2000)
+	trials=int((1/dataLength)*2000)
+	if trials < 1: return 1
+	return trials
 
 
 #########################################

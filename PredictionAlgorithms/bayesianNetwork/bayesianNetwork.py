@@ -123,7 +123,7 @@ def makePrediction(dataSet,coinSymbol):
 		distribution=STAT.findBestDistribution(data)
 		output=getattr(STAT, distribution)(data)
 		prediction+=getattr(GLM, function)(output)
-		print('added a factor')
+		#print('\nadded factor')
 	return prediction
 
 
@@ -132,15 +132,15 @@ def main():
 	data=getData(60*24)
 	print('24 hour prediction')
 	#pp.pprint(data)
-	print(makePrediction(data,'BTC'))
+	print('\n',makePrediction(data,'BTC'))
 	data=getData(60)
 	print('60 min prediction')
 	#pp.pprint(data)
-	print(makePrediction(data,'BTC'))
+	print('\n',makePrediction(data,'BTC'))
 	data=getData(10)
 	print('10 min prediction')
 	#pp.pprint(data)
-	print(makePrediction(data,'BTC'))
+	print('\n',makePrediction(data,'BTC'))
 
 
 if __name__ == '__main__':
