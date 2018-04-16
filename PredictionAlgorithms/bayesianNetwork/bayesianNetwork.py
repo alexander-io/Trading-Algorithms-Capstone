@@ -29,7 +29,8 @@ collections=[{
 	'id':'pagetitle',
 	'time':'timestamp'
 	}]
-translationTable={'Bitcoin':'BTC','Litecoin':'LTC','Ripple_(payment_protocol)':'XRP','Dogecoin':'DOGE','Bitcoin_Cash':'BCH','Ethereum':'ETH','BTC':'BTC','LTC':'LTC','XRP':'XRP','DOGE':'DOGE','BCH':'BCH','ETH':'ETH'}
+symbolTranslationTable={'Bitcoin':'BTC','Litecoin':'LTC','Ripple_(payment_protocol)':'XRP','Dogecoin':'DOGE','Bitcoin_Cash':'BCH','Ethereum':'ETH','BTC':'BTC','LTC':'LTC','XRP':'XRP','DOGE':'DOGE','BCH':'BCH','ETH':'ETH'}
+timeTranslationTable={'wiki_views':1405357584,'coinmarketcap_ticker':0}
 
 #timePeriod in minutes. lower limit is 1
 def getData(timePeriod):
@@ -51,7 +52,7 @@ def getData(timePeriod):
 		for doc in cursor:
 
 			#get translated symbol
-			try:symbol=translationTable[doc[collection['id']]]
+			try:symbol=symbolTranslationTable[doc[collection['id']]]
 			except KeyError: continue
 			if symbol not in dataSets.keys(): continue
 			#get correct dataset
@@ -69,7 +70,10 @@ def getData(timePeriod):
 			#print(previousDocs[symbol])
 			#print(previousDocs[symbol][collection['time']])
 			#time difference
-			dTimePeriods=((int(doc[collection['time']])-int(previousDocs[symbol][collection['time']]))//60)/timePeriod
+			currentTime=int(doc[collection['time']])+timeTranslationTable[collection['collectionTitle']]
+			previousTime=int(previousDocs[symbol][collection['time']])+timeTranslationTable[collection['collectionTitle']]
+
+			dTimePeriods=((currentTime-previousTime)//60)/timePeriod
 			#skip datapoint if not enough time has passed
 			if collection['collectionTitle']=='wiki_views':
 				#pp.pprint(doc)
