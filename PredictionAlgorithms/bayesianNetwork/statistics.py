@@ -215,13 +215,10 @@ def findBestDistribution(inputVariable):
 	errorList=[]
 	trials=numTrials(len(inputVariable))
 	print(trials)
-	for dist in distributions:
-		#if dist=='movingAverage':
-		#	errorList.append((dist,findBestMovingAverageLimit(inputVariable)))
-		#	continue
-		#print('starting',dist)
-		error=testDistribution(inputVariable,dist,trials)
-		errorList.append((error,dist))
+	for x in range(len(distributions)):
+		progress(x,range(len(distributions)))
+		error=testDistribution(inputVariable,distributions[x],trials)
+		errorList.append((error,distributions[x]))
 		#print('\nfinished',dist,'with error',error)
 	errorList.sort()
 	return errorList[0][1]
@@ -235,7 +232,6 @@ def testDistribution(inputVariable,distribution,trials):
 	#if its in another module use instead
 	#output=getattr(bayesianNetwork, distribution)(testSet)
 	for y in range(trials):
-		#progress(y,trials,'Now testing '+distribution)
 		individualError=decimal.Decimal(0)
 		for x in range(len(inputVariable)//2,len(inputVariable)-1):
 			testSet=inputVariable[0:x]
@@ -249,12 +245,12 @@ This function calculates the number of trials needed to find best distribution
 General idea is that with more data we need to test it less times
 Therefore, a function that could output a large number given small number and vice versa is required
 the function I came up with was (1/dataLength)*root(datalength)*447.21
-The 447.21 comes from 100/(1/20)*root(20) because a data set with length 20 should probably be tested about 100 times.
+The 2000 comes from 100/(1/20) because a data set with length 20 should probably be tested about 100 times.
 Therefore, with a relativly small dataset of length 20, 100 passes must be run to gauge data correctly.
-However with a dataset of 500, it would only be tested about 20 times 
+However with a dataset of 500, it would only be tested about 4 times 
 '''
 def numTrials(dataLength):
-	return int((1/dataLength)*math.sqrt(dataLength)*447.21)
+	return int((1/dataLength)*2000)
 
 
 #########################################

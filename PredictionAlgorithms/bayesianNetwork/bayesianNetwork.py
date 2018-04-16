@@ -94,23 +94,17 @@ def getData(timePeriod):
 
 def interpolate(previousDatum,currentDatum,dTimePeriod):
 	if dTimePeriod<=1:return [currentDatum]
-	#print('interpolating',dTimePeriod,'datapoints')
-	#print(currentDatum)
 	data=[]
 	for x in range(1,dTimePeriod-1):
 		newDatum=copy.deepcopy(previousDatum)
 		for key in newDatum:
 			try:
 				valueChange=(float(currentDatum[key])-float(previousDatum[key]))/dTimePeriod
-				#print('current:',float(currentDatum[key]))
-				#print('previous:',float(previousDatum[key]))
-				#print('newValue',newValue)
 				newDatum[key]=float(previousDatum[key])+valueChange*x
 			except:
 				continue
 		data.append(newDatum)
 	data.append(currentDatum)
-	#print('added' ,len(data)-1,'additional datum')
 	return data
 
 
@@ -125,8 +119,6 @@ def makePrediction(dataSet,coinSymbol):
 			except KeyError:
 				continue
 	prediction=getattr(GLM, coinSymbol+'_intercept')()
-	#print(len(usableFunctions))
-	#print(usableFunctions)
 	for function,data in usableFunctions:
 		distribution=STAT.findBestDistribution(data)
 		output=getattr(STAT, distribution)(data)
@@ -136,12 +128,7 @@ def makePrediction(dataSet,coinSymbol):
 
 
 def main():
-	#data=getData(60*24)
-	#print('daily data')
-	#pp.pprint(data)
-	#data=getData(60)
-	#print('hourly data')
-	#pp.pprint(data)	
+	
 	data=getData(60*24)
 	print('24 hour prediction')
 	#pp.pprint(data)
