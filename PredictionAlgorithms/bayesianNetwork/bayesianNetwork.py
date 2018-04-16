@@ -89,6 +89,12 @@ def getData(timePeriod):
 						data[key+symbol].append(entry[key])
 					else: 
 						data[key+symbol]=[entry[key]]
+
+	for symbol in dataSets:
+		for data in dataSets[symbol]:
+			if len(dataSets[symbol][data])>1024:
+				dataSets[symbol][data]=dataSets[symbol][data][len(dataSets[symbol][data])-1024:]
+	print(len(dataSets['BTC']['price_usdBTC']))
 	return dataSets
 
 
