@@ -132,10 +132,12 @@ def makePrediction(dataSet,coinSymbol):
 			except KeyError:
 				continue
 	prediction=getattr(GLM, coinSymbol+'_intercept')()
+	print(len(usableFunctions))
 	for function,data in usableFunctions:
 		distribution=STAT.findBestDistribution(data)
 		output=getattr(STAT, distribution)(data)
 		prediction+=getattr(GLM, function)(output)
+		print('added a factor')
 	return prediction
 
 
