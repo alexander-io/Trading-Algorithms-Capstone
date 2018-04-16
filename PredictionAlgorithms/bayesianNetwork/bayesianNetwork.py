@@ -149,8 +149,16 @@ def main():
 	#print('hourly data')
 	#pp.pprint(data)	
 	data=getData(60*24)
-	print('60 min data')
-	pp.pprint(data)
+	print('24 hour prediction')
+	#pp.pprint(data)
+	print(makePrediction(data,'BTC'))
+	data=getData(60)
+	print('60 min prediction')
+	#pp.pprint(data)
+	print(makePrediction(data,'BTC'))
+	data=getData(10)
+	print('10 min prediction')
+	#pp.pprint(data)
 	print(makePrediction(data,'BTC'))
 
 
