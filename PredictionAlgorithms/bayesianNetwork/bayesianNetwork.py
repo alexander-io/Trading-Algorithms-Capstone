@@ -30,7 +30,7 @@ collections=[{
 	'time':'timestamp'
 	}]
 symbolTranslationTable={'Bitcoin':'BTC','Litecoin':'LTC','Ripple_(payment_protocol)':'XRP','Dogecoin':'DOGE','Bitcoin_Cash':'BCH','Ethereum':'ETH','BTC':'BTC','LTC':'LTC','XRP':'XRP','DOGE':'DOGE','BCH':'BCH','ETH':'ETH'}
-timeTranslationTable={'wiki_views':0,'coinmarketcap_ticker':60}
+timeTranslationTable={'wiki_views':1,'coinmarketcap_ticker':60}
 
 #timePeriod in minutes. lower limit is 1
 def getData(timePeriod):
