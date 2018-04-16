@@ -73,6 +73,10 @@ def getData(timePeriod):
 			#skip datapoint if not enough time has passed
 			if collection['collectionTitle']=='wiki_views':
 				pp.pprint(doc)
+				print(len(doc[collection['time']]))
+
+			if collection['collectionTitle']=='coinmarketcap_ticker':
+				print(len(doc[collection['time']]))
 			print(dTimePeriods)
 			if dTimePeriods<1 and dTimePeriods!=0: 
 				print('skipping datum')
@@ -91,7 +95,7 @@ def getData(timePeriod):
 				#for each field..
 				for key in entry.keys():
 					#filter further unwanted fields
-					if key=='symbol' or key=='pagetitle' or key=='timestamp' or key=='last_updated' : continue
+					if key=='symbol' or key=='pagetitle' or key=='timestamp' or key=='last_updated' or key=='unix_time' : continue
 
 					if type(entry[key])==str:
 						try: entry[key]=float(entry[key])
