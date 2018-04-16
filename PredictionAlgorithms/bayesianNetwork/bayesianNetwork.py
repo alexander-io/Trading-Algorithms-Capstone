@@ -73,6 +73,10 @@ def getData(timePeriod):
 			try:
 				currentTime=int(doc[collection['time']])
 				previousTime=int(previousDocs[symbol][collection['time']])
+				if collection['collectionTitle']=='wiki_views':
+					#pp.pprint(doc)
+					print('wiki time len',len(doc[collection['time']]))
+					print(doc[collection['time']])
 			except:
 				print('bad datum, couldnt find time, skipping')
 			print('Ctime',currentTime)
@@ -80,10 +84,6 @@ def getData(timePeriod):
 
 			dTimePeriods=((currentTime-previousTime)//timeTranslationTable[collection['collectionTitle']])/timePeriod
 			#skip datapoint if not enough time has passed
-			if collection['collectionTitle']=='wiki_views':
-				#pp.pprint(doc)
-				print('wiki time len',len(doc[collection['time']]))
-				print(doc[collection['time']])
 
 			#if collection['collectionTitle']=='coinmarketcap_ticker':
 			#	print('coinmarketcap_ticker time len',len(doc[collection['time']]))
