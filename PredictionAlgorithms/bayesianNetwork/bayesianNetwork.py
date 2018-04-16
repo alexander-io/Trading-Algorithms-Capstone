@@ -58,17 +58,8 @@ def getData(timePeriod):
 			#get correct dataset
 			data=dataSets[symbol]
 
-			#print('START')
-			#print('previousDocs')
-			#print(previousDocs[symbol])
-			#print('doc')
-			#print(doc)
-
-
 			#check how many time periods have gone by since previous time period
 			if previousDocs[symbol] == None: previousDocs[symbol]=doc
-			#print(previousDocs[symbol])
-			#print(previousDocs[symbol][collection['time']])
 			#time difference
 			try:
 				currentTime=int(doc[collection['time']])
@@ -84,29 +75,18 @@ def getData(timePeriod):
 
 			dTimePeriods=((currentTime-previousTime)//timeTranslationTable[collection['collectionTitle']])/timePeriod
 			#skip datapoint if not enough time has passed
-
-			#if collection['collectionTitle']=='coinmarketcap_ticker':
-			#	print('coinmarketcap_ticker time len',len(doc[collection['time']]))
-			#	print(doc[collection['time']])
-			print(dTimePeriods)
 			if dTimePeriods<1 and dTimePeriods!=0: 
 				#print('skipping datum')
 				continue
-			
-
 			#interpolate missing data and create list for each new datapoint
 			docList=interpolate(previousDocs[symbol],doc,int(dTimePeriods))
-			print('dTimePeriods')
-			print(dTimePeriods)
-			#print('docList')
-			#print(docList)
-			#print('END')
+
 			previousDocs[symbol]=doc
 			for entry in docList:
 				#for each field..
 				for key in entry.keys():
 					#filter further unwanted fields
-					if key=='symbol' or key=='pagetitle' or key=='unix_time' or key=='last_updated' or key=='unix_time' : continue
+					if key=='symbol' or key=='pagetitle' or key=='unix_time' or key=='last_updated': continue
 
 					if type(entry[key])==str:
 						try: entry[key]=float(entry[key])
@@ -118,21 +98,6 @@ def getData(timePeriod):
 						data[key+symbol]=[entry[key]]
 	return dataSets
 
-'''
-def interpolate(previousDatum,currentDatum,dTimePeriod):
-	if dTimePeriod==1:return [currentDatum]
-	for field in previousDatum:
-		try:
-			previous=float(previousDatum[field])
-			current=float(currentDatum[field])
-			currentDatum[field]=[]
-			for x in range(1,dTimePeriod):
-				interpolation=previousDatum[field]+((current-previous)/dTimePeriod)*x
-				currentDatum[field].append(interpolation)
-		except:
-			currentDatum[field]=[currentDatum[field]*dTimePeriod]
-	return currentDatum
-'''
 
 def interpolate(previousDatum,currentDatum,dTimePeriod):
 	if dTimePeriod<=1:return [currentDatum]
@@ -184,7 +149,7 @@ def main():
 	data=getData(60*24)
 	print('60 min data')
 	pp.pprint(data)
-	#print(makePrediction(data,'BTC'))
+	print(makePrediction(data,'BTC'))
 
 
 if __name__ == '__main__':
