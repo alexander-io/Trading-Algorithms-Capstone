@@ -226,7 +226,8 @@ def findBestDistribution(inputVariable):
 
 def testDistribution(inputVariable,distribution):
 	totalError=decimal.Decimal(0)
-	trials=100
+	trials=numTrials(len(inputVariable))
+	print(trials)
 	#stuff for calling function from a string name
 	possibles = globals().copy()
 	possibles.update(locals())
@@ -242,6 +243,18 @@ def testDistribution(inputVariable,distribution):
 			individualError+=(decimal.Decimal(inputVariable[x+1]-output)**2)/x
 		totalError+=individualError
 	return totalError/trials
+
+'''
+This function calculates the number of trials needed to find best distribution
+General idea is that with more data we need to test it less times
+Therefore, a function that could output a large number given small number and vice versa is required
+the function I came up with was (1/dataLength)*root(datalength)*670.83
+The 782.63 comes from 150/(1/20)*root(20) because a data set with length 20 should probably be tested about 150 times.
+Therefore, with a relativly small dataset of length 20, 150 passes must be run to gauge data correctly.
+However with a dataset of 500, it would only be tested about 30 times 
+'''
+def numTrials(dataLength):
+	return int((1/dataLength)*math.sqrt(datalength)*670.83)
 
 
 #########################################
