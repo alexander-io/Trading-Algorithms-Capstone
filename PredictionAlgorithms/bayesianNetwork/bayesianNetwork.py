@@ -73,6 +73,9 @@ def getData(timePeriod):
 			currentTime=int(doc[collection['time']])+timeTranslationTable[collection['collectionTitle']]
 			previousTime=int(previousDocs[symbol][collection['time']])+timeTranslationTable[collection['collectionTitle']]
 
+			print('Ctime',currentTime,int(doc[collection['time']]))
+			print('Ptime',previousTime,int(previousDocs[symbol][collection['time']]))
+
 			dTimePeriods=((currentTime-previousTime)//60)/timePeriod
 			#skip datapoint if not enough time has passed
 			if collection['collectionTitle']=='wiki_views':
@@ -91,8 +94,8 @@ def getData(timePeriod):
 
 			#interpolate missing data and create list for each new datapoint
 			docList=interpolate(previousDocs[symbol],doc,int(dTimePeriods))
-			#print('dTimePeriods')
-			#print(dTimePeriods)
+			print('dTimePeriods')
+			print(dTimePeriods)
 			#print('docList')
 			#print(docList)
 			#print('END')
