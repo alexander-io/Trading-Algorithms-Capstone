@@ -216,7 +216,7 @@ def findBestDistribution(inputVariable):
 	trials=numTrials(len(inputVariable))
 	print(trials)
 	for x in range(len(distributions)):
-		progress(x,range(len(distributions)))
+		progress(x,len(distributions))
 		error=testDistribution(inputVariable,distributions[x],trials)
 		errorList.append((error,distributions[x]))
 		#print('\nfinished',dist,'with error',error)
