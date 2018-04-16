@@ -80,14 +80,14 @@ def getData(timePeriod):
 
 			dTimePeriods=((currentTime-previousTime)//timeTranslationTable[collection['collectionTitle']])/timePeriod
 			#skip datapoint if not enough time has passed
-			#if collection['collectionTitle']=='wiki_views':
+			if collection['collectionTitle']=='wiki_views':
 				#pp.pprint(doc)
-				#print('wiki time len',len(doc[collection['time']]))
-				#print(doc[collection['time']])
-
-			if collection['collectionTitle']=='coinmarketcap_ticker':
-				print('coinmarketcap_ticker time len',len(doc[collection['time']]))
+				print('wiki time len',len(doc[collection['time']]))
 				print(doc[collection['time']])
+
+			#if collection['collectionTitle']=='coinmarketcap_ticker':
+			#	print('coinmarketcap_ticker time len',len(doc[collection['time']]))
+			#	print(doc[collection['time']])
 			print(dTimePeriods)
 			if dTimePeriods<1 and dTimePeriods!=0: 
 				#print('skipping datum')
