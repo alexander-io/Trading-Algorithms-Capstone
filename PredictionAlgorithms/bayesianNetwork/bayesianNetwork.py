@@ -65,8 +65,7 @@ def getData(timePeriod):
 				currentTime=int(doc[collection['time']])
 				previousTime=int(previousDocs[symbol][collection['time']])
 			except:
-				continue
-
+				pass
 			dTimePeriods=((currentTime-previousTime)//timeTranslationTable[collection['collectionTitle']])/timePeriod
 			#skip datapoint if not enough time has passed
 			if dTimePeriods<1 and dTimePeriods!=0: 
@@ -127,6 +126,7 @@ def makePrediction(dataSet,coinSymbol):
 				continue
 	prediction=getattr(GLM, coinSymbol+'_intercept')()
 	print(len(usableFunctions))
+	print(usableFunctions)
 	for function,data in usableFunctions:
 		distribution=STAT.findBestDistribution(data)
 		output=getattr(STAT, distribution)(data)
