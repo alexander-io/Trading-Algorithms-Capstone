@@ -72,14 +72,16 @@ def getData(timePeriod):
 			dTimePeriods=((int(doc[collection['time']])-int(previousDocs[symbol][collection['time']]))//60)/timePeriod
 			#skip datapoint if not enough time has passed
 			if collection['collectionTitle']=='wiki_views':
-				pp.pprint(doc)
+				#pp.pprint(doc)
 				print('wiki time len',len(doc[collection['time']]))
+				print(doc[collection['time']])
 
 			if collection['collectionTitle']=='coinmarketcap_ticker':
 				print('coinmarketcap_ticker time len',len(doc[collection['time']]))
+				print(doc[collection['time']])
 			print(dTimePeriods)
 			if dTimePeriods<1 and dTimePeriods!=0: 
-				print('skipping datum')
+				#print('skipping datum')
 				continue
 			
 
@@ -125,8 +127,8 @@ def interpolate(previousDatum,currentDatum,dTimePeriod):
 
 def interpolate(previousDatum,currentDatum,dTimePeriod):
 	if dTimePeriod<=1:return [currentDatum]
-	print('interpolating',dTimePeriod,'datapoints')
-	print(currentDatum)
+	#print('interpolating',dTimePeriod,'datapoints')
+	#print(currentDatum)
 	data=[]
 	for x in range(1,dTimePeriod-1):
 		newDatum=copy.deepcopy(previousDatum)
@@ -141,7 +143,7 @@ def interpolate(previousDatum,currentDatum,dTimePeriod):
 				continue
 		data.append(newDatum)
 	data.append(currentDatum)
-	print('added' ,len(data)-1,'additional datum')
+	#print('added' ,len(data)-1,'additional datum')
 	return data
 
 
