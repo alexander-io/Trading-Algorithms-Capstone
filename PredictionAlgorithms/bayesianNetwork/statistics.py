@@ -214,20 +214,20 @@ def findBestMovingAverageLimit(inputVariable):
 def findBestDistribution(inputVariable):
 	errorList=[]
 	for dist in distributions:
+		trials=numTrials(len(inputVariable))
+		print(trials)
 		#if dist=='movingAverage':
 		#	errorList.append((dist,findBestMovingAverageLimit(inputVariable)))
 		#	continue
 		#print('starting',dist)
-		error=testDistribution(inputVariable,dist)
+		error=testDistribution(inputVariable,dist,trials)
 		errorList.append((error,dist))
 		#print('\nfinished',dist,'with error',error)
 	errorList.sort()
 	return errorList[0][1]
 
-def testDistribution(inputVariable,distribution):
+def testDistribution(inputVariable,distribution,trials):
 	totalError=decimal.Decimal(0)
-	trials=numTrials(len(inputVariable))
-	print(trials)
 	#stuff for calling function from a string name
 	possibles = globals().copy()
 	possibles.update(locals())
