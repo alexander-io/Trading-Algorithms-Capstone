@@ -25,9 +25,9 @@ collections=[{
 	},
 	{
 	'collectionTitle':'wiki_views',
-	'projection':{'timestamp':1,'pagetitle':1,'views':1,'_id':0},
+	'projection':{'unix_time':1,'pagetitle':1,'views':1,'_id':0},
 	'id':'pagetitle',
-	'time':'timestamp'
+	'time':'unix_time'
 	}]
 symbolTranslationTable={'Bitcoin':'BTC','Litecoin':'LTC','Ripple_(payment_protocol)':'XRP','Dogecoin':'DOGE','Bitcoin_Cash':'BCH','Ethereum':'ETH','BTC':'BTC','LTC':'LTC','XRP':'XRP','DOGE':'DOGE','BCH':'BCH','ETH':'ETH'}
 timeTranslationTable={'wiki_views':1,'coinmarketcap_ticker':60}
@@ -70,15 +70,20 @@ def getData(timePeriod):
 			#print(previousDocs[symbol])
 			#print(previousDocs[symbol][collection['time']])
 			#time difference
-			currentTime=int(doc[collection['time']])
-			previousTime=int(previousDocs[symbol][collection['time']])
+			try:
+				currentTime=int(doc[collection['time']])
+				previousTime=int(previousDocs[symbol][collection['time']])
+			except:
+				print('bad datum, couldnt find time, skipping')
+			print('Ctime',currentTime)
+			print('Ptime',previousTime)
 
 			dTimePeriods=((currentTime-previousTime)//timeTranslationTable[collection['collectionTitle']])/timePeriod
 			#skip datapoint if not enough time has passed
-			if collection['collectionTitle']=='wiki_views':
+			#if collection['collectionTitle']=='wiki_views':
 				#pp.pprint(doc)
-				print('wiki time len',len(doc[collection['time']]))
-				print(doc[collection['time']])
+				#print('wiki time len',len(doc[collection['time']]))
+				#print(doc[collection['time']])
 
 			if collection['collectionTitle']=='coinmarketcap_ticker':
 				print('coinmarketcap_ticker time len',len(doc[collection['time']]))
@@ -101,7 +106,7 @@ def getData(timePeriod):
 				#for each field..
 				for key in entry.keys():
 					#filter further unwanted fields
-					if key=='symbol' or key=='pagetitle' or key=='timestamp' or key=='last_updated' or key=='unix_time' : continue
+					if key=='symbol' or key=='pagetitle' or key=='unix_time' or key=='last_updated' or key=='unix_time' : continue
 
 					if type(entry[key])==str:
 						try: entry[key]=float(entry[key])
