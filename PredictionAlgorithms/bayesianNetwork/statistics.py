@@ -254,7 +254,7 @@ Therefore, with a relativly small dataset of length 20, 150 passes must be run t
 However with a dataset of 500, it would only be tested about 30 times 
 '''
 def numTrials(dataLength):
-	return int((1/dataLength)*math.sqrt(datalength)*670.83)
+	return int((1/dataLength)*math.sqrt(dataLength)*670.83)
 
 
 #########################################
