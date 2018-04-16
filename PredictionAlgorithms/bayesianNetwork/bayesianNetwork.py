@@ -73,10 +73,10 @@ def getData(timePeriod):
 			#skip datapoint if not enough time has passed
 			if collection['collectionTitle']=='wiki_views':
 				pp.pprint(doc)
-				print(len(doc[collection['time']]))
+				print('wiki time len',len(doc[collection['time']]))
 
 			if collection['collectionTitle']=='coinmarketcap_ticker':
-				print(len(doc[collection['time']]))
+				print('coinmarketcap_ticker time len',len(doc[collection['time']]))
 			print(dTimePeriods)
 			if dTimePeriods<1 and dTimePeriods!=0: 
 				print('skipping datum')
