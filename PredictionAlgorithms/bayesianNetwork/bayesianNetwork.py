@@ -30,7 +30,7 @@ collections=[{
 	'time':'timestamp'
 	}]
 symbolTranslationTable={'Bitcoin':'BTC','Litecoin':'LTC','Ripple_(payment_protocol)':'XRP','Dogecoin':'DOGE','Bitcoin_Cash':'BCH','Ethereum':'ETH','BTC':'BTC','LTC':'LTC','XRP':'XRP','DOGE':'DOGE','BCH':'BCH','ETH':'ETH'}
-timeTranslationTable={'wiki_views':1405357584,'coinmarketcap_ticker':0}
+timeTranslationTable={'wiki_views':0,'coinmarketcap_ticker':60}
 
 #timePeriod in minutes. lower limit is 1
 def getData(timePeriod):
@@ -70,13 +70,10 @@ def getData(timePeriod):
 			#print(previousDocs[symbol])
 			#print(previousDocs[symbol][collection['time']])
 			#time difference
-			currentTime=int(doc[collection['time']])+timeTranslationTable[collection['collectionTitle']]
-			previousTime=int(previousDocs[symbol][collection['time']])+timeTranslationTable[collection['collectionTitle']]
+			currentTime=int(doc[collection['time']])
+			previousTime=int(previousDocs[symbol][collection['time']])
 
-			print('Ctime',currentTime,int(doc[collection['time']]))
-			print('Ptime',previousTime,int(previousDocs[symbol][collection['time']]))
-
-			dTimePeriods=((currentTime-previousTime)//60)/timePeriod
+			dTimePeriods=((currentTime-previousTime)//timeTranslationTable[collection['collectionTitle']])/timePeriod
 			#skip datapoint if not enough time has passed
 			if collection['collectionTitle']=='wiki_views':
 				#pp.pprint(doc)
