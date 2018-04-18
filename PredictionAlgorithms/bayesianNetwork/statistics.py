@@ -107,7 +107,7 @@ def median(inputVariable,limit=None):
 #										#
 #########################################
 
-distributions=['MA49','MA42','MA35','MA28','MA21','MA14','MA7','median','mode','simpleAverage','movingAverage','binomialDist','RECENTtriangularDist','MEANtriangularDist','triangularDist','betaDist','exponentialDist','uniformDist','cauchyDist','geometricDist','poissonDist','normalDist']
+distributions=['mode','median','MA49','MA42','MA35','MA28','MA21','MA14','MA7','median','mode','simpleAverage','movingAverage','binomialDist','RECENTtriangularDist','MEANtriangularDist','triangularDist','betaDist','exponentialDist','uniformDist','cauchyDist','geometricDist','poissonDist','normalDist']
 
 def getDistributions():
 	return distributions
@@ -249,7 +249,7 @@ Therefore, with a relativly small dataset of length 20, 100 passes must be run t
 However with a dataset of 500, it would only be tested about 4 times 
 '''
 def numTrials(dataLength):
-	trials=int((1/dataLength)*2000)
+	trials=int(2000/dataLength)
 	if trials < 1: return 1
 	return trials
 

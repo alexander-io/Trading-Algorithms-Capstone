@@ -33,7 +33,8 @@ symbolTranslationTable={'Bitcoin':'BTC','Litecoin':'LTC','Ripple_(payment_protoc
 timeTranslationTable={'wiki_views':60*1000,'coinmarketcap_ticker':60}
 
 #timePeriod in minutes. lower limit is 1
-def getData(timePeriod):
+def getData(timePeriod, dataLimit=1024):
+	if dataLimit>1024: dataLimit=1024
 	#dict to store data
 	dataSets={}
 	#create dict for each coin's data
@@ -50,7 +51,6 @@ def getData(timePeriod):
 			previousDocs[symbol]=None
 		#for each param...
 		for doc in cursor:
-
 			#get translated symbol
 			try:symbol=symbolTranslationTable[doc[collection['id']]]
 			except KeyError: continue
@@ -92,9 +92,9 @@ def getData(timePeriod):
 
 	for symbol in dataSets:
 		for data in dataSets[symbol]:
-			if len(dataSets[symbol][data])>1024:
-				dataSets[symbol][data]=dataSets[symbol][data][len(dataSets[symbol][data])-1024:]
-	print(len(dataSets['BTC']['price_usdBTC']))
+			if len(dataSets[symbol][data])>dataLimit:
+				dataSets[symbol][data]=dataSets[symbol][data][len(dataSets[symbol][data])-dataLimit:]
+	#print(len(dataSets['BTC']['price_usdBTC']))
 	return dataSets
 
 
@@ -112,6 +112,15 @@ def interpolate(previousDatum,currentDatum,dTimePeriod):
 		data.append(newDatum)
 	data.append(currentDatum)
 	return data
+
+
+def sliceData(data, sliceLength, start):
+	newData={}
+	for symbol in data:
+		newData[symbol]={}
+		for key in data[symbol]:
+			newData[symbol][key]=data[symbol][key][start:start+sliceLength]
+	return newData
 
 
 def makePrediction(dataSet,coinSymbol):
@@ -137,7 +146,7 @@ def main():
 	
 	data=getData(60*24)
 	print('24 hour prediction')
-	#pp.pprint(data)
+	pp.pprint(data)
 	print('\n',makePrediction(data,'BTC'))
 	data=getData(60)
 	print('60 min prediction')
