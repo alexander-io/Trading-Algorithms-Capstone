@@ -122,6 +122,14 @@ def sliceData(data, sliceLength, start):
 			newData[symbol][key]=data[symbol][key][start:start+sliceLength]
 	return newData
 
+def getDataLength(data):
+	length=1000000
+	for symbol in data:
+		for key in data[symbol]:
+			if len(data[symbol][key])<length:
+				length=len(data[symbol][key])
+	return length
+
 
 def makePrediction(dataSet,coinSymbol):
 	coinFunctions=GLM.getCoins()[coinSymbol]
