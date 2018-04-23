@@ -113,15 +113,6 @@ def interpolate(previousDatum,currentDatum,dTimePeriod):
 	data.append(currentDatum)
 	return data
 
-
-def sliceData(data, sliceLength, start):
-	newData={}
-	for symbol in data:
-		newData[symbol]={}
-		for key in data[symbol]:
-			newData[symbol][key]=data[symbol][key][start:start+sliceLength]
-	return newData
-
 def getDataLength(data):
 	length=1000000
 	for symbol in data:
@@ -154,7 +145,7 @@ def main():
 	
 	data=getData(60*24)
 	print('24 hour prediction')
-	pp.pprint(data)
+	#pp.pprint(data)
 	print('\n',makePrediction(data,'BTC'))
 	data=getData(60)
 	print('60 min prediction')
