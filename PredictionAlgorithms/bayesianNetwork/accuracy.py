@@ -30,6 +30,7 @@ def testTimePeriods(coinSymbol,maxTimePeriod):
 			data=BN.getData(timePeriod*60)
 			timePeriodError=0
 			dataLength=lenData(data)
+			print(dataLength)
 			for x in range(dataLength//2,dataLength-1):
 				testSet=sliceData(data,x,0)
 				output=BN.makePrediction(testSet,coinSymbol)
@@ -39,13 +40,15 @@ def testTimePeriods(coinSymbol,maxTimePeriod):
 
 
 def lenData(data):
-	print(data[list(data.keys())[0]])
+	print(data[list(data)[0]][list(data[list(data)[0]])[0]])
+	#print(data[list(data.keys())[0]])
 	#print(len(data[data.keys()]))
-	return len(data[list(data.keys())[0]])
+	#fix. right now only returns symbols list
+	return len(data[list(data)[0]][list(data[list(data)[0]])[0]])
 
 
 def main():
-	testTimePeriods('BTC',7*24)
+	testTimePeriods('BTC',24)
 
 
 
