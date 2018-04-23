@@ -1,4 +1,4 @@
-var initial_time_periods = 256
+var initial_time_periods = 10
   var socket = io.connect('http://localhost:8080');
   var list_of_currencies = null
 

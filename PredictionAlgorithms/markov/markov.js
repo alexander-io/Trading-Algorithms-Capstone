@@ -126,7 +126,7 @@ module.exports = {
           key_builder += '->'+list_of_state_keys[j]
         }
       }
-      console.log(key_builder)
+      // console.log(key_builder)
 
       if (map_of_state_key_freq[key_builder]) {
         if (map_of_state_key_freq[key_builder][list_of_state_keys[i-n_states]]) {
@@ -139,6 +139,8 @@ module.exports = {
         map_of_state_key_freq[key_builder][list_of_state_keys[i-n_states]] = 1
       }
     }
+
+
     delete map_of_state_key_freq.undefined
     return map_of_state_key_freq
   },
@@ -150,6 +152,14 @@ module.exports = {
     let most_recent_range = array_of_price_fluctuation_ranges.slice(0,2)
 
     return most_recent_range[1]+'->'+most_recent_range[0]
+  },
+  get_n_most_recent_price_change_range : function(array_of_price_fluctuation_ranges, num_states) {
+    let most_recent_range = array_of_price_fluctuation_ranges.slice(0, num_states)
+    let builder = most_recent_range[most_recent_range.length-1]
+    for (let i = most_recent_range.length-2; i >= 0; i--) {
+      builder += '->' + most_recent_range[i]
+    }
+    return builder
   },
 
   /*
@@ -169,6 +179,11 @@ module.exports = {
     var max_val = 0
     var max = null
     var max_arr = []
+    // XXX test print
+    // console.log('recent', most_recent_price_fluctuation)
+    // console.log('freq', next_state_occurance_frequency)
+    // console.log('freq->recent', next_state_occurance_frequency[most_recent_price_fluctuation])
+    // console.log(next_state_occurance_frequency, most_recent_price_fluctuation)
     // initialize the max value to be any object in map
     for (x in next_state_occurance_frequency[most_recent_price_fluctuation]) {
       max_val = next_state_occurance_frequency[most_recent_price_fluctuation][x]
@@ -211,7 +226,7 @@ module.exports = {
       average_expected_price_fluctuation : running_total/num_elems
     }
   },
-  predict_price_for_next_time_period : function(currency, time_periods, minute_interval) {
+  predict_price_for_next_time_period : function(currency, time_periods, minute_interval, num_states) {
     return new Promise((resolve, reject) => {
       funx.get_array_n_most_recent_prices_cmarketcap_by_currency_title_skip_k_periods(currency, time_periods, minute_interval).then((resolution, rejection) => {
         // generate array of price percent changes_
@@ -220,26 +235,14 @@ module.exports = {
         // let n = array of prices length
         // length of percent_change_arr is n-1 because percent change is determined via interpolation between two time periods
         percent_change_arr.pop()
-        // console.log(percent_change_arr)
 
         var list_of_state_keys = this.make_list_of_state_keys(percent_change_arr)
-        // console.log(list_of_state_keys)
 
-        var most_recent_price_fluctuation = this.get_most_recent_price_change_range(list_of_state_keys)
-        // var most_recent_price_fluctuation = this.get_double_most_recent_price_change_range(list_of_state_keys)
+        var most_recent_price_fluctuation = this.get_n_most_recent_price_change_range(list_of_state_keys, num_states)
 
-        var next_state_occurance_frequency = this.make_state_next_state_occurance_frequency_map(list_of_state_keys)
-        // var next_state_occurance_frequency = this.make_double_state_next_state_occurance_frequency_map(list_of_state_keys)
-        // var next_state_occurance_frequency = this.make_n_state_next_state_occurance_frequency_map(list_of_state_keys, 5)
-
-        // console.log(next_state_occurance_frequency)
-
-
-        // console.log(most_recent_price_fluctuation, next_state_occurance_frequency)
+        var next_state_occurance_frequency = this.make_n_state_next_state_occurance_frequency_map(list_of_state_keys, num_states)
 
         var max_arr_AND_average_expected_price_flux = this.determine_array_of_likely_next_state_AND_average_expected_price_fluctuation(next_state_occurance_frequency, most_recent_price_fluctuation)
-
-        // console.log(max_arr_AND_average_expected_price_flux)
 
         resolve ({
           currency : currency,
@@ -254,15 +257,18 @@ module.exports = {
       })
     })
   },
-  determine_currency_with_highest_expected_average_price_change : function(list_of_currencies, time_periods, minute_interval) {
+  determine_currency_with_highest_expected_average_price_change : function(list_of_currencies, time_periods, minute_interval, num_states) {
     return new Promise((resolve, reject) => {
       var semaphore = 0
       let max_val = 0
       let max = 0
 
       for (let i = 0; i < list_of_currencies.length; i++) {
-        module.exports.predict_price_for_next_time_period(list_of_currencies[i], time_periods, minute_interval).then((resolution, rejection) => {
+        module.exports.predict_price_for_next_time_period(list_of_currencies[i], time_periods, minute_interval, num_states).then((resolution, rejection) => {
+
+
           if (rejection) reject(rejection)
+
           // spin lock
           while(semaphore < 0) {
             if (semaphore >= 0) break
@@ -324,7 +330,7 @@ module.exports = {
 }
 
 var main = () => {
-  let currency, time_periods, skip_periods
+  let currency, time_periods, skip_periods, num_states
 
   if (process.argv[2] && currencies.currencies.includes(process.argv[2]) || process.argv[2] && process.argv[2] === 'top') {
     currency = process.argv[2]
@@ -333,22 +339,25 @@ var main = () => {
   }
   process.argv[3] ? time_periods = parseInt(process.argv[3]) : time_periods = 100
   process.argv[4] ? skip_periods = parseInt(process.argv[4]) : skip_periods = 1
+  process.argv[5] ? num_states = parseInt(process.argv[5]) : num_states = 1
+
+  console.log('num states ::', num_states)
 
   if (currency === 'all') {
     for (let i = 0; i < currencies.currencies.length;i++) {
-      module.exports.predict_price_for_next_time_period(currencies.currencies[i], time_periods, skip_periods).then((resolution, rejection) => {
+      module.exports.predict_price_for_next_time_period(currencies.currencies[i], time_periods, skip_periods, num_states).then((resolution, rejection) => {
         console.log(resolution)
       })
     }
   } else if (currency === 'top') {
-    module.exports.determine_currency_with_highest_expected_average_price_change(currencies.currencies, time_periods, skip_periods).then((resolution, rejection) => {
+    module.exports.determine_currency_with_highest_expected_average_price_change(currencies.currencies, time_periods, skip_periods, num_states).then((resolution, rejection) => {
       console.log(resolution)
     })
   } else {
-    module.exports.predict_price_for_next_time_period(currency, time_periods, skip_periods).then((resolution, rejection) => {
+    module.exports.predict_price_for_next_time_period(currency, time_periods, skip_periods, num_states).then((resolution, rejection) => {
       console.log(resolution)
     })
   }
 }
-//
+
 main()
