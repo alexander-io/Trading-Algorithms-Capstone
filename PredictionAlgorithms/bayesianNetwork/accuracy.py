@@ -26,11 +26,11 @@ def testTimePeriods(coinSymbol,maxTimePeriod):
 	with open('accuracyGraph.csv', 'w', newline='') as csvfile:
 		csvWriter = csv.writer(csvfile)
 		for timePeriod in range(1,maxTimePeriod):
-			progress(timePeriod,maxTimePeriod)
+			print('testing timePeriod',timePeriod,'out of',maxTimePeriod)
 			data=BN.getData(timePeriod*60)
 			timePeriodError=0
 			dataLength=lenData(data)
-			print(dataLength)
+			#print(dataLength)
 			for x in range(dataLength//2,dataLength-1):
 				testSet=sliceData(data,x,0)
 				output=BN.makePrediction(testSet,coinSymbol)
