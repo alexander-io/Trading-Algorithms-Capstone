@@ -40,7 +40,7 @@ def testTimePeriods(coinSymbol,maxTimePeriod):
 
 
 def lenData(data):
-	print(data[list(data)[0]][list(data[list(data)[0]])[0]])
+	#print(data[list(data)[0]][list(data[list(data)[0]])[0]])
 	#print(data[list(data.keys())[0]])
 	#print(len(data[data.keys()]))
 	#fix. right now only returns symbols list
