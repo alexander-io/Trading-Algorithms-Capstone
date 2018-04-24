@@ -32,7 +32,7 @@ def testTimePeriods(coinSymbol,maxTimePeriod):
 		#for x in range(dataLength//2,dataLength-1):
 		#	testSet=sliceData(data,x,0)
 		output=BN.makePrediction(data,coinSymbol)
-		timePeriodError+=((data[coinSymbol]['price_usd'+coinSymbol][x+1]-output)**2)/x
+		timePeriodError+=((data[coinSymbol]['price_usd'+coinSymbol][x+1]-output)**2)/dataLength
 		with open('accuracyGraph.csv', 'w', newline='') as csvfile:
 			csvWriter = csv.writer(csvfile)
 			csvWriter.writerow((timePeriodError,timePeriod))
