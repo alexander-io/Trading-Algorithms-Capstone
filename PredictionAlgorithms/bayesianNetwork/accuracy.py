@@ -23,8 +23,6 @@ def sliceData(data, sliceLength, start):
 
 #tests accuracy at the hour by hour level
 def testTimePeriods(coinSymbol,maxTimePeriod):
-	with open('accuracyGraph.csv', 'w', newline='') as csvfile:
-		csvWriter = csv.writer(csvfile)
 		for timePeriod in range(1,maxTimePeriod):
 			print('testing timePeriod',timePeriod,'out of',maxTimePeriod)
 			data=BN.getData(timePeriod*60)
@@ -35,8 +33,10 @@ def testTimePeriods(coinSymbol,maxTimePeriod):
 				testSet=sliceData(data,x,0)
 				output=BN.makePrediction(testSet,coinSymbol)
 				timePeriodError+=((data[coinSymbol]['price_usd'+coinSymbol][x+1]-output)**2)/x
-			csvWriter.writerow((timePeriodError,timePeriod))
-	csvfile.close()
+			with open('accuracyGraph.csv', 'w', newline='') as csvfile:
+				csvWriter = csv.writer(csvfile)
+				csvWriter.writerow((timePeriodError,timePeriod))
+			csvfile.close()
 
 
 def lenData(data):
