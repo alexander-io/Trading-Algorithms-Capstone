@@ -231,7 +231,7 @@ def testDistribution(inputVariable,distribution,trials):
 	#if its in another module use instead
 	#output=getattr(bayesianNetwork, distribution)(testSet)
 	for y in range(trials):
-		individualError=decimal.Decimal(0)
+		individualError=0.0
 		for x in range(len(inputVariable)//2,len(inputVariable)-1):
 			testSet=inputVariable[0:x]
 			output=dist(testSet)
