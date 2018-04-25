@@ -223,7 +223,7 @@ def findBestDistribution(inputVariable):
 	return errorList[0][1]
 
 def testDistribution(inputVariable,distribution,trials):
-	totalError=decimal.Decimal(0)
+	totalError=0
 	#stuff for calling function from a string name
 	possibles = globals().copy()
 	possibles.update(locals())
