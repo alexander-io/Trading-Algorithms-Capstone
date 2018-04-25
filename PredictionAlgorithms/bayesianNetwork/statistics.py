@@ -235,7 +235,7 @@ def testDistribution(inputVariable,distribution,trials):
 		for x in range(len(inputVariable)//2,len(inputVariable)-1):
 			testSet=inputVariable[0:x]
 			output=dist(testSet)
-			individualError+=(decimal.Decimal(inputVariable[x+1]-output)**2)/x
+			individualError+=((inputVariable[x+1]-output)**2)/x
 		totalError+=individualError
 	return totalError/trials
 
