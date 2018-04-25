@@ -16,13 +16,13 @@ def getCoins():
 	return coins
 
 def BTC_intercept():
-	return 35.36
+	return 31.92
 
 def BTC_WIKI_to_BTC_Value(pageViews):
-	return pageViews*0.0005666
+	return pageViews*0.0009831
 
 def BTC_Trade_Volume_to_BTC_Value(tradeVolume):
-	return tradeVolume*-0.00000001253
+	return tradeVolume*-0.00000002806
 
 def BTC_Market_Cap_to_BTC_Value(marketCap):
-	return marketCap*0.00000005930
+	return marketCap*0.00000005917

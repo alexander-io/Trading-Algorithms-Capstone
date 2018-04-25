@@ -211,11 +211,11 @@ def findBestMovingAverageLimit(inputVariable):
 	return bestLimit
 '''
 
-def findBestDistribution(inputVariable):
+def findBestDistribution(inputVariable,status=None):
 	errorList=[]
 	trials=numTrials(len(inputVariable))
 	for x in range(len(distributions)):
-		progress(x,len(distributions))
+		progress(x,len(distributions),status)
 		error=testDistribution(inputVariable,distributions[x],trials)
 		errorList.append((error,distributions[x]))
 		#print('\nfinished',dist,'with error',error)
