@@ -30,9 +30,10 @@ def testTimePeriods(coinSymbol,maxTimePeriod):
 		dataLength=lenData(data)
 		#print(dataLength)
 		#for x in range(dataLength//2,dataLength-1):
-		#	testSet=sliceData(data,x,0)
-		output=BN.makePrediction(data[:len(data)],coinSymbol)
-		timePeriodError+=((data[coinSymbol]['price_usd'+coinSymbol][len(data)]-output)**2)/dataLength
+		trainSet=sliceData(data,len(data)-1,0)
+
+		output=BN.makePrediction(trainSet,coinSymbol)
+		timePeriodError+=((data[coinSymbol]['price_usd'+coinSymbol][-1]-output)**2)/dataLength
 		with open('accuracyGraph.csv', 'w', newline='') as csvfile:
 			csvWriter = csv.writer(csvfile)
 			csvWriter.writerow((timePeriodError,timePeriod))
