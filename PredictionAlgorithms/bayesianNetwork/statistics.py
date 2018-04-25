@@ -211,11 +211,11 @@ def findBestMovingAverageLimit(inputVariable):
 	return bestLimit
 '''
 
-def findBestDistribution(inputVariable,status=None):
+def findBestDistribution(inputVariable,status=None,verbose=False):
 	errorList=[]
 	trials=numTrials(len(inputVariable))
 	for x in range(len(distributions)):
-		progress(x,len(distributions),status)
+		if verbose: progress(x,len(distributions),status)
 		error=testDistribution(inputVariable,distributions[x],trials)
 		errorList.append((error,distributions[x]))
 		#print('\nfinished',dist,'with error',error)
@@ -271,7 +271,8 @@ def progress(count, total, status=''):
     percents = round(100.0 * count / float(total), 1)
     bar = '#' * filled_len + '*' * (bar_len - filled_len)
 
-    sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', status))
+    sys.stdout.write('')
+    sys.stdout.write('[%s] %s%s : %s\r' % (bar, percents, '%', status))
     sys.stdout.flush()
 
 

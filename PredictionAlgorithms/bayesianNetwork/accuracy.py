@@ -33,7 +33,7 @@ def testTimePeriods(coinSymbol,maxTimePeriod):
 			#for x in range(dataLength//2,dataLength-1):
 			trainSet=sliceData(data,len(data)-1,0)
 
-			output=BN.makePrediction(trainSet,coinSymbol,'testing timePeriod '+str(timePeriod)+'/'+str(maxTimePeriod))
+			output=BN.makePrediction(dataSet=trainSet,coinSymbol=coinSymbol,verbose=True,status='testing timePeriod '+str(timePeriod)+'/'+str(maxTimePeriod))
 			timePeriodError+=((data[coinSymbol]['price_usd'+coinSymbol][-1]-output)**2)/dataLength
 			csvWriter.writerow((timePeriodError,timePeriod))
 		csvfile.close()
@@ -51,26 +51,6 @@ def main():
 	testTimePeriods('BTC',24*7)
 
 
-
-#########################################
-#										#
-#				Progress Bar 			#
-#										#
-#########################################
-'''
-progress bar for longer calls
-from vladignatyev on github
-'''
-import sys
-def progress(count, total, status=''):
-    bar_len = 100
-    filled_len = int(round(bar_len * count / float(total)))
-
-    percents = round(100.0 * count / float(total), 1)
-    bar = '#' * filled_len + '*' * (bar_len - filled_len)
-
-    sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', status))
-    sys.stdout.flush()
 
 
 

@@ -122,7 +122,7 @@ def getDataLength(data):
 	return length
 
 
-def makePrediction(dataSet,coinSymbol,status=None):
+def makePrediction(dataSet,coinSymbol,status=None,verbose=False):
 	coinFunctions=GLM.getCoins()[coinSymbol]
 	usableFunctions=[]
 	for symbol in dataSet:
@@ -134,7 +134,7 @@ def makePrediction(dataSet,coinSymbol,status=None):
 				continue
 	prediction=getattr(GLM, coinSymbol+'_intercept')()
 	for function,data in usableFunctions:
-		distribution=STAT.findBestDistribution(data,status)
+		distribution=STAT.findBestDistribution(data,status,verbose)
 		output=getattr(STAT, distribution)(data)
 		prediction+=getattr(GLM, function)(output)
 		#print('\nadded factor')
