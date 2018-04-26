@@ -27,16 +27,17 @@ def testTimePeriods(coinSymbol,maxTimePeriod):
 		csvWriter = csv.writer(csvfile)
 		for timePeriod in range(1,maxTimePeriod):
 			data=BN.getData(timePeriod*60)
-			timePeriodError=0
 			dataLength=lenData(data)
 			#print(dataLength)
 			#for x in range(dataLength//2,dataLength-1):
 			trainSet=sliceData(data,len(data)-1,0)
 
 			output=BN.makePrediction(dataSet=trainSet,coinSymbol=coinSymbol,verbose=True,status='testing timePeriod '+str(timePeriod)+'/'+str(maxTimePeriod))
-			timePeriodError+=((data[coinSymbol]['price_usd'+coinSymbol][-1]-output)**2)/dataLength
-			csvWriter.writerow((timePeriodError,timePeriod))
-		csvfile.close()
+			actualPrice=data[coinSymbol]['price_usd'+coinSymbol][-1]
+			timePeriodError=((actualPrice-output)**2)/dataLength
+			percentError=abs((actualPrice-output)/actualPrice)
+			csvWriter.writerow((timePeriodError,timePeriod,percentError))
+	csvfile.close()
 
 
 def lenData(data):
